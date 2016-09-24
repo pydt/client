@@ -50,6 +50,7 @@ function createWindow() {
   appIcon.setToolTip('Giant Multiplayer Ripoff')
   appIcon.setContextMenu(contextMenu)
 
+  // Comment this line out to get the default menu for debugging...
   win.setMenu(null);
 }
 

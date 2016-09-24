@@ -38,5 +38,18 @@ module.exports = {
   plugins: [
     new CommonsChunkPlugin({ name: 'common',   filename: 'common.js' })
   ],
-  target:'node-webkit'
+  target:'node-webkit',
+  externals: [
+    (function () {
+      var IGNORES = [
+        'electron'
+      ];
+      return function (context, request, callback) {
+        if (IGNORES.indexOf(request) >= 0) {
+          return callback(null, "require('" + request + "')");
+        }
+        return callback();
+      };
+    })()
+  ]
 };
