@@ -1,12 +1,18 @@
 const electron = require('electron');
+const path = require('path');
+
 // Module to control application life.
 const {app} = electron;
 // Module to create native browser window.
 const {BrowserWindow} = electron;
 
+const Menu = electron.Menu;
+const Tray = electron.Tray;
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win;
+let appIcon;
 
 function createWindow() {
   // Create the browser window.
@@ -23,6 +29,28 @@ function createWindow() {
     // when you should delete the corresponding element.
     win = null;
   });
+
+  win.on('minimize', () => {
+    win.hide();
+  });
+
+  const iconPath = path.join(__dirname, 'dumpsterfire.png')
+  appIcon = new Tray(iconPath)
+  const contextMenu = Menu.buildFromTemplate([{
+    label: 'Show Client',
+    click: function () {
+      win.show();
+    }
+  }, {
+    label: 'Exit',
+    click: function () {
+      app.quit();
+    }
+  }])
+  appIcon.setToolTip('Giant Multiplayer Ripoff')
+  appIcon.setContextMenu(contextMenu)
+
+  win.setMenu(null);
 }
 
 // This method will be called when Electron has finished
@@ -37,6 +65,8 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
+
+  appIcon.destroy();
 });
 
 app.on('activate', () => {
