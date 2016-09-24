@@ -2,7 +2,7 @@ import { NgModule, ApplicationRef } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpModule } from '@angular/http';
 
-import { AppComponent, ByteFormatPipe } from './app';
+import { AppComponent } from './app.component';
 
 @NgModule({
   imports: [
@@ -10,8 +10,7 @@ import { AppComponent, ByteFormatPipe } from './app';
     HttpModule
   ],
   declarations: [
-    AppComponent,
-    ByteFormatPipe
+    AppComponent
   ],
   providers: [],
   bootstrap: [AppComponent]

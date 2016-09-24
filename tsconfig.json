@@ -9,5 +9,7 @@
   },
   "filesGlob": [
     "app/ui/**"
-  ]
+  ],
+  "compileOnSave": false,
+  "buildOnSave": false
 }
