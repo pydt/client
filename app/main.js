@@ -13,7 +13,7 @@ function createWindow() {
   win = new BrowserWindow({width: 1200, height: 900});
 
   // and load the index.html of the app.
-  win.loadURL(`file://${__dirname}/index.html`);
+  win.loadURL(`file://${__dirname}/ui/index.html`);
 
 
   // Emitted when the window is closed.

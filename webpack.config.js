@@ -12,7 +12,7 @@ module.exports = {
       'reflect-metadata',
       '@angular/core'
     ],
-    'app': './app/app'
+    'app': './app/ui/main'
   },
 
   output: {

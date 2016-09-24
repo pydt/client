@@ -1,9 +1,8 @@
-import {bootstrap} from '@angular/platform-browser-dynamic';
 import {Component, Pipe, PipeTransform} from '@angular/core';
 import {NgFor} from '@angular/common';
 
 @Pipe({ name: 'byteFormat'})
-class ByteFormatPipe implements PipeTransform {
+export class ByteFormatPipe implements PipeTransform {
   // Credit: http://stackoverflow.com/a/18650828
   transform(bytes, args) {
     if(bytes == 0) return '0 Bytes';
@@ -16,7 +15,6 @@ class ByteFormatPipe implements PipeTransform {
 
 @Component({
   selector: 'app',
-  pipes: [ByteFormatPipe],
   template: `
 
     <h1>Total Images: {{ imageStats().count }}</h1>
@@ -32,7 +30,7 @@ class ByteFormatPipe implements PipeTransform {
       </p>
     </div>
 
-    <div class="media" *ngFor="#image of images">
+    <div class="media" *ngFor="let image of images">
       <div class="media-left">
         <a href="#">
           <img class="media-object" src="{{image.path}}" style="max-width:200px">
@@ -46,7 +44,7 @@ class ByteFormatPipe implements PipeTransform {
   `
 })
 
-export class App {
+export class AppComponent {
 
   images:Array<Object> = [];
 
@@ -87,5 +85,3 @@ export class App {
   }
 
 }
-
-bootstrap(App);
