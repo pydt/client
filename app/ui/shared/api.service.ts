@@ -29,6 +29,24 @@ export class ApiService {
     });
   }
 
+  getUserGames() {
+    return this.getAuthHeaders().then(headers => {
+      return this.http.get(this.baseUrl + '/user/games', headers)
+        .map(res => {
+          return res.json();
+        }).toPromise();
+    });
+  }
+
+  getTurnUrl(gameId) {
+    return this.getAuthHeaders().then(headers => {
+      return this.http.get(this.baseUrl + '/game/' + gameId + '/turn', headers)
+        .map(res => {
+          return res.json().downloadUrl;
+        }).toPromise();
+    });
+  }
+
   getAuthHeaders() : Promise<Headers> {
     return this.configService.getConfig().then(config => {
       let headers = new Headers();

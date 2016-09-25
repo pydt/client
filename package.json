@@ -9,6 +9,7 @@
     "electron": "electron app"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.36",
     "bootstrap-loader": "^2.0.0-beta.11",
     "bootstrap-sass": "^3.3.7",
     "css-loader": "^0.25.0",
@@ -37,6 +38,7 @@
     "@angular/router": "3.0.0",
     "electron-json-storage": "^2.0.0",
     "es6-shim": "^0.35.0",
+    "lodash": "^4.16.1",
     "reflect-metadata": "0.1.3",
     "rxjs": "5.0.0-beta.12",
     "systemjs": "0.19.26",

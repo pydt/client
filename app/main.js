@@ -1,5 +1,6 @@
 const electron = require('electron');
 const path = require('path');
+const storage = require('electron-json-storage');
 
 // Module to control application life.
 const {app} = electron;
@@ -50,8 +51,26 @@ function createWindow() {
   appIcon.setToolTip('Giant Multiplayer Ripoff')
   appIcon.setContextMenu(contextMenu)
 
-  // Comment this line out to get the default menu for debugging...
-  win.setMenu(null);
+  const debugMenu = Menu.buildFromTemplate([{
+      label: 'Debug',
+      submenu: [
+        {
+          label: 'Toggle Developer Tools',
+          accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
+          click: (item, focusedWindow) => {
+            if (focusedWindow) focusedWindow.webContents.toggleDevTools();
+          }
+        }, {
+          label: 'Clear Storage',
+          click: () => {
+            storage.clear(() => {
+              win.reload();
+            });
+          }
+        }
+      ]
+  }]);
+  win.setMenu(debugMenu);
 }
 
 // This method will be called when Electron has finished

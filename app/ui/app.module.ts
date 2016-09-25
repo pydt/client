@@ -5,11 +5,13 @@ import { FormsModule }   from '@angular/forms';
 import { routing } from './app.routing';
 
 import { AppComponent } from './app.component';
-import { HomeComponent } from './home/home.component';
 import { AuthComponent } from './auth/auth.component'
+import { HomeComponent } from './home/home.component';
+import { PlayTurnComponent } from './playTurn/playTurn.component';
 
 import { ApiService } from './shared/api.service.ts';
 import { ConfigService } from './shared/config.service.ts';
+import { ProfileCacheService } from './shared/profileCache.service';
 
 @NgModule({
   imports: [
@@ -20,12 +22,14 @@ import { ConfigService } from './shared/config.service.ts';
   ],
   declarations: [
     AppComponent,
+    AuthComponent,
     HomeComponent,
-    AuthComponent
+    PlayTurnComponent
   ],
   providers: [
     ApiService,
-    ConfigService
+    ConfigService,
+    ProfileCacheService
   ],
   bootstrap: [AppComponent]
 })
