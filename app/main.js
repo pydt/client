@@ -71,6 +71,10 @@ function createWindow() {
       ]
   }]);
   win.setMenu(debugMenu);
+
+  electron.ipcMain.on('focus-window', (event, arg) => {
+    win.focus();
+  });
 }
 
 // This method will be called when Electron has finished

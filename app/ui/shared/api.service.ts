@@ -47,6 +47,24 @@ export class ApiService {
     });
   }
 
+  startTurnSubmit(gameId) {
+    return this.getAuthHeaders().then(headers => {
+      return this.http.post(this.baseUrl + '/game/' + gameId + '/turn/startSubmit', {}, headers)
+        .map(res => {
+          return res.json();
+        }).toPromise();
+      });
+  }
+
+  finishTurnSubmit(gameId) {
+    return this.getAuthHeaders().then(headers => {
+      return this.http.post(this.baseUrl + '/game/' + gameId + '/turn/finishSubmit', {}, headers)
+        .map(res => {
+          return res.json();
+        }).toPromise();
+      });
+  }
+
   getAuthHeaders() : Promise<Headers> {
     return this.configService.getConfig().then(config => {
       let headers = new Headers();

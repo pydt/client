@@ -9,6 +9,7 @@
     "electron": "electron app"
   },
   "devDependencies": {
+    "@types/chokidar": "^1.4.29",
     "@types/lodash": "^4.14.36",
     "bootstrap-loader": "^2.0.0-beta.11",
     "bootstrap-sass": "^3.3.7",
@@ -16,6 +17,7 @@
     "electron-prebuilt": "^1.2.0",
     "es6-shim": "^0.34.0",
     "file-loader": "^0.9.0",
+    "json-loader": "^0.5.4",
     "node-sass": "^3.10.0",
     "resolve-url-loader": "^1.6.0",
     "sass-loader": "^4.0.2",
@@ -36,6 +38,7 @@
     "@angular/platform-browser": "2.0.0",
     "@angular/platform-browser-dynamic": "2.0.0",
     "@angular/router": "3.0.0",
+    "chokidar": "^1.6.0",
     "electron-json-storage": "^2.0.0",
     "es6-shim": "^0.35.0",
     "lodash": "^4.16.1",
