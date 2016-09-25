@@ -1,6 +1,19 @@
 var path = require('path');
+var fs = require('fs');
 var webpack = require('webpack');
 var CommonsChunkPlugin = webpack.optimize.CommonsChunkPlugin;
+
+var apiUrl = "https://whateverthisisinproduction.com.org";
+
+if (process.env.NODE_ENV !== 'production') {
+  apiUrl = fs.readFileSync('../api-url.txt', 'utf-8');
+
+  if (apiUrl) {
+    console.log('Using ' + apiUrl + ' for API URL!');
+  } else {
+    console.log('There wasn\'t anything in ../api-url.txt, have you deployed the serverless api?');
+  }
+}
 
 module.exports = {
   devtool: 'source-map',
@@ -8,7 +21,8 @@ module.exports = {
 
   entry: {
     'vendor': [
-      'reflect-metadata'
+      'reflect-metadata',
+      'bootstrap-loader'
     ],
     'app': './app/ui/bootstrap.ts'
   },
@@ -31,12 +45,20 @@ module.exports = {
         test: /\.ts$/,
         loader: 'ts',
         exclude: [ /node_modules/ ]
-      }
+      },
+      { test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "url-loader?limit=10000&mimetype=application/font-woff" },
+           { test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "file-loader" }
     ]
   },
 
   plugins: [
-    new CommonsChunkPlugin({ name: 'common',   filename: 'common.js' })
+    new CommonsChunkPlugin({ name: 'common',   filename: 'common.js' }),
+    new webpack.DefinePlugin({
+      // Environment helpers
+      'process.env': {
+        API_URL: JSON.stringify(apiUrl)
+      }
+    })
   ],
   target:'node-webkit',
   externals: [

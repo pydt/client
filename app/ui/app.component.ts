@@ -1,18 +1,21 @@
 import { Component, OnInit } from '@angular/core';
-import { ConfigService } from './shared/config.service.ts';
+import { Router }    from '@angular/router';
+
+import { ConfigService } from './shared/config.service';
+import { Config } from './shared/config';
 
 @Component({
   selector: 'app',
   templateUrl: './app.component.html'
 })
 export class AppComponent implements OnInit {
-  private token;
-
-  constructor(private config: ConfigService) {}
+  constructor(private configService: ConfigService, private router: Router) {}
 
   ngOnInit() {
-    this.config.getToken().then(_token => {
-      this.token = _token;
-    });
+    this.configService.getConfig().then(config => {
+      if (!config.token) {
+        this.router.navigate(['/auth']);
+      }
+    })
   }
 }

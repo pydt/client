@@ -1,39 +1,28 @@
 import { Injectable } from '@angular/core';
 import * as storage from 'electron-json-storage';
 
+import { Config } from './config';
+
 @Injectable()
 export class ConfigService {
-  private token: String;
 
   constructor() {}
 
-  getToken() {
-    return this.getConfigData().then((data: any) => {
-      return data.token;
-    });
-  }
-
-  setToken() {
-    return this.getConfigData().then(data => {
-      return
-    });
-  }
-
-  private getConfigData() {
+  getConfig(): Promise<Config> {
     return new Promise((resolve, reject) => {
-      storage.get('configData', (err, data) => {
+      storage.get('configData', (err, config) => {
         if (err) {
           reject(err);
         }
 
-        resolve(data);
+        resolve(config);
       });
     });
   }
 
-  private saveConfigData(data) {
+  saveConfig(config: Config): Promise<void> {
     return new Promise((resolve, reject) => {
-      storage.set('configData', data, err => {
+      storage.set('configData', config, err => {
         if (err) {
           reject(err);
         }

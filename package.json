@@ -1,5 +1,5 @@
 {
-  "name": "image-size-calculator",
+  "name": "giant-multiplayer-ripoff",
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
@@ -8,14 +8,21 @@
     "watch": "webpack --watch --progress --profile --colors --display-error-details --display-cached",
     "electron": "electron app"
   },
-  "author": "Auth0",
-  "license": "MIT",
   "devDependencies": {
+    "bootstrap-loader": "^2.0.0-beta.11",
+    "bootstrap-sass": "^3.3.7",
+    "css-loader": "^0.25.0",
     "electron-prebuilt": "^1.2.0",
     "es6-shim": "^0.34.0",
+    "file-loader": "^0.9.0",
+    "node-sass": "^3.10.0",
+    "resolve-url-loader": "^1.6.0",
+    "sass-loader": "^4.0.2",
+    "style-loader": "^0.13.1",
     "ts-loader": "^0.8.2",
     "typescript": "2.0.2",
     "typings": "^0.8.1",
+    "url-loader": "^0.5.7",
     "webpack": "^1.12.13",
     "webpack-dev-server": "^1.14.1"
   },
@@ -23,6 +30,7 @@
     "@angular/common": "2.0.0",
     "@angular/compiler": "2.0.0",
     "@angular/core": "2.0.0",
+    "@angular/forms": "2.0.0",
     "@angular/http": "2.0.0",
     "@angular/platform-browser": "2.0.0",
     "@angular/platform-browser-dynamic": "2.0.0",
