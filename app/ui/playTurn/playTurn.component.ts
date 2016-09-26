@@ -18,8 +18,21 @@ export class PlayTurnComponent implements OnInit {
   private saveFileToUpload: string;
 
   constructor(private route: ActivatedRoute, private apiService: ApiService, private router: Router) {
-    this.saveDir = app.remote.app.getPath('documents') + '/My Games/Sid Meier\'s Civilization 5/Saves/hotseat/';
+    let documents = app.remote.app.getPath('documents');
+    if (this.ifExists(documents + '/Aspyr')) {
+      this.saveDir = documents + '/Aspyr/Sid Meier\'s Civilization 5/Saves/hotseat/';
+    } else {
+      this.saveDir = app.remote.app.getPath('documents') + '/My Games/Sid Meier\'s Civilization 5/Saves/hotseat/';
+    } 
     this.saveFileToPlay = this.saveDir + '(Ripoff) Play This One!.Civ5Save';
+  }
+
+  ifExists(path: string): boolean {
+    try {
+      return fs.statSync(path) != null;
+    } catch (error) {
+      return false;
+    }
   }
 
   ngOnInit() {
@@ -28,6 +41,7 @@ export class PlayTurnComponent implements OnInit {
 
       this.apiService.getTurnUrl(this.gameId)
         .then(url => {
+          console.log(url);
           return this.downloadFile(url);
         })
         .then(() => {
