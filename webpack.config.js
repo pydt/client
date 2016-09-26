@@ -3,7 +3,7 @@ var fs = require('fs');
 var webpack = require('webpack');
 var CommonsChunkPlugin = webpack.optimize.CommonsChunkPlugin;
 
-var apiUrl = "https://whateverthisisinproduction.com.org";
+var apiUrl = "https://z9cjeucs49.execute-api.us-east-1.amazonaws.com/prod";
 
 if (process.env.NODE_ENV !== 'production') {
   apiUrl = fs.readFileSync('../api-url.txt', 'utf-8');
