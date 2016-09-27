@@ -1,6 +1,7 @@
 const electron = require('electron');
 const path = require('path');
 const storage = require('electron-json-storage');
+const chokidar = require('chokidar');
 
 // Module to control application life.
 const {app} = electron;
@@ -72,8 +73,13 @@ function createWindow() {
   }]);
   win.setMenu(debugMenu);
 
-  electron.ipcMain.on('focus-window', (event, arg) => {
-    win.focus();
+  electron.ipcMain.on('start-chokidar', (event, arg) => {
+    const watcher = chokidar.watch(arg, { depth: 0 });
+    watcher.on('change', path => {
+      win.focus();
+      event.sender.send('new-save-detected', path);
+      watcher.close();
+    });
   });
 }
 

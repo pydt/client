@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import * as fs from 'fs';
-import * as chokidar from 'chokidar';
 import * as app from 'electron';
 
 import { ApiService } from '../shared/api.service';
@@ -23,7 +22,7 @@ export class PlayTurnComponent implements OnInit {
       this.saveDir = documents + '/Aspyr/Sid Meier\'s Civilization 5/Saves/hotseat/';
     } else {
       this.saveDir = app.remote.app.getPath('documents') + '/My Games/Sid Meier\'s Civilization 5/Saves/hotseat/';
-    } 
+    }
     this.saveFileToPlay = this.saveDir + '(Ripoff) Play This One!.Civ5Save';
   }
 
@@ -73,19 +72,19 @@ export class PlayTurnComponent implements OnInit {
   }
 
   private watchForSave() {
+    const ptThis = this;
     return new Promise((resolve, reject) => {
-      const watcher = chokidar.watch(this.saveDir, { depth: 0 });
-      watcher.on('error', err => {
-        watcher.close();
-        reject(err);
-      });
-      watcher.on('change', path => {
-        app.ipcRenderer.send('focus-window', true);
-        this.status = "Detected new save, submit turn?";
-        this.saveFileToUpload = path;
-        watcher.close();
+      app.ipcRenderer.send('start-chokidar', this.saveDir);
+      app.ipcRenderer.on('new-save-detected', newSaveDetected);
+
+      //////
+
+      function newSaveDetected(event, arg) {
+        ptThis.status = "Detected new save, submit turn?";
+        ptThis.saveFileToUpload = arg;
+        app.ipcRenderer.removeListener('new-save-detected', newSaveDetected);
         resolve();
-      });
+      }
     });
   }
 
