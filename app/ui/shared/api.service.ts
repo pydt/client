@@ -11,61 +11,33 @@ export class ApiService {
 
   constructor (private configService: ConfigService, private http: Http) {}
 
-  getUserProfile() {
-    return this.getAuthHeaders().then(headers => {
-      return this.http.get(this.baseUrl + '/user/profile', headers)
-        .map(res => {
-          return res.json();
-        }).toPromise();
-    });
+  getSteamProfile() {
+    return this.get(this.baseUrl + '/user/steamProfile');
   }
 
   getSteamProfiles(steamIds: string[]) {
-    return this.getAuthHeaders().then(headers => {
-      return this.http.get(this.baseUrl + '/user/steamProfiles?steamIds=' + steamIds.join(), headers)
-        .map(res => {
-          return res.json();
-        }).toPromise();
-    });
+    return this.get(this.baseUrl + '/user/steamProfiles?steamIds=' + steamIds.join());
   }
 
   getUserGames() {
-    return this.getAuthHeaders().then(headers => {
-      return this.http.get(this.baseUrl + '/user/games', headers)
-        .map(res => {
-          return res.json();
-        }).toPromise();
-    });
+    return this.get(this.baseUrl + '/user/games');
   }
 
   getTurnUrl(gameId) {
-    return this.getAuthHeaders().then(headers => {
-      return this.http.get(this.baseUrl + '/game/' + gameId + '/turn', headers)
-        .map(res => {
-          return res.json().downloadUrl;
-        }).toPromise();
+    return this.get(this.baseUrl + '/game/' + gameId + '/turn').then(data => {
+      return data.downloadUrl;
     });
   }
 
   startTurnSubmit(gameId) {
-    return this.getAuthHeaders().then(headers => {
-      return this.http.post(this.baseUrl + '/game/' + gameId + '/turn/startSubmit', {}, headers)
-        .map(res => {
-          return res.json();
-        }).toPromise();
-      });
+    return this.post(this.baseUrl + '/game/' + gameId + '/turn/startSubmit', {});
   }
 
   finishTurnSubmit(gameId) {
-    return this.getAuthHeaders().then(headers => {
-      return this.http.post(this.baseUrl + '/game/' + gameId + '/turn/finishSubmit', {}, headers)
-        .map(res => {
-          return res.json();
-        }).toPromise();
-      });
+    return this.post(this.baseUrl + '/game/' + gameId + '/turn/finishSubmit', {});
   }
 
-  getAuthHeaders() : Promise<Headers> {
+  private getAuthHeaders() : Promise<Headers> {
     return this.configService.getConfig().then(config => {
       let headers = new Headers();
 
@@ -77,5 +49,23 @@ export class ApiService {
 
       return { headers: headers };
     });
+  }
+
+  private get(url) {
+    return this.getAuthHeaders().then(headers => {
+      return this.http.get(url, headers)
+        .map(res => {
+          return res.json();
+        }).toPromise();
+    });
+  }
+
+  private post(url, data) {
+    return this.getAuthHeaders().then(headers => {
+      return this.http.post(url, data, headers)
+        .map(res => {
+          return res.json();
+        }).toPromise();
+      });
   }
 }

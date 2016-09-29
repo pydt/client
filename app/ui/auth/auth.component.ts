@@ -28,7 +28,7 @@ export class AuthComponent implements OnInit {
       return this.configService.saveConfig(config);
     })
     .then(() => {
-      return this.apiService.getUserProfile();
+      return this.apiService.getSteamProfile();
     })
     .then(profile => {
       config.profile = profile;
