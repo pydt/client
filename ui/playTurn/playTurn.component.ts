@@ -19,11 +19,11 @@ export class PlayTurnComponent implements OnInit {
   constructor(private route: ActivatedRoute, private apiService: ApiService, private router: Router) {
     let documents = app.remote.app.getPath('documents');
     if (this.ifExists(documents + '/Aspyr')) {
-      this.saveDir = documents + '/Aspyr/Sid Meier\'s Civilization 5/Saves/hotseat/';
+      this.saveDir = documents + '/Aspyr/Sid Meier\'s Civilization VI/Saves/Hotseat/';
     } else {
-      this.saveDir = app.remote.app.getPath('documents') + '/My Games/Sid Meier\'s Civilization 5/Saves/hotseat/';
+      this.saveDir = app.remote.app.getPath('documents') + '/My Games/Sid Meier\'s Civilization VI/Saves/Hotseat/';
     }
-    this.saveFileToPlay = this.saveDir + '(Ripoff) Play This One!.Civ5Save';
+    this.saveFileToPlay = this.saveDir + '(Ripoff) Play This One!.Civ6Save';
   }
 
   ifExists(path: string): boolean {
