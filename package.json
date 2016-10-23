@@ -3,7 +3,7 @@
   "scripts": {
     "clean": "rm -rf dist app/ui_compiled",
     "build": "webpack --progress --profile --colors --display-error-details --display-cached",
-    "build-prod": "webpack --colors",
+    "build-prod": "bash -c \"npm run clean; webpack --colors\"",
     "watch": "webpack --watch --progress --profile --colors --display-error-details --display-cached",
     "electron": "electron app",
     "pack": "bash -c \"npm run build-prod; build --dir\"",

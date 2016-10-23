@@ -8,7 +8,10 @@
 
 If you have an api-url.txt in the parent directory (created when deploying the API), it will use that, otherwise it will use the "production" URL.
 
-## TODO: Prod Packaging / Deployment
+## Prod Packaging / Deployment
+
+* `npm run dist`
+
 
 # License
 
