@@ -3,9 +3,11 @@ var fs = require('fs');
 var webpack = require('webpack');
 var CommonsChunkPlugin = webpack.optimize.CommonsChunkPlugin;
 
+var ENV = process.env.npm_lifecycle_event;
+var isProd = ENV === 'build-prod';
 var apiUrl = "https://z9cjeucs49.execute-api.us-east-1.amazonaws.com/prod";
 
-if (process.env.NODE_ENV !== 'production') {
+if (!isProd) {
   try {
     apiUrl = fs.readFileSync('../api-dev-url.txt', 'utf-8');
     console.log('Using ' + apiUrl + ' for API URL!');
@@ -19,6 +21,7 @@ module.exports = {
   debug: true,
 
   entry: {
+    'zone': 'zone.js',
     'vendor': [
       'reflect-metadata',
       'bootstrap-loader'
@@ -40,7 +43,7 @@ module.exports = {
 
   module: {
     loaders: [
-      { test: /\.ts$/, loaders: ['ts', 'angular2-template-loader'], exclude: [ /node_modules/ ] },
+      { test: /\.ts$/, loaders: ['ts', 'angular2-template-loader'], exclude: [ /node_modules/, /app\/node_modules/ ] },
       { test: /\.(html|css)$/, loader: 'raw-loader' },
       // Hack for chokidar, doesn't work without this?
       { test: /binary-extensions/, loader: 'json-loader' },

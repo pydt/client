@@ -3,16 +3,17 @@
   "scripts": {
     "clean": "rm -rf dist app/ui_compiled",
     "build": "webpack --progress --profile --colors --display-error-details --display-cached",
+    "build-prod": "webpack --colors",
     "watch": "webpack --watch --progress --profile --colors --display-error-details --display-cached",
     "electron": "electron app",
-    "pack": "build --dir",
-    "dist": "build",
+    "pack": "bash -c \"npm run build-prod; build --dir\"",
+    "dist": "bash -c \"npm run build-prod; build\"",
     "postinstall": "install-app-deps"
   },
   "build": {
     "appId": "giant.multiplayer.ripoff.client",
     "win": {
-      "iconUrl": "https://s3.amazonaws.com/giant-multiplayer-ripoff/dumpsterfire.png"
+      "iconUrl": "https://s3.amazonaws.com/giant-multiplayer-ripoff/icon.ico"
     }
   },
   "devDependencies": {
