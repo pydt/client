@@ -6,6 +6,7 @@
   "main": "main.js",
   "dependencies": {
     "chokidar": "^1.6.1",
-    "electron-json-storage": "^2.0.1"
+    "electron-json-storage": "^2.0.1",
+    "electron-squirrel-startup": "^1.0.0"
   }
 }

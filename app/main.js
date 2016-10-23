@@ -1,3 +1,5 @@
+if (require('electron-squirrel-startup')) return;
+
 const electron = require('electron');
 const path = require('path');
 const storage = require('electron-json-storage');
