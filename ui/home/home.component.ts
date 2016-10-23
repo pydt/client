@@ -10,7 +10,7 @@ import * as _ from 'lodash';
 
 @Component({
   selector: 'home',
-  templateUrl: './home/home.component.html'
+  templateUrl: './home.component.html'
 })
 export class HomeComponent implements OnInit, OnDestroy {
   private games: any;

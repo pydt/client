@@ -7,7 +7,7 @@ import { ApiService } from '../shared/api.service';
 
 @Component({
   selector: 'home',
-  templateUrl: './playTurn/playTurn.component.html'
+  templateUrl: './playTurn.component.html'
 })
 export class PlayTurnComponent implements OnInit {
   private status = "Downloading Save File...";

@@ -1,5 +1,11 @@
 {
   "name": "giant-multiplayer-ripoff",
   "version": "0.0.1",
-  "main": "main.js"
+  "description": "Desktop Client to assist with playing Ripoff turns.",
+  "author": "Mike Rosack",
+  "main": "main.js",
+  "dependencies": {
+    "chokidar": "^1.6.1",
+    "electron-json-storage": "^2.0.1"
+  }
 }

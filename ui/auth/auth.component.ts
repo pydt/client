@@ -7,7 +7,7 @@ import { Config } from '../shared/config';
 
 @Component({
   selector: 'auth',
-  templateUrl: './auth/auth.component.html'
+  templateUrl: './auth.component.html'
 })
 export class AuthComponent implements OnInit {
   private model = new Config("", null);

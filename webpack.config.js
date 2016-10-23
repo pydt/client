@@ -23,12 +23,12 @@ module.exports = {
       'reflect-metadata',
       'bootstrap-loader'
     ],
-    'app': './app/ui/bootstrap.ts'
+    'app': './ui/bootstrap.ts'
   },
 
   output: {
-    path: __dirname + '/build/',
-    publicPath: 'build/',
+    path: __dirname + '/app/ui_compiled/',
+    publicPath: 'ui_compiled/',
     filename: '[name].js',
     sourceMapFilename: '[name].js.map',
     chunkFilename: '[id].chunk.js'
@@ -40,7 +40,8 @@ module.exports = {
 
   module: {
     loaders: [
-      { test: /\.ts$/, loader: 'ts', exclude: [ /node_modules/ ] },
+      { test: /\.ts$/, loaders: ['ts', 'angular2-template-loader'], exclude: [ /node_modules/ ] },
+      { test: /\.(html|css)$/, loader: 'raw-loader' },
       // Hack for chokidar, doesn't work without this?
       { test: /binary-extensions/, loader: 'json-loader' },
       // Hacks for bootstrap fonts

@@ -8,7 +8,7 @@
     "sourceMap": true
   },
   "filesGlob": [
-    "app/ui/**"
+    "ui/**"
   ],
   "compileOnSave": false,
   "buildOnSave": false
