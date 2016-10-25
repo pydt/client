@@ -1,0 +1,13 @@
+image: electronuserland/electron-builder:wine
+
+deploy:
+  environment: production
+  script:
+    - npm install --silent && npm prune && npm run dist
+    - mv dist/win/giant-multiplayer-ripoff*.exe ./giant-multiplayer-ripoff-setup.exe
+    - apt-get update
+    - apt-get install -y python-pip
+    - pip install awscli
+    - aws s3 sync ./giant-multiplayer-ripoff-setup.exe s3://giant-multiplayer-ripoff
+  only:
+    - master
