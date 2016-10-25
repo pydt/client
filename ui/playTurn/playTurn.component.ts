@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import * as fs from 'fs';
+import * as mkdirp from 'mkdirp';
 import * as app from 'electron';
 
 import { ApiService } from '../shared/api.service';
@@ -58,6 +59,7 @@ export class PlayTurnComponent implements OnInit {
       xhr.open('GET', url, true);
       xhr.responseType = 'arraybuffer';
       xhr.onload = e => {
+        mkdirp.sync(this.saveDir);
         fs.writeFile(this.saveFileToPlay, new Buffer(new Uint8Array(xhr.response)), (err) => {
           if (err) {
             reject(err);
