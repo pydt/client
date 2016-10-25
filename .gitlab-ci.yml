@@ -3,7 +3,7 @@ image: electronuserland/electron-builder:wine
 deploy:
   environment: production
   script:
-    - npm install --silent && npm prune && npm run dist
+    - npm install --silent && npm prune && npm run dist-win
     - mv dist/win/giant-multiplayer-ripoff*.exe ./giant-multiplayer-ripoff-setup.exe
     - apt-get update
     - apt-get install -y python-pip

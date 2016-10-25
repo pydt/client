@@ -7,7 +7,7 @@
     "watch": "webpack --watch --progress --profile --colors --display-error-details --display-cached",
     "electron": "electron app",
     "pack": "bash -c \"npm run build-prod; build --dir\"",
-    "dist": "bash -c \"npm run build-prod; build\"",
+    "dist-win": "bash -c \"npm run build-prod; node_modules/.bin/build --win\"",
     "postinstall": "install-app-deps"
   },
   "build": {
