@@ -86,10 +86,7 @@ function createWindow() {
   });
 
   electron.ipcMain.on('show-toast', (event, arg) => {
-    notifier.notify({
-      title: 'IT\'S YOUR DAMN TURN!',
-      message: arg
-    });
+    notifier.notify(arg);
   });
 }
 

@@ -9,6 +9,9 @@ import { Observable, Subscription } from 'rxjs';
 import * as _ from 'lodash';
 import * as app from 'electron';
 
+const POLL_INTERVAL: number = 60 * 1000;
+const TOAST_INTERVAL: number = 14.5 * 60 * 1000;
+
 @Component({
   selector: 'home',
   templateUrl: './home.component.html'
@@ -27,7 +30,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.config = config;
     });
 
-    const timer = Observable.timer(10, 60000);
+    const timer = Observable.timer(10, POLL_INTERVAL);
     this.timerSub = timer.subscribe(() => {
       this.apiService.getUserGames().then(games => {
         this.games = games;
@@ -42,8 +45,12 @@ export class HomeComponent implements OnInit, OnDestroy {
           })
           .value();
 
-        if (yourTurns.length && (!this.lastNotification || new Date().getTime() - this.lastNotification.getTime() > 900000)) {
-          app.ipcRenderer.send('show-toast', yourTurns.join(', '));
+        if (yourTurns.length && (!this.lastNotification || new Date().getTime() - this.lastNotification.getTime() > TOAST_INTERVAL)) {
+          app.ipcRenderer.send('show-toast', {
+            title: 'PLAY YOUR DAMN TURN',
+            message: yourTurns.join(', ')
+          });
+          this.lastNotification = new Date();
         }
 
         let steamIds = _.uniq(_.flatMap(this.games, (game) => {
@@ -58,6 +65,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.lastNotification = null;
     this.timerSub.unsubscribe();
   }
 
