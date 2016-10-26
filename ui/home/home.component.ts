@@ -7,6 +7,7 @@ import { ConfigService } from '../shared/config.service';
 import { ProfileCacheService } from '../shared/profileCache.service';
 import { Observable, Subscription } from 'rxjs';
 import * as _ from 'lodash';
+import * as app from 'electron';
 
 @Component({
   selector: 'home',
@@ -17,6 +18,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private gamePlayerProfiles: any = {};
   private config: Config;
   private timerSub: Subscription;
+  private lastNotification: Date;
 
   constructor(private apiService: ApiService, private configService: ConfigService, private profileCache: ProfileCacheService, private router: Router) {}
 
@@ -29,6 +31,20 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.timerSub = timer.subscribe(() => {
       this.apiService.getUserGames().then(games => {
         this.games = games;
+        const steamid = this.config.profile.steamid;
+
+        const yourTurns = _.chain(games)
+          .filter((game: any) => {
+            return game.currentPlayerSteamId == steamid;
+          })
+          .map((game: any) => {
+            return game.displayName
+          })
+          .value();
+
+        if (yourTurns.length && (!this.lastNotification || new Date().getTime() - this.lastNotification.getTime() > 900000)) {
+          app.ipcRenderer.send('show-toast', yourTurns.join(', '));
+        }
 
         let steamIds = _.uniq(_.flatMap(this.games, (game) => {
           return _.map(game.players, 'steamId');

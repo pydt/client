@@ -4,6 +4,7 @@ const electron = require('electron');
 const path = require('path');
 const storage = require('electron-json-storage');
 const chokidar = require('chokidar');
+const notifier = require('node-notifier');
 
 // Module to control application life.
 const {app} = electron;
@@ -81,6 +82,13 @@ function createWindow() {
       win.focus();
       event.sender.send('new-save-detected', path);
       watcher.close();
+    });
+  });
+
+  electron.ipcMain.on('show-toast', (event, arg) => {
+    notifier.notify({
+      title: 'IT\'S YOUR DAMN TURN!',
+      message: arg
     });
   });
 }
