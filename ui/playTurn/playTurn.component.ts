@@ -17,13 +17,15 @@ export class PlayTurnComponent implements OnInit {
   private saveFileToPlay: string;
   private saveFileToUpload: string;
 
-  constructor(private route: ActivatedRoute, private apiService: ApiService, private router: Router) {    
-    let appSupport = app.remote.app.getPath('appData');
-    if (this.ifExists(appSupport)) {
-      this.saveDir = appSupport + '/Sid Meier\'s Civilization VI/Saves/Hotseat/';
+  constructor(private route: ActivatedRoute, private apiService: ApiService, private router: Router) {
+    const SUFFIX = '/Sid Meier\'s Civilization VI/Saves/Hotseat/';
+
+    if (process.platform === 'darwin') {
+      this.saveDir = app.remote.app.getPath('appData') + SUFFIX;
     } else {
-      this.saveDir = app.remote.app.getPath('documents') + '/My Games/Sid Meier\'s Civilization VI/Saves/Hotseat/';
+      this.saveDir = app.remote.app.getPath('documents') + '/My Games' + SUFFIX;
     }
+
     this.saveFileToPlay = this.saveDir + '(Ripoff) Play This One!.Civ6Save';
   }
 
