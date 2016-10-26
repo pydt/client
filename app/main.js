@@ -38,7 +38,7 @@ function createWindow() {
     win.hide();
   });
 
-  const iconPath = path.join(__dirname, 'dumpsterfire.png')
+  const iconPath = path.join(__dirname, 'icon.png')
   appIcon = new Tray(iconPath)
   const contextMenu = Menu.buildFromTemplate([{
     label: 'Show Client',

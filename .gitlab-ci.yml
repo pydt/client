@@ -1,7 +1,6 @@
-image: electronuserland/electron-builder:wine
-
-deploy:
-  environment: production
+deploy-win:
+  image: electronuserland/electron-builder:wine
+  environment: production-win
   script:
     - npm install --silent && npm prune && npm run dist-win
     - mv dist/win/giant-multiplayer-ripoff*.exe ./giant-multiplayer-ripoff-setup.exe
@@ -11,3 +10,16 @@ deploy:
     - aws s3 cp giant-multiplayer-ripoff-setup.exe s3://giant-multiplayer-ripoff/giant-multiplayer-ripoff-setup.exe
   only:
     - master
+  tags:
+    - docker
+
+deploy-mac:
+  environment: production-mac
+  script:
+    - npm install --silent && npm prune && npm run dist-mac
+    - mv dist/mac/giant-multiplayer-ripoff*.dmg ./giant-multiplayer-ripoff.dmg
+    - aws s3 cp giant-multiplayer-ripoff.dmg s3://giant-multiplayer-ripoff/giant-multiplayer-ripoff.dmg
+  only:
+    - master
+  tags:
+    - mac
