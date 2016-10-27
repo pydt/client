@@ -77,12 +77,16 @@ function createWindow() {
   win.setMenu(debugMenu);
 
   electron.ipcMain.on('start-chokidar', (event, arg) => {
-    const watcher = chokidar.watch(arg, { depth: 0 });
-    watcher.on('change', path => {
+    const watcher = chokidar.watch(arg, { depth: 0, ignoreInitial: true });
+
+    const changeDetected = (path) => {
       win.focus();
       event.sender.send('new-save-detected', path);
       watcher.close();
-    });
+    };
+
+    watcher.on('add', changeDetected);
+    watcher.on('change', changeDetected);
   });
 
   electron.ipcMain.on('show-toast', (event, arg) => {

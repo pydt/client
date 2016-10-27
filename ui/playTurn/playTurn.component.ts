@@ -97,7 +97,7 @@ export class PlayTurnComponent implements OnInit {
     const fileData = fs.readFileSync(this.saveFileToUpload);
     this.saveFileToUpload = null;
 
-    this.apiService.startTurnSubmit(this.gameId).then(response => {
+    this.apiService.startTurnSubmit(this.gameId).then((response: any) => {
       return new Promise((resolve, reject) => {
         let xhr = new XMLHttpRequest();
         xhr.open('PUT', response.putUrl, true);
