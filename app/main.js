@@ -92,6 +92,14 @@ function createWindow() {
   electron.ipcMain.on('show-toast', (event, arg) => {
     notifier.notify(arg);
   });
+
+  electron.ipcMain.on('init-rollbar', (event, arg) => {
+    const rollbar = require('rollbar');
+
+    rollbar.handleUncaughtExceptionsAndRejections("67488d20e1444df7ab91d279659d519a", {
+      environment: "prod"
+    });
+  });
 }
 
 // This method will be called when Electron has finished

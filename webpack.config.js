@@ -21,6 +21,7 @@ module.exports = {
   debug: true,
 
   entry: {
+    'rollbar': './ui/rollbar.js',
     'zone': 'zone.js',
     'vendor': [
       'reflect-metadata',
@@ -58,6 +59,7 @@ module.exports = {
     new webpack.DefinePlugin({
       // Environment helpers
       'process.env': {
+        PROD: JSON.stringify(isProd),
         API_URL: JSON.stringify(apiUrl)
       }
     })

@@ -8,6 +8,7 @@
     "chokidar": "^1.6.1",
     "electron-json-storage": "^2.0.1",
     "electron-squirrel-startup": "^1.0.0",
-    "node-notifier": "^4.6.1"
+    "node-notifier": "^4.6.1",
+    "rollbar": "^0.6.2"
   }
 }
