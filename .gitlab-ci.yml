@@ -5,9 +5,8 @@ deploy-win:
     - npm install --silent && npm prune && npm run dist-win
     - mv dist/win/giant-multiplayer-ripoff*.exe ./giant-multiplayer-ripoff-setup.exe
     - apt-get update
-    - apt-get install -y python-pip
-    - pip install awscli
-    - aws s3 cp giant-multiplayer-ripoff-setup.exe s3://giant-multiplayer-ripoff/giant-multiplayer-ripoff-setup.exe
+    - apt-get install -y lftp
+    - lftp -u $AZURE_DEPLOYMENT_USER,$AZURE_DEPLOYMENT_PASSWORD -e 'cd /site/wwwroot; put giant-multiplayer-ripoff-setup.exe; quit' ftps://waws-prod-ch1-013.ftp.azurewebsites.windows.net
   only:
     - master
   tags:
@@ -18,7 +17,7 @@ deploy-mac:
   script:
     - npm install --silent && npm prune && npm run dist-mac
     - mv dist/mac/giant-multiplayer-ripoff*.dmg ./giant-multiplayer-ripoff.dmg
-    - aws s3 cp giant-multiplayer-ripoff.dmg s3://giant-multiplayer-ripoff/giant-multiplayer-ripoff.dmg
+    - lftp -u $AZURE_DEPLOYMENT_USER,$AZURE_DEPLOYMENT_PASSWORD -e 'cd /site/wwwroot; put giant-multiplayer-ripoff.dmg; quit' ftps://waws-prod-ch1-013.ftp.azurewebsites.windows.net
   only:
     - master
   tags:
