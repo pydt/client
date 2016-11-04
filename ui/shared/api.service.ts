@@ -27,7 +27,7 @@ export class ApiService {
   }
 
   getUserGames() {
-    return this.get(this.baseUrl + '/user/games', { includepollurl: 'yup' });
+    return this.get(this.baseUrl + '/user/games');
   }
 
   getTurnUrl(gameId) {
