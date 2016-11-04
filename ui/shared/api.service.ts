@@ -11,6 +11,13 @@ export class ApiService {
 
   constructor (private configService: ConfigService, private http: Http) {}
 
+  getPublicJson(url: string) {
+    return this.http.get(url)
+      .map(res => {
+        return res.json();
+      }).toPromise();
+  }
+
   getSteamProfile() {
     return this.get(this.baseUrl + '/user/steamProfile');
   }
@@ -20,7 +27,7 @@ export class ApiService {
   }
 
   getUserGames() {
-    return this.get(this.baseUrl + '/user/games');
+    return this.get(this.baseUrl + '/user/games', { includepollurl: 'yup' });
   }
 
   getTurnUrl(gameId) {
@@ -37,7 +44,7 @@ export class ApiService {
     return this.post(this.baseUrl + '/game/' + gameId + '/turn/finishSubmit', {});
   }
 
-  private getAuthHeaders() : Promise<Headers> {
+  private getAuthHeaders() {
     return this.configService.getConfig().then(config => {
       let headers = new Headers();
 
@@ -51,9 +58,15 @@ export class ApiService {
     });
   }
 
-  private get(url) {
-    return this.getAuthHeaders().then(headers => {
-      return this.http.get(url, headers)
+  private get(url, addlHeaders?: any) {
+    return this.getAuthHeaders().then(reqOptions => {
+      if (addlHeaders) {
+        for (let header in addlHeaders) {
+          reqOptions.headers.append(header, addlHeaders[header]);
+        }
+      }
+
+      return this.http.get(url, reqOptions)
         .map(res => {
           return res.json();
         }).toPromise();

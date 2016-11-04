@@ -31,8 +31,21 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
 
     const timer = Observable.timer(10, POLL_INTERVAL);
+    let pollUrl;
+
     this.timerSub = timer.subscribe(() => {
-      this.apiService.getUserGames().then(games => {
+      let req;
+
+      if (pollUrl) {
+        req = this.apiService.getPublicJson(pollUrl);
+      } else {
+        req = this.apiService.getUserGames().then(games => {
+          pollUrl = games.pollUrl;
+          return games.data;
+        });
+      }
+
+      req.then(games => {
         this.games = games;
         const steamid = this.config.profile.steamid;
 
@@ -60,6 +73,8 @@ export class HomeComponent implements OnInit, OnDestroy {
         return this.profileCache.getProfiles(steamIds as [string]).then(profiles => {
           this.gamePlayerProfiles = profiles;
         });
+      }).catch(err => {
+        console.log('Error polling user games...', err);
       });
     });
   }
