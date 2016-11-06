@@ -16,6 +16,7 @@ export class PlayTurnComponent implements OnInit {
   private saveDir: string;
   private saveFileToPlay: string;
   private saveFileToUpload: string;
+  private abort: boolean;
 
   constructor(private route: ActivatedRoute, private apiService: ApiService, private router: Router) {
     const SUFFIX = '/Sid Meier\'s Civilization VI/Saves/Hotseat/';
@@ -38,6 +39,8 @@ export class PlayTurnComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.abort = false;
+
     this.route.params.forEach((params: Params) => {
       this.gameId = params['gameId'];
 
@@ -125,7 +128,13 @@ export class PlayTurnComponent implements OnInit {
       this.router.navigate(['/']);
     })
     .catch(err => {
-      this.status = err;
+      console.log(err);
+      this.status = 'There was an error submitting your turn.  Please try again.';
+      this.abort = true;
     });
+  }
+
+  private goHome() {
+    this.router.navigate(['/']);
   }
 }

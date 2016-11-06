@@ -1,2 +1,3 @@
 <h3>{{status}}</h3>
 <button *ngIf="saveFileToUpload" type="submit" class="btn btn-default" (click)="submitFile(game)">Submit File?</button>
+<button *ngIf="abort" type="submit" class="btn btn-default" (click)="goHome()">Return</button>
