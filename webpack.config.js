@@ -44,7 +44,7 @@ module.exports = {
 
   module: {
     loaders: [
-      { test: /\.ts$/, loaders: ['ts', 'angular2-template-loader'], exclude: [ /node_modules/, /app\/node_modules/ ] },
+      { test: /\.ts$/, loaders: ['ts', 'angular2-template-loader'], exclude: [ /node_modules\/(?!(civx-.+))/, /app\/node_modules/ ] },
       { test: /\.(html|css)$/, loader: 'raw-loader' },
       // Hack for chokidar, doesn't work without this?
       { test: /binary-extensions/, loader: 'json-loader' },

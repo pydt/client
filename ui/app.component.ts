@@ -1,21 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { Router }    from '@angular/router';
 
-import { ConfigService } from './shared/config.service';
-import { Config } from './shared/config';
+import { ApiService } from 'civx-angular2-shared';
 
 @Component({
   selector: 'app',
   templateUrl: './app.component.html'
 })
 export class AppComponent implements OnInit {
-  constructor(private configService: ConfigService, private router: Router) {}
+  constructor(private api: ApiService, private router: Router) {}
 
   ngOnInit() {
-    this.configService.getConfig().then(config => {
-      if (!config.token) {
+    this.api.isLoggedIn().then(isLoggedIn => {
+      if (!isLoggedIn) {
         this.router.navigate(['/auth']);
       }
-    })
+    });
   }
 }

@@ -9,9 +9,8 @@ import { AuthComponent } from './auth/auth.component'
 import { HomeComponent } from './home/home.component';
 import { PlayTurnComponent } from './playTurn/playTurn.component';
 
-import { ApiService } from './shared/api.service.ts';
-import { ConfigService } from './shared/config.service.ts';
-import { ProfileCacheService } from './shared/profileCache.service';
+import { ApiService, ProfileCacheService, API_URL_PROVIDER_TOKEN, API_CREDENTIALS_PROVIDER_TOKEN } from 'civx-angular2-shared';
+import { WebApiUrlProvider, WebApiCredentialsProvider } from './shared/electronApiServiceImplementations';
 
 @NgModule({
   imports: [
@@ -28,7 +27,8 @@ import { ProfileCacheService } from './shared/profileCache.service';
   ],
   providers: [
     ApiService,
-    ConfigService,
+    { provide: API_URL_PROVIDER_TOKEN, useClass: WebApiUrlProvider },
+    { provide: API_CREDENTIALS_PROVIDER_TOKEN, useClass: WebApiCredentialsProvider },
     ProfileCacheService
   ],
   bootstrap: [AppComponent]

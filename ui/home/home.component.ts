@@ -1,10 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router }    from '@angular/router';
 
-import { ApiService } from '../shared/api.service';
-import { Config } from '../shared/config';
-import { ConfigService } from '../shared/config.service';
-import { ProfileCacheService } from '../shared/profileCache.service';
+import { ApiService, ProfileCacheService } from 'civx-angular2-shared';
 import { Observable, Subscription } from 'rxjs';
 import * as _ from 'lodash';
 import * as app from 'electron';
@@ -19,17 +16,12 @@ const TOAST_INTERVAL: number = 14.5 * 60 * 1000;
 export class HomeComponent implements OnInit, OnDestroy {
   private games: any;
   private gamePlayerProfiles: any = {};
-  private config: Config;
   private timerSub: Subscription;
   private lastNotification: Date;
 
-  constructor(private apiService: ApiService, private configService: ConfigService, private profileCache: ProfileCacheService, private router: Router) {}
+  constructor(private apiService: ApiService, private profileCache: ProfileCacheService, private router: Router) {}
 
   ngOnInit() {
-    this.configService.getConfig().then(config => {
-      this.config = config;
-    });
-
     const timer = Observable.timer(10, POLL_INTERVAL);
     let pollUrl;
 
@@ -47,11 +39,12 @@ export class HomeComponent implements OnInit, OnDestroy {
 
       req.then(games => {
         this.games = games;
-        const steamid = this.config.profile.steamid;
-
-        const yourTurns = _.chain(games)
+        return this.apiService.getSteamProfile();
+      })
+      .then(profile => {
+        const yourTurns = _.chain(this.games)
           .filter((game: any) => {
-            return game.currentPlayerSteamId == steamid;
+            return game.currentPlayerSteamId == profile.steamid;
           })
           .map((game: any) => {
             return game.displayName

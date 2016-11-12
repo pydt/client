@@ -1,45 +1,25 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router }    from '@angular/router';
 
-import { ApiService } from '../shared/api.service';
-import { ConfigService } from '../shared/config.service';
-import { Config } from '../shared/config';
+import { ApiService } from 'civx-angular2-shared';
 
 @Component({
   selector: 'auth',
   templateUrl: './auth.component.html'
 })
-export class AuthComponent implements OnInit {
-  private model = new Config("", null);
+export class AuthComponent {
+  private model = new AuthModel();
 
-  constructor(private apiService: ApiService, private configService: ConfigService, private router: Router) {}
-
-  ngOnInit() {
-
-  }
+  constructor(private apiService: ApiService, private router: Router) {}
 
   onSubmit() {
-    let config;
-
-    this.configService.getConfig().then(_config => {
-      config = _config;
-      config.token = this.model.token;
-
-      return this.configService.saveConfig(config);
-    })
-    .then(() => {
-      return this.apiService.getSteamProfile();
-    })
-    .then(profile => {
-      config.profile = profile;
-      return this.configService.saveConfig(config);
-    })
-    .then(() => {
-      this.router.navigate(['/']);
-    })
-    .catch(err => {
-      config.token = null;
-      return this.configService.saveConfig(config);
-    });
+    this.apiService.setToken(this.model.token)
+      .then(() => {
+        this.router.navigate(['/']);
+      });
   }
+}
+
+class AuthModel {
+  token: string;
 }

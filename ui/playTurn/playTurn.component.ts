@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
 import * as app from 'electron';
 
-import { ApiService } from '../shared/api.service';
+import { ApiService } from 'civx-angular2-shared';
 
 @Component({
   selector: 'home',

@@ -1,11 +1,25 @@
 deploy-win:
   image: electronuserland/electron-builder:wine
   environment: production-win
+  before_script:
+    - apt-get update
+    # install ssh-agent
+    - 'which ssh-agent || ( apt-get install openssh-client -y )'
+    # run ssh-agent
+    - eval $(ssh-agent -s)
+    # add ssh key stored in SSH_PRIVATE_KEY variable to the agent store
+    - echo "$SSH_PRIVATE_KEY" > .tempKey
+    - chmod 0600 .tempKey
+    - ssh-add .tempKey
+    # disable host key checking (NOTE: makes you susceptible to man-in-the-middle attacks)
+    # WARNING: use only in docker container, if you use it with shell you will overwrite your user's ssh config
+    - mkdir -p ~/.ssh
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
   script:
+    - apt-get install -y git lftp
+    - sed -i -e 's/https:\/\/gitlab.com\/civx/ssh+git:\/\/git@gitlab.com:civx/g' package.json
     - npm install --silent && npm prune && npm run dist-win
     - mv dist/win/giant-multiplayer-ripoff*.exe ./giant-multiplayer-ripoff-setup.exe
-    - apt-get update
-    - apt-get install -y lftp
     - lftp -u $AZURE_DEPLOYMENT_USER,$AZURE_DEPLOYMENT_PASSWORD -e 'cd /site/wwwroot; put giant-multiplayer-ripoff-setup.exe; quit' ftps://waws-prod-ch1-013.ftp.azurewebsites.windows.net
   only:
     - master
@@ -14,7 +28,15 @@ deploy-win:
 
 deploy-mac:
   environment: production-mac
+  before_script:
+    # run ssh-agent
+    - eval $(ssh-agent -s)
+    # add ssh key stored in SSH_PRIVATE_KEY variable to the agent store
+    - echo "$SSH_PRIVATE_KEY" > .tempKey
+    - chmod 0600 .tempKey
+    - ssh-add .tempKey
   script:
+    - sed -i -e 's/https:\/\/gitlab.com\/civx/ssh+git:\/\/git@gitlab.com:civx/g' package.json
     - npm install --silent && npm prune && npm run dist-mac
     - mv dist/mac/giant-multiplayer-ripoff*.dmg ./giant-multiplayer-ripoff.dmg
     - lftp -u $AZURE_DEPLOYMENT_USER,$AZURE_DEPLOYMENT_PASSWORD -e 'cd /site/wwwroot; put giant-multiplayer-ripoff.dmg; quit' ftps://waws-prod-ch1-013.ftp.azurewebsites.windows.net
