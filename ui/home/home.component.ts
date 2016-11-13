@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router }    from '@angular/router';
 
-import { ApiService, ProfileCacheService } from 'civx-angular2-shared';
+import { ApiService, ProfileCacheService, SteamProfile } from 'civx-angular2-shared';
 import { Observable, Subscription } from 'rxjs';
 import * as _ from 'lodash';
 import * as app from 'electron';
@@ -15,6 +15,7 @@ const TOAST_INTERVAL: number = 14.5 * 60 * 1000;
 })
 export class HomeComponent implements OnInit, OnDestroy {
   private games: any;
+  private profile: SteamProfile;
   private gamePlayerProfiles: any = {};
   private timerSub: Subscription;
   private lastNotification: Date;
@@ -42,6 +43,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         return this.apiService.getSteamProfile();
       })
       .then(profile => {
+        this.profile = profile;
         const yourTurns = _.chain(this.games)
           .filter((game: any) => {
             return game.currentPlayerSteamId == profile.steamid;
