@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
@@ -11,14 +11,17 @@ import { ApiService } from 'civx-angular2-shared';
   templateUrl: './playTurn.component.html'
 })
 export class PlayTurnComponent implements OnInit {
+  private busy: Promise<any>;
   private status = "Downloading Save File...";
   private gameId: string;
   private saveDir: string;
   private saveFileToPlay: string;
   private saveFileToUpload: string;
   private abort: boolean;
+  private curBytes: number;
+  private maxBytes: number;
 
-  constructor(private route: ActivatedRoute, private apiService: ApiService, private router: Router) {
+  constructor(private route: ActivatedRoute, private apiService: ApiService, private router: Router, private cdRef: ChangeDetectorRef) {
     const SUFFIX = '/Sid Meier\'s Civilization VI/Saves/Hotseat/';
 
     if (process.platform === 'darwin') {
@@ -63,14 +66,26 @@ export class PlayTurnComponent implements OnInit {
       var xhr = new XMLHttpRequest();
       xhr.open('GET', url, true);
       xhr.responseType = 'arraybuffer';
+
+      xhr.onprogress = e => {
+        if (e.lengthComputable) {
+          this.curBytes = Math.round(e.loaded / 1024);
+          this.maxBytes = Math.round(e.total / 1024);
+          this.cdRef.detectChanges();
+        }
+      };
+
       xhr.onload = e => {
         mkdirp.sync(this.saveDir);
         fs.writeFile(this.saveFileToPlay, new Buffer(new Uint8Array(xhr.response)), (err) => {
           if (err) {
             reject(err);
           } else {
-            this.status = "Downloaded file!  Play your damn turn!";
-            resolve();
+            setTimeout(() => {
+              this.curBytes = this.maxBytes = null;
+              this.status = "Downloaded file!  Play your damn turn!";
+              resolve();
+            }, 500);
           }
         });
       };
@@ -105,6 +120,14 @@ export class PlayTurnComponent implements OnInit {
         let xhr = new XMLHttpRequest();
         xhr.open('PUT', response.putUrl, true);
 
+        xhr.upload.onprogress = e => {
+          if (e.lengthComputable) {
+            this.curBytes = Math.round(e.loaded / 1024);
+            this.maxBytes = Math.round(e.total / 1024);
+            this.cdRef.detectChanges();
+          }
+        };
+
         xhr.onload = () => {
           if (xhr.status === 200) {
             resolve();
@@ -122,7 +145,7 @@ export class PlayTurnComponent implements OnInit {
       });
     })
     .then(() => {
-      return this.apiService.finishTurnSubmit(this.gameId);
+      return this.busy = this.apiService.finishTurnSubmit(this.gameId);
     })
     .then(() => {
       this.router.navigate(['/']);

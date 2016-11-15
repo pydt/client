@@ -21,5 +21,5 @@ export class AuthComponent {
 }
 
 class AuthModel {
-  token: string;
+  public token: string;
 }
