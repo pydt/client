@@ -1,13 +1,16 @@
-<h1 *ngIf="!games">Loading...</h1>
-<h1 *ngIf="games?.length === 0">You have no games. :(</h1>
-<div class="container-fluid" *ngFor="let game of games">
-  <h3>{{game.displayName}}</h3>
-  <img [src]="gamePlayerProfiles[game.currentPlayerSteamId]?.avatarmedium">
-  <div *ngIf="game.currentPlayerSteamId === profile?.steamid">
-    <h2>It's your turn!</h2>
-    <div *ngIf="game.gameTurnRangeKey > 1">
-      <button type="submit" class="btn btn-default" (click)="playTurn(game)">Play Turn!</button>
+<div [ngBusy]="busy">
+  <div *ngIf="games">
+    <h1 *ngIf="games?.length === 0">You have no games. :(</h1>
+    <div class="container-fluid" *ngFor="let game of games">
+      <h3>{{game.displayName}}</h3>
+      <img [src]="gamePlayerProfiles[game.currentPlayerSteamId]?.avatarmedium">
+      <div *ngIf="game.currentPlayerSteamId === profile?.steamid">
+        <h2>It's your turn!</h2>
+        <div *ngIf="game.gameTurnRangeKey > 1">
+          <button type="submit" class="btn btn-default" (click)="playTurn(game)">Play Turn!</button>
+        </div>
+      </div>
+      <h2 *ngIf="game.currentPlayerSteamId !== profile?.steamid">It's not your turn :(</h2>
     </div>
   </div>
-  <h2 *ngIf="game.currentPlayerSteamId !== profile?.steamid">It's not your turn :(</h2>
 </div>

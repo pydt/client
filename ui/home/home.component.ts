@@ -14,6 +14,7 @@ const TOAST_INTERVAL: number = 14.5 * 60 * 1000;
   templateUrl: './home.component.html'
 })
 export class HomeComponent implements OnInit, OnDestroy {
+  private busy: Promise<any>;
   private games: any;
   private profile: SteamProfile;
   private gamePlayerProfiles: any = {};
@@ -38,7 +39,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         });
       }
 
-      req.then(games => {
+      this.busy = req.then(games => {
         this.games = games;
         return this.apiService.getSteamProfile();
       })
@@ -71,6 +72,11 @@ export class HomeComponent implements OnInit, OnDestroy {
       }).catch(err => {
         console.log('Error polling user games...', err);
       });
+
+      // Only show busy overlay on initial load...
+      if (this.games) {
+        this.busy = null;
+      }
     });
   }
 
