@@ -19,7 +19,7 @@ deploy-win:
     - apt-get install -y git lftp
     - sed -i -e 's/https:\/\/gitlab.com\/civx/ssh+git:\/\/git@gitlab.com:civx/g' package.json
     - npm install --silent && npm prune && npm run dist-win
-    - mv dist/win/giant-multiplayer-ripoff*.exe ./giant-multiplayer-ripoff-setup.exe
+    - mv dist/giant-multiplayer-ripoff*.exe ./giant-multiplayer-ripoff-setup.exe
     - lftp -u $AZURE_DEPLOYMENT_USER,$AZURE_DEPLOYMENT_PASSWORD -e 'cd /site/wwwroot; put giant-multiplayer-ripoff-setup.exe; quit' ftps://waws-prod-ch1-013.ftp.azurewebsites.windows.net
   only:
     - master
