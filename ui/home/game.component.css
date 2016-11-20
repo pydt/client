@@ -1,0 +1,23 @@
+.panel {
+  margin-top:10px;
+}
+
+.panel-body {
+  padding: 10px 15px;
+}
+
+.panel-heading {
+  padding: 5px 15px;
+}
+
+.currentTurn {
+  background-color: #ccffcc;
+}
+
+.thumbnail {
+  margin-bottom: 0px;
+}
+
+button {
+  margin-top: 10px;
+}

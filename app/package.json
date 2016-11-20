@@ -1,7 +1,7 @@
 {
-  "name": "giant-multiplayer-ripoff",
+  "name": "play-your-damn-turn",
   "version": "0.0.1",
-  "description": "Desktop Client to assist with playing Ripoff turns.",
+  "description": "Desktop Client to assist with playing your damn turns.",
   "author": "Mike Rosack",
   "main": "main.js",
   "dependencies": {

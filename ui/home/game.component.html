@@ -1,0 +1,15 @@
+<div class="panel" [ngClass]="{'panel-default': !yourTurn, 'panel-primary': yourTurn}">
+  <div class="panel-heading">{{game.displayName}}</div>
+  <div class="panel-body">
+    <div class="row">
+      <div *ngFor="let player of game.players" class="col-xs-{{iconGridCells}}">
+        <a href="#" class="thumbnail" [class.currentTurn]="game.currentPlayerSteamId === player.steamId" [tooltip]="gamePlayerProfiles[player.steamId]?.personaname">
+          <img [src]="gamePlayerProfiles[player.steamId]?.avatar">
+        </a>
+      </div>
+    </div>
+    <div *ngIf="yourTurn">
+      <button type="submit" class="btn btn-primary btn-xs btn-block" (click)="playTurn(game)">Play Your Damn Turn!</button>
+    </div>
+  </div>
+</div>

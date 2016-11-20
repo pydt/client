@@ -12,12 +12,12 @@
     "postinstall": "install-app-deps"
   },
   "build": {
-    "appId": "giant.multiplayer.ripoff.client",
+    "appId": "play.your.damn.turn.client",
     "mac": {
       "category": "public.app-category.strategy-games"
     },
     "win": {
-      "iconUrl": "https://s3.amazonaws.com/giant-multiplayer-ripoff/icon.ico"
+      "iconUrl": "https://wwww.playyourdamnturn.com/img/winClientIcon.ico"
     }
   },
   "devDependencies": {

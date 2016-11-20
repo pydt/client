@@ -30,7 +30,7 @@ export class PlayTurnComponent implements OnInit {
       this.saveDir = app.remote.app.getPath('documents') + '/My Games' + SUFFIX;
     }
 
-    this.saveFileToPlay = this.saveDir + '(Ripoff) Play This One!.Civ6Save';
+    this.saveFileToPlay = this.saveDir + '(PYDT) Play This One!.Civ6Save';
   }
 
   ifExists(path: string): boolean {
@@ -83,7 +83,7 @@ export class PlayTurnComponent implements OnInit {
           } else {
             setTimeout(() => {
               this.curBytes = this.maxBytes = null;
-              this.status = "Downloaded file!  Play your damn turn!";
+              this.status = "Downloaded file!  Play Your Damn Turn!";
               resolve();
             }, 500);
           }

@@ -52,7 +52,7 @@ function createWindow() {
       app.quit();
     }
   }])
-  appIcon.setToolTip('Giant Multiplayer Ripoff')
+  appIcon.setToolTip('Play Your Damn Turn Client')
   appIcon.setContextMenu(contextMenu)
 
   const debugMenu = Menu.buildFromTemplate([{
