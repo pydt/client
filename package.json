@@ -7,8 +7,8 @@
     "watch": "webpack --watch --progress --profile --colors --display-error-details --display-cached",
     "electron": "electron app",
     "pack": "bash -c \"npm run build-prod; build --dir\"",
-    "dist-win": "bash -c \"npm run build-prod; node_modules/.bin/build --win\"",
-    "dist-mac": "bash -c \"npm run build-prod; node_modules/.bin/build --mac\"",
+    "dist-win": "bash -c \"npm run build-prod; node_modules/.bin/build --win squirrel --publish always\"",
+    "dist-mac": "bash -c \"npm run build-prod; node_modules/.bin/build --mac --publish always\"",
     "postinstall": "install-app-deps"
   },
   "build": {
@@ -20,6 +20,7 @@
       "iconUrl": "https://wwww.playyourdamnturn.com/img/winClientIcon.ico"
     }
   },
+  "repository": "https://github.com/mrosack/playyourdamnturn-client-release",
   "devDependencies": {
     "@angular/common": "2.1.2",
     "@angular/compiler": "2.1.2",
