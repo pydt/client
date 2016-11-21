@@ -47,6 +47,11 @@ module.exports.checkForUpdates = (window) => {
 
   window.webContents.once("did-frame-finish-load", event => {
     autoUpdater.checkForUpdates();
+
+    // Check for updates every 30 minutes
+    setInterval(function() {
+      autoUpdater.checkForUpdates();
+    }, 30 * 60 * 1000);
   });
 };
 
