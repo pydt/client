@@ -1,6 +1,6 @@
 {
-  "name": "play-your-damn-turn",
-  "version": "0.0.1",
+  "name": "playyourdamnturn",
+  "version": "1.0.1",
   "dependencies": {
     "ansi-regex": {
       "version": "2.0.0",
@@ -125,12 +125,18 @@
     "decache": {
       "version": "3.1.0",
       "from": "decache@>=3.0.5 <4.0.0",
-      "resolved": "https://registry.npmjs.org/decache/-/decache-3.1.0.tgz"
+      "resolved": "https://registry.npmjs.org/decache/-/decache-3.1.0.tgz",
+      "optional": true
     },
     "electron-json-storage": {
       "version": "2.0.1",
       "from": "electron-json-storage@>=2.0.1 <3.0.0",
       "resolved": "https://registry.npmjs.org/electron-json-storage/-/electron-json-storage-2.0.1.tgz"
+    },
+    "electron-log": {
+      "version": "1.2.2",
+      "from": "electron-log@latest",
+      "resolved": "https://registry.npmjs.org/electron-log/-/electron-log-1.2.2.tgz"
     },
     "electron-squirrel-startup": {
       "version": "1.0.0",
@@ -180,7 +186,8 @@
     "find": {
       "version": "0.2.7",
       "from": "find@>=0.2.4 <0.3.0",
-      "resolved": "https://registry.npmjs.org/find/-/find-0.2.7.tgz"
+      "resolved": "https://registry.npmjs.org/find/-/find-0.2.7.tgz",
+      "optional": true
     },
     "for-in": {
       "version": "0.1.6",
@@ -557,7 +564,8 @@
     "traverse-chain": {
       "version": "0.1.0",
       "from": "traverse-chain@>=0.1.0 <0.2.0",
-      "resolved": "https://registry.npmjs.org/traverse-chain/-/traverse-chain-0.1.0.tgz"
+      "resolved": "https://registry.npmjs.org/traverse-chain/-/traverse-chain-0.1.0.tgz",
+      "optional": true
     },
     "util-deprecate": {
       "version": "1.0.2",

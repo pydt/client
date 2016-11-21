@@ -1,4 +1,5 @@
 const electron = require('electron');
+const log = require('electron-log');
 const autoUpdater = electron.autoUpdater;
 
 const UPDATE_SERVER_HOST = "updates.playyourdamnturn.com";
@@ -8,7 +9,7 @@ module.exports.checkForUpdates = (window) => {
   const version = electron.app.getVersion();
 
   if (electron.app.getPath("exe").search(/node_modules.electron/)) {
-    console.log('in dev, skipping updates...');
+    log.info('in dev, skipping updates...');
     return;
   }
 
@@ -17,31 +18,31 @@ module.exports.checkForUpdates = (window) => {
   }
 
   autoUpdater.addListener("update-available", event => {
-    console.log("A new update is available")
+    log.info("A new update is available")
   });
 
   autoUpdater.addListener("update-downloaded", (event, releaseNotes, releaseName, releaseDate, updateURL) => {
     notify("A new update is ready to install", `Version ${releaseName} is downloaded and will be automatically installed on Quit`);
-    console.log("quitAndInstall");
+    log.info("quitAndInstall");
     autoUpdater.quitAndInstall();
     return true;
   });
 
   autoUpdater.addListener("error", error => {
-    console.log(error);
+    log.error(error);
   });
 
   autoUpdater.addListener("checking-for-update", event => {
-    console.log("checking-for-update");
+    log.info("checking-for-update");
   });
 
   autoUpdater.addListener("update-not-available", () => {
-    console.log("update-not-available");
+    log.info("update-not-available");
   });
 
   const updatePlatform = platform === 'darwin' ? 'osx' : 'win32';
   const feedUrl = `https://${UPDATE_SERVER_HOST}/update/${updatePlatform}/${version}`;
-  console.log(feedUrl);
+  log.info(feedUrl);
   
   autoUpdater.setFeedURL(feedUrl);
 

@@ -4,7 +4,7 @@ import { HttpModule } from '@angular/http';
 import { FormsModule }   from '@angular/forms';
 import { routing } from './app.routing';
 import { BusyModule } from 'angular2-busy';
-import { ProgressbarModule, TooltipModule } from 'ng2-bootstrap/ng2-bootstrap';
+import { ModalModule, ProgressbarModule, TooltipModule } from 'ng2-bootstrap/ng2-bootstrap';
 
 import { AppComponent } from './app.component';
 import { AuthComponent } from './auth/auth.component'
@@ -20,6 +20,7 @@ import { WebApiUrlProvider, WebApiCredentialsProvider } from './shared/electronA
     BrowserModule,
     HttpModule,
     FormsModule,
+    ModalModule,
     BusyModule,
     ProgressbarModule,
     TooltipModule,

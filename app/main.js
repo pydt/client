@@ -56,6 +56,11 @@ function createWindow() {
   appIcon.setContextMenu(contextMenu)
 
   const debugMenu = Menu.buildFromTemplate([{
+      label: 'About',
+      click: (item, focusedWindow) => {
+        win.send('show-about-modal', app.getVersion());
+      }
+    },{
       label: 'Debug',
       submenu: [
         {
