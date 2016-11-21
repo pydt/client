@@ -1,6 +1,6 @@
 {
   "name": "play-your-damn-turn",
-  "version": "1.0.0-beta.0",
+  "version": "1.0.0",
   "description": "Desktop Client to assist with playing your damn turns.",
   "author": "Mike Rosack",
   "main": "main.js",

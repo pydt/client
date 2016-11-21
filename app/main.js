@@ -76,6 +76,8 @@ function createWindow() {
   }]);
   win.setMenu(debugMenu);
 
+  require('./appUpdater').checkForUpdates(win);
+
   electron.ipcMain.on('start-chokidar', (event, arg) => {
     const watcher = chokidar.watch(arg, { depth: 0, ignoreInitial: true });
 
