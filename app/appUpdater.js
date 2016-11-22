@@ -8,7 +8,9 @@ module.exports.checkForUpdates = (window) => {
   const platform = process.platform;
   const version = electron.app.getVersion();
 
-  if (electron.app.getPath("exe").search(/node_modules.electron/)) {
+  log.info("version: " + version);
+
+  if (/node_modules.electron/.test(electron.app.getPath("exe"))) {
     log.info('in dev, skipping updates...');
     return;
   }
@@ -22,10 +24,12 @@ module.exports.checkForUpdates = (window) => {
   });
 
   autoUpdater.addListener("update-downloaded", (event, releaseNotes, releaseName, releaseDate, updateURL) => {
-    notify("A new update is ready to install", `Version ${releaseName} is downloaded and will be automatically installed on Quit`);
-    log.info("quitAndInstall");
-    autoUpdater.quitAndInstall();
+    window.send('show-update-modal', releaseName);
     return true;
+  });
+
+  electron.ipcMain.on('apply-update', () => {
+    autoUpdater.quitAndInstall();
   });
 
   autoUpdater.addListener("error", error => {
@@ -55,12 +59,3 @@ module.exports.checkForUpdates = (window) => {
     }, 30 * 60 * 1000);
   });
 };
-
-function notify(title, message) {
-  let windows = electron.BrowserWindowElectron.getAllWindows();
-  if (windows.length == 0) {
-    return;
-  }
-
-  windows[0].webContents.send("notify", title, message);
-}

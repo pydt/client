@@ -11,7 +11,9 @@ import { ApiService } from 'civx-angular2-shared';
 })
 export class AppComponent implements OnInit {
   private version: string;
+  private newVersion: string;
   @ViewChild('aboutModal') aboutModal: ModalDirective;
+  @ViewChild('updateModal') updateModal: ModalDirective;
 
   constructor(private api: ApiService, private router: Router, private viewContainerRef: ViewContainerRef) {}
 
@@ -26,5 +28,14 @@ export class AppComponent implements OnInit {
       this.version = data;
       this.aboutModal.show();
     });
+
+    app.ipcRenderer.on('show-update-modal', (e, data) => {
+      this.newVersion = data;
+      this.updateModal.show();
+    });
+  }
+
+  applyUpdate() {
+    app.ipcRenderer.send('apply-update');
   }
 }

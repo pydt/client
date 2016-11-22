@@ -55,7 +55,7 @@ function createWindow() {
   appIcon.setToolTip('Play Your Damn Turn Client')
   appIcon.setContextMenu(contextMenu)
 
-  const debugMenu = Menu.buildFromTemplate([{
+  const topMenu = Menu.buildFromTemplate([{
       label: 'About',
       click: (item, focusedWindow) => {
         win.send('show-about-modal', app.getVersion());
@@ -79,7 +79,7 @@ function createWindow() {
         }
       ]
   }]);
-  win.setMenu(debugMenu);
+  win.setMenu(topMenu);
 
   require('./appUpdater').checkForUpdates(win);
 
