@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { HttpModule } from '@angular/http';
 import { FormsModule }   from '@angular/forms';
 import { routing } from './app.routing';
-import { BusyModule } from 'angular2-busy';
+import { BusyConfig, BusyModule } from 'angular2-busy';
 import { ModalModule, ProgressbarModule, TooltipModule } from 'ng2-bootstrap/ng2-bootstrap';
 
 import { AppComponent } from './app.component';
@@ -21,7 +21,9 @@ import { WebApiUrlProvider, WebApiCredentialsProvider } from './shared/electronA
     HttpModule,
     FormsModule,
     ModalModule,
-    BusyModule,
+    BusyModule.forRoot(
+        new BusyConfig({template: `<div class="pydt-spinner"></div>`})
+    ),
     ProgressbarModule,
     TooltipModule,
     routing
