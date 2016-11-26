@@ -26,6 +26,16 @@ function createWindow() {
   // and load the index.html of the app.
   win.loadURL(`file://${__dirname}/index.html`);
 
+  let forceQuit = false;
+
+  app.on('before-quit', () => { forceQuit = true; });
+
+  win.on('close', e => {
+    if (!forceQuit && process.platform === 'darwin') {
+      e.preventDefault();
+      win.hide();
+    }
+  });
 
   // Emitted when the window is closed.
   win.on('closed', () => {
@@ -39,23 +49,27 @@ function createWindow() {
     win.hide();
   });
 
-  const iconPath = path.join(__dirname, 'icon.png')
-  appIcon = new Tray(iconPath)
-  const contextMenu = Menu.buildFromTemplate([{
-    label: 'Show Client',
-    click: function () {
-      win.show();
-    }
-  }, {
-    label: 'Exit',
-    click: function () {
-      app.quit();
-    }
-  }])
-  appIcon.setToolTip('Play Your Damn Turn Client')
-  appIcon.setContextMenu(contextMenu)
+  if (process.platform !== 'darwin') {
+    const iconPath = path.join(__dirname, 'icon.png')
+    appIcon = new Tray(iconPath)
+    const contextMenu = Menu.buildFromTemplate([{
+      label: 'Show Client',
+      click: function () {
+        win.show();
+      }
+    }, {
+      label: 'Exit',
+      click: function () {
+        app.quit();
+      }
+    }]);
+
+    appIcon.setToolTip('Play Your Damn Turn Client')
+    appIcon.setContextMenu(contextMenu)
+  }
 
   const aboutClick = (item, focusedWindow) => {
+    win.show();
     win.send('show-about-modal', app.getVersion());
   };
 
@@ -87,10 +101,6 @@ function createWindow() {
       label: app.getName(),
       submenu: [
         { label: 'About', click: aboutClick },
-        { type: 'separator' },
-        { role: 'hide' },
-        { role: 'hideothers' },
-        { role: 'unhide' },
         { type: 'separator' },
         { role: 'quit' }
       ]
@@ -157,7 +167,9 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 
-  appIcon.destroy();
+  if (appIcon) {
+    appIcon.destroy();
+  }
 });
 
 app.on('activate', () => {
@@ -165,6 +177,8 @@ app.on('activate', () => {
   // dock icon is clicked and there are no other windows open.
   if (win === null) {
     createWindow();
+  } else {
+    win.show();
   }
 });
 
