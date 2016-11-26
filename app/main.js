@@ -55,11 +55,13 @@ function createWindow() {
   appIcon.setToolTip('Play Your Damn Turn Client')
   appIcon.setContextMenu(contextMenu)
 
-  const topMenu = Menu.buildFromTemplate([{
+  const aboutClick = (item, focusedWindow) => {
+    win.send('show-about-modal', app.getVersion());
+  };
+
+  const menuTemplate = [{
       label: 'About',
-      click: (item, focusedWindow) => {
-        win.send('show-about-modal', app.getVersion());
-      }
+      click: aboutClick
     },{
       label: 'Debug',
       submenu: [
@@ -78,8 +80,31 @@ function createWindow() {
           }
         }
       ]
-  }]);
-  win.setMenu(topMenu);
+  }];
+
+  if (process.platform === 'darwin') {
+    menuTemplate.unshift({
+      label: app.getName(),
+      submenu: [
+        { label: 'About', click: aboutClick },
+        { type: 'separator' },
+        { role: 'hide' },
+        { role: 'hideothers' },
+        { role: 'unhide' },
+        { type: 'separator' },
+        { role: 'quit' }
+      ]
+    }, {
+      label: 'Edit',
+      submenu: [
+        { role: 'cut' },
+        { role: 'copy' },
+        { role: 'paste' }
+      ]
+    });
+  }
+
+  Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate));
 
   require('./appUpdater').checkForUpdates(win);
 
