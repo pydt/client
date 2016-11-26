@@ -112,7 +112,11 @@ function createWindow() {
     const watcher = chokidar.watch(arg, { depth: 0, ignoreInitial: true });
 
     const changeDetected = (path) => {
+      win.setAlwaysOnTop(true);
+      win.show();
       win.focus();
+      win.setAlwaysOnTop(false);
+      
       event.sender.send('new-save-detected', path);
       watcher.close();
     };
@@ -122,7 +126,13 @@ function createWindow() {
   });
 
   electron.ipcMain.on('show-toast', (event, arg) => {
+    arg.icon = path.join(__dirname, 'toast_icon.png');
+    arg.wait = true;
     notifier.notify(arg);
+  });
+
+  notifier.on('click', () => {
+    win.show();
   });
 
   electron.ipcMain.on('init-rollbar', (event, arg) => {
