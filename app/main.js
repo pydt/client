@@ -136,7 +136,7 @@ function createWindow() {
   });
 
   electron.ipcMain.on('show-toast', (event, arg) => {
-    arg.icon = path.join(__dirname, 'toast_icon.png');
+    arg.icon = path.join(__dirname, 'icon.png');
     arg.wait = true;
     notifier.notify(arg);
   });
