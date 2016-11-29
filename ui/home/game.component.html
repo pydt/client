@@ -1,10 +1,13 @@
 <div class="panel" [ngClass]="{'panel-default': !yourTurn, 'panel-primary': yourTurn}">
   <div class="panel-heading">{{game.displayName}}</div>
   <div class="panel-body">
-    <div class="row">
-      <div *ngFor="let player of game.players" class="col-xs-{{iconGridCells}}">
-        <a href="#" class="thumbnail" [class.currentTurn]="game.currentPlayerSteamId === player.steamId" [tooltip]="gamePlayerProfiles[player.steamId]?.personaname">
-          <img [src]="gamePlayerProfiles[player.steamId]?.avatar">
+    <div class="row" style="padding-left:13px;padding-right:13px;">
+      <div *ngFor="let player of gamePlayers; let i = index;" class="col-xs-{{iconGridCells}}" style="padding-left:2px; padding-right:2px;">
+        <a href="#" *ngIf="player" class="thumbnail" [class.currentTurn]="game.currentPlayerSteamId === player.steamId" [tooltip]="gamePlayerProfiles[player.steamId]?.personaname + ' / ' + civDefs[i]?.getFullDisplayName()" [tooltipAppendToBody]="true">
+          <img #profileImg [src]="gamePlayerProfiles[player.steamId]?.avatarmedium" style="height:32px;" on-mouseover="profileImg.src = imgRoot + civDefs[i]?.getImageFileName();" on-mouseleave="profileImg.src = gamePlayerProfiles[player.steamId]?.avatarmedium;">
+        </a>
+        <a href="#" *ngIf="!player" class="thumbnail" tooltip="AI">
+          <img src="https://playyourdamnturn.com/img/android.png" style="height: 32px;">
         </a>
       </div>
     </div>
