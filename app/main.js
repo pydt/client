@@ -2,6 +2,7 @@ if (require('electron-squirrel-startup')) return;
 
 const electron = require('electron');
 const path = require('path');
+const fs = require('fs');
 const storage = require('electron-json-storage');
 const chokidar = require('chokidar');
 const notifier = require('node-notifier');
@@ -136,7 +137,16 @@ function createWindow() {
   });
 
   electron.ipcMain.on('show-toast', (event, arg) => {
-    arg.icon = path.join(__dirname, 'icon.png');
+    if (__dirname.indexOf('app.asar') > 0) {
+      const splitDirname = __dirname.split(path.sep);
+      const rootPath = path.join.apply(this, splitDirname.slice(0, splitDirname.length - 2));
+      
+      arg.icon = path.join(rootPath, 'Contents/app/icon.png');
+      if (!fs.existsSync(arg.icon)) arg.icon = path.join(rootPath, 'app/icon.png');
+    } else {
+      arg.icon = path.join(__dirname, 'icon.png');
+    }
+
     arg.wait = true;
     notifier.notify(arg);
   });

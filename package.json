@@ -18,7 +18,10 @@
     },
     "win": {
       "iconUrl": "https://wwww.playyourdamnturn.com/img/winClientIcon.ico"
-    }
+    },
+    "extraFiles": [
+      "app/icon.png"
+    ]
   },
   "repository": "https://github.com/mrosack/playyourdamnturn-client-release",
   "devDependencies": {
