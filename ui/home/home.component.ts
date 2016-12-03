@@ -46,10 +46,10 @@ export class HomeComponent implements OnInit, OnDestroy {
           this.games = games;
           const yourTurns = _.chain(this.games)
             .filter(game => {
-              return game.currentPlayerSteamId == profile.steamid;
+              return game.currentPlayerSteamId == profile.steamid && game.gameTurnRangeKey > 1;
             })
             .map(game => {
-              return game.displayName
+              return game.displayName;
             })
             .value();
 

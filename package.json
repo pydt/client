@@ -39,7 +39,7 @@
     "angular2-template-loader": "0.6.0",
     "bootstrap-loader": "1.2.0",
     "bootstrap-sass": "3.3.7",
-    "civx-angular2-shared": "https://gitlab.com/civx/angular2-shared.git#77608199f",
+    "civx-angular2-shared": "git+https://gitlab.com/civx/angular2-shared.git#322896ed",
     "core-js": "2.4.1",
     "css-loader": "0.25.0",
     "electron": "1.4.6",

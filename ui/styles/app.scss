@@ -380,3 +380,60 @@ a.list-group-item {
 .modal-header, .modal-body, .modal-footer {
   padding: 10px;
 }
+
+// Custom columns for slots
+@mixin make-slot-column($slots) {
+  position: relative;
+  // Prevent columns from collapsing when empty
+  min-height: 1px;
+  // Inner gutter via padding
+  padding-left:  ($grid-gutter-width / 2);
+  padding-right: ($grid-gutter-width / 2);
+
+  float: left;
+  width: percentage(1 / $slots);
+}
+
+.col-2-slots {
+  @include make-slot-column(2);
+}
+
+.col-3-slots {
+  @include make-slot-column(3);
+}
+
+.col-4-slots {
+  @include make-slot-column(4);
+}
+
+.col-5-slots {
+  @include make-slot-column(5);
+}
+
+.col-6-slots {
+  @include make-slot-column(6);
+}
+
+.col-7-slots {
+  @include make-slot-column(7);
+}
+
+.col-8-slots {
+  @include make-slot-column(8);
+}
+
+.col-9-slots {
+  @include make-slot-column(9);
+}
+
+.col-10-slots {
+  @include make-slot-column(10);
+}
+
+.col-11-slots {
+  @include make-slot-column(11);
+}
+
+.col-12-slots {
+  @include make-slot-column(12);
+}

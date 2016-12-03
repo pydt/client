@@ -117,7 +117,14 @@ function createWindow() {
 
   Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate));
 
-  require('./appUpdater').checkForUpdates(win);
+  const appUpdater = require('./appUpdater');
+  
+  appUpdater.checkForUpdates(win);
+
+  electron.ipcMain.on('apply-update', () => {
+    forceQuit = true;
+    appUpdater.applyUpdate();
+  });
 
   electron.ipcMain.on('start-chokidar', (event, arg) => {
     const watcher = chokidar.watch(arg, { depth: 0, ignoreInitial: true });

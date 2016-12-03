@@ -15,7 +15,6 @@ export class GameComponent implements OnInit {
   @Input() game: Game;
   @Input() gamePlayerProfiles: Map<String, SteamProfile>;
   @Input() yourTurn: boolean;
-  private iconGridCells: number;
   private gamePlayers: GamePlayer[] = [];
   private civDefs: CivDef[] = [];
   private imgRoot = 'https://playyourdamnturn.com/img/civs/';
@@ -23,12 +22,6 @@ export class GameComponent implements OnInit {
   constructor(private router: Router) {}
 
   ngOnInit() {
-    this.iconGridCells = Math.floor(12 / this.game.slots);
-
-    if (this.iconGridCells < 1) {
-      this.iconGridCells = 1;
-    }
-
     for (let i = 0; i < this.game.slots; i++) {
       if (this.game.players.length > i) {
         this.gamePlayers.push(this.game.players[i]);

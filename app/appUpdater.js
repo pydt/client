@@ -28,10 +28,6 @@ module.exports.checkForUpdates = (window) => {
     return true;
   });
 
-  electron.ipcMain.on('apply-update', () => {
-    autoUpdater.quitAndInstall();
-  });
-
   autoUpdater.addListener("error", error => {
     log.error(error);
   });
@@ -58,4 +54,9 @@ module.exports.checkForUpdates = (window) => {
       autoUpdater.checkForUpdates();
     }, 30 * 60 * 1000);
   });
+};
+
+
+module.exports.applyUpdate = () => {
+  autoUpdater.quitAndInstall();
 };
