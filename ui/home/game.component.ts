@@ -23,7 +23,7 @@ export class GameComponent implements OnInit {
 
   ngOnInit() {
     for (let i = 0; i < this.game.slots; i++) {
-      if (this.game.players.length > i) {
+      if (this.game.players.length > i && !this.game.players[i].hasSurrendered) {
         this.gamePlayers.push(this.game.players[i]);
         this.civDefs.push(_.find(Civ6Leaders, leader => {
           return leader.leaderKey === this.game.players[i].civType;

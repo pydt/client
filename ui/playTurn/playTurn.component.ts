@@ -151,8 +151,12 @@ export class PlayTurnComponent implements OnInit {
       this.router.navigate(['/']);
     })
     .catch(err => {
-      console.log(err);
       this.status = 'There was an error submitting your turn.  Please try again.';
+
+      if (err.json && err.json().errorMessage) {
+        this.status = err.json().errorMessage;
+      }
+
       this.abort = true;
     });
   }
