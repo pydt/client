@@ -44,6 +44,11 @@ export class HomeComponent implements OnInit, OnDestroy {
 
         this.busy = req.then(games => {
           this.games = games;
+
+          this.profileCache.getProfilesForGames(games).then(profiles => {
+            this.gamePlayerProfiles = profiles;
+          });
+
           const yourTurns = _.chain(this.games)
             .filter(game => {
               return game.currentPlayerSteamId == profile.steamid && game.gameTurnRangeKey > 1;
@@ -60,14 +65,6 @@ export class HomeComponent implements OnInit, OnDestroy {
             });
             this.lastNotification = new Date();
           }
-
-          let steamIds = _.uniq(_.flatMap(this.games, (game) => {
-            return _.map(game.players, 'steamId');
-          }));
-
-          return this.profileCache.getProfiles(steamIds as [string]).then(profiles => {
-            this.gamePlayerProfiles = profiles;
-          });
         }).catch(err => {
           console.log('Error polling user games...', err);
         });
