@@ -20,6 +20,26 @@ const Tray = electron.Tray;
 let win;
 let appIcon;
 
+var shouldQuit = app.makeSingleInstance(function(commandLine, workingDirectory) {
+  // Someone tried to run a second instance, we should focus our window.
+  forceShowWindow();
+});
+
+if (shouldQuit) {
+  app.quit();
+  return;
+}
+
+function forceShowWindow() {
+  if (win) {
+    win.setAlwaysOnTop(true);
+    win.show();
+    win.focus();
+    win.setAlwaysOnTop(false);
+  }
+}
+
+
 function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({width: 500, height: 300});
@@ -130,11 +150,7 @@ function createWindow() {
     const watcher = chokidar.watch(arg, { depth: 0, ignoreInitial: true });
 
     const changeDetected = (path) => {
-      win.setAlwaysOnTop(true);
-      win.show();
-      win.focus();
-      win.setAlwaysOnTop(false);
-      
+      forceShowWindow();
       event.sender.send('new-save-detected', path);
       watcher.close();
     };
