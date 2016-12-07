@@ -47,7 +47,7 @@ module.exports = {
       { test: /\.ts$/, loaders: ['ts', 'angular2-template-loader'], exclude: [ /node_modules\/(?!(civx-.+))/, /app\/node_modules/ ] },
       { test: /\.(html|css)$/, loader: 'raw-loader' },
       // Hack for chokidar, doesn't work without this?
-      { test: /binary-extensions/, loader: 'json-loader' },
+      { test: /binary-extensions|\.json/, loader: 'json-loader' },
       // Hacks for bootstrap fonts
       { test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "url-loader?limit=10000&mimetype=application/font-woff" },
       { test: /\.(png|ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "file-loader" }
