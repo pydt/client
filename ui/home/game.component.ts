@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Router }    from '@angular/router';
-import { SteamProfile, Game, GamePlayer, CivDef, Civ6Leaders } from 'civx-angular2-shared';
+import { SteamProfile, Game, GamePlayer, CivDef, Civ6Leaders } from 'pydt-shared';
 import * as _ from 'lodash';
 
 const POLL_INTERVAL: number = 60 * 1000;

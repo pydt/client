@@ -3,7 +3,7 @@ import { ModalDirective } from 'ng2-bootstrap/ng2-bootstrap';
 import { Router }    from '@angular/router';
 import * as app from 'electron';
 
-import { ApiService } from 'civx-angular2-shared';
+import { ApiService } from 'pydt-shared';
 
 @Component({
   selector: 'app',

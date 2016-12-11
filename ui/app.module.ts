@@ -12,7 +12,7 @@ import { HomeComponent } from './home/home.component';
 import { GameComponent } from './home/game.component';
 import { PlayTurnComponent } from './playTurn/playTurn.component';
 
-import { ApiService, ProfileCacheService, API_URL_PROVIDER_TOKEN, API_CREDENTIALS_PROVIDER_TOKEN } from 'civx-angular2-shared';
+import { ApiService, ProfileCacheService, API_URL_PROVIDER_TOKEN, API_CREDENTIALS_PROVIDER_TOKEN } from 'pydt-shared';
 import { WebApiUrlProvider, WebApiCredentialsProvider } from './shared/electronApiServiceImplementations';
 
 @NgModule({

@@ -23,7 +23,7 @@
       "app/icon.png"
     ]
   },
-  "repository": "https://github.com/mrosack/playyourdamnturn-client-release",
+  "repository": "https://github.com/pydt/client",
   "devDependencies": {
     "@angular/common": "2.1.2",
     "@angular/compiler": "2.1.2",
@@ -39,7 +39,6 @@
     "angular2-template-loader": "0.6.0",
     "bootstrap-loader": "1.2.0",
     "bootstrap-sass": "3.3.7",
-    "civx-angular2-shared": "git+https://gitlab.com/civx/angular2-shared.git#5b3e469edbc7934911ee65a999a38823fc93e6d2",
     "core-js": "2.4.1",
     "css-loader": "0.25.0",
     "electron": "1.4.6",
@@ -55,6 +54,7 @@
     "mkdirp": "0.5.1",
     "ng2-bootstrap": "1.1.16",
     "node-sass": "3.12.2",
+    "pydt-shared": "git+https://github.com/pydt/shared.git#d635e235fe8912b8c934537e1728e749742f0a46",
     "raw-loader": "0.5.1",
     "reflect-metadata": "0.1.8",
     "resolve-url-loader": "1.6.0",

@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
 import * as app from 'electron';
 
-import { ApiService } from 'civx-angular2-shared';
+import { ApiService } from 'pydt-shared';
 
 @Component({
   selector: 'home',

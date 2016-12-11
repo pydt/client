@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router }    from '@angular/router';
 
-import { ApiService } from 'civx-angular2-shared';
+import { ApiService } from 'pydt-shared';
 
 @Component({
   selector: 'auth',

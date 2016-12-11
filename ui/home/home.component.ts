@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router }    from '@angular/router';
 
-import { ApiService, ProfileCacheService, SteamProfile, Game } from 'civx-angular2-shared';
+import { ApiService, ProfileCacheService, SteamProfile, Game } from 'pydt-shared';
 import { Observable, Subscription } from 'rxjs';
 import * as _ from 'lodash';
 import * as app from 'electron';
