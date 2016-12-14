@@ -3,7 +3,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { HttpModule } from '@angular/http';
 import { FormsModule }   from '@angular/forms';
 import { routing } from './app.routing';
-import { BusyConfig, BusyModule } from 'angular2-busy';
 import { ModalModule, ProgressbarModule, TooltipModule } from 'ng2-bootstrap/ng2-bootstrap';
 
 import { AppComponent } from './app.component';
@@ -12,7 +11,7 @@ import { HomeComponent } from './home/home.component';
 import { GameComponent } from './home/game.component';
 import { PlayTurnComponent } from './playTurn/playTurn.component';
 
-import { ApiService, ProfileCacheService, API_URL_PROVIDER_TOKEN, API_CREDENTIALS_PROVIDER_TOKEN } from 'pydt-shared';
+import { ApiService, BusyModule, ProfileCacheService, API_URL_PROVIDER_TOKEN, API_CREDENTIALS_PROVIDER_TOKEN } from 'pydt-shared';
 import { WebApiUrlProvider, WebApiCredentialsProvider } from './shared/electronApiServiceImplementations';
 
 @NgModule({
@@ -21,9 +20,7 @@ import { WebApiUrlProvider, WebApiCredentialsProvider } from './shared/electronA
     HttpModule,
     FormsModule,
     ModalModule,
-    BusyModule.forRoot(
-        new BusyConfig({template: `<div class="pydt-spinner"></div>`})
-    ),
+    BusyModule,
     ProgressbarModule,
     TooltipModule,
     routing

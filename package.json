@@ -35,7 +35,6 @@
     "@angular/router": "3.1.2",
     "@types/chokidar": "1.4.29",
     "@types/lodash": "4.14.39",
-    "angular2-busy": "https://github.com/mrosack/angular2-busy",
     "angular2-template-loader": "0.6.0",
     "bootstrap-loader": "1.2.0",
     "bootstrap-sass": "3.3.7",

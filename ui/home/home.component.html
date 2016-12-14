@@ -1,4 +1,4 @@
-<div [ngBusy]="busy">
+<div [pydtBusy]="busy">
   <h1 *ngIf="games?.length === 0">You have no games. :(</h1>
   <div *ngIf="games">
     <div *ngFor="let game of yourTurnGames()">
