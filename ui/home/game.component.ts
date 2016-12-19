@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Router }    from '@angular/router';
 import { SteamProfile, Game, GamePlayer, CivDef, Civ6Leaders } from 'pydt-shared';
 import * as _ from 'lodash';
+import * as countdown from 'countdown';
 
 const POLL_INTERVAL: number = 60 * 1000;
 const TOAST_INTERVAL: number = 14.5 * 60 * 1000;
@@ -36,5 +37,9 @@ export class GameComponent implements OnInit {
 
   playTurn(game) {
     this.router.navigate(['/playTurn/' + game.gameId]);
+  }
+
+  lastTurn() {
+    return countdown(Date.parse(this.game.updatedAt), null, countdown.HOURS | countdown.MINUTES);
   }
 }

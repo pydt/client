@@ -5,7 +5,7 @@ import { ApiUrlProvider, ApiCredentialsProvider, SteamProfile } from 'pydt-share
 @Injectable()
 export class WebApiCredentialsProvider implements ApiCredentialsProvider {
   store(token: string, profile: SteamProfile): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       const config = {
         token: token,
         profile: profile
