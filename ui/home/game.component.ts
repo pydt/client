@@ -31,6 +31,7 @@ export class GameComponent implements OnInit {
         }));
       } else {
         this.gamePlayers.push(null);
+        this.civDefs.push(null);
       }
     }
   }
