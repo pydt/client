@@ -10,7 +10,7 @@ const POLL_INTERVAL: number = 60 * 1000;
 const TOAST_INTERVAL: number = 14.5 * 60 * 1000;
 
 @Component({
-  selector: 'home',
+  selector: 'pydt-home',
   templateUrl: './home.component.html'
 })
 export class HomeComponent implements OnInit, OnDestroy {
@@ -51,7 +51,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
           const yourTurns = _.chain(this.games)
             .filter(game => {
-              return game.currentPlayerSteamId == profile.steamid && game.gameTurnRangeKey > 1;
+              return game.currentPlayerSteamId === profile.steamid && game.gameTurnRangeKey > 1;
             })
             .map(game => {
               return game.displayName;
@@ -83,10 +83,6 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.timerSub.unsubscribe();
       this.timerSub = null;
     }
-  }
-
-  playTurn(game) {
-    this.router.navigate(['/playTurn/' + game.gameId]);
   }
 
   yourTurnGames() {

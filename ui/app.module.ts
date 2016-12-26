@@ -1,4 +1,4 @@
-import { NgModule, ApplicationRef } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpModule } from '@angular/http';
 import { FormsModule }   from '@angular/forms';
@@ -6,9 +6,10 @@ import { routing } from './app.routing';
 import { ModalModule, ProgressbarModule, TooltipModule } from 'ng2-bootstrap/ng2-bootstrap';
 
 import { AppComponent } from './app.component';
-import { AuthComponent } from './auth/auth.component'
+import { AuthComponent } from './auth/auth.component';
 import { HomeComponent } from './home/home.component';
 import { GameComponent } from './home/game.component';
+import { GamePlayerComponent } from './home/player.component';
 import { PlayTurnComponent } from './playTurn/playTurn.component';
 
 import { ApiService, BusyModule, ProfileCacheService, API_URL_PROVIDER_TOKEN, API_CREDENTIALS_PROVIDER_TOKEN } from 'pydt-shared';
@@ -30,6 +31,7 @@ import { WebApiUrlProvider, WebApiCredentialsProvider } from './shared/electronA
     AuthComponent,
     HomeComponent,
     GameComponent,
+    GamePlayerComponent,
     PlayTurnComponent
   ],
   providers: [

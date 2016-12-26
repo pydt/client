@@ -2,10 +2,10 @@
   <h1 *ngIf="games?.length === 0">You have no games. :(</h1>
   <div *ngIf="games">
     <div *ngFor="let game of yourTurnGames()">
-      <game [game]="game" [gamePlayerProfiles]="gamePlayerProfiles" [yourTurn]="true"></game>
+      <pydt-game [game]="game" [gamePlayerProfiles]="gamePlayerProfiles" [yourTurn]="true"></pydt-game>
     </div>
     <div *ngFor="let game of notYourTurnGames()">
-      <game [game]="game" [gamePlayerProfiles]="gamePlayerProfiles" [yourTurn]="false"></game>
+      <pydt-game [game]="game" [gamePlayerProfiles]="gamePlayerProfiles" [yourTurn]="false"></pydt-game>
     </div>
   </div>
 </div>

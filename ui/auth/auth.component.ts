@@ -4,7 +4,7 @@ import { Router }    from '@angular/router';
 import { ApiService } from 'pydt-shared';
 
 @Component({
-  selector: 'auth',
+  selector: 'pydt-auth',
   templateUrl: './auth.component.html'
 })
 export class AuthComponent {

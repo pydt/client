@@ -3,12 +3,7 @@
   <div class="panel-body">
     <div class="row" style="padding-left:13px;padding-right:13px;">
       <div *ngFor="let player of gamePlayers; let i = index;" class="col-{{game.slots}}-slots" style="padding-left:2px; padding-right:2px;">
-        <a href="#" *ngIf="player" class="thumbnail" [class.currentTurn]="game.currentPlayerSteamId === player.steamId" [tooltip]="gamePlayerProfiles[player.steamId]?.personaname + ' / ' + civDefs[i]?.getFullDisplayName()" [tooltipAppendToBody]="true">
-          <img #profileImg [src]="gamePlayerProfiles[player.steamId]?.avatarmedium" style="height:32px;" on-mouseover="profileImg.src = imgRoot + civDefs[i]?.getImageFileName();" on-mouseleave="profileImg.src = gamePlayerProfiles[player.steamId]?.avatarmedium;">
-        </a>
-        <a href="#" *ngIf="!player" class="thumbnail" tooltip="AI">
-          <img src="https://playyourdamnturn.com/img/android.png" style="height: 32px;">
-        </a>
+        <pydt-player [game]="game" [player]="player" [gamePlayerProfiles]="gamePlayerProfiles" [civDef]="civDefs[i]"></pydt-player>
       </div>
     </div>
     <div *ngIf="yourTurn">

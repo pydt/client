@@ -4,11 +4,8 @@ import { SteamProfile, Game, GamePlayer, CivDef, Civ6Leaders } from 'pydt-shared
 import * as _ from 'lodash';
 import * as countdown from 'countdown';
 
-const POLL_INTERVAL: number = 60 * 1000;
-const TOAST_INTERVAL: number = 14.5 * 60 * 1000;
-
 @Component({
-  selector: 'game',
+  selector: 'pydt-game',
   templateUrl: './game.component.html',
   styleUrls: ['./game.component.css']
 })
@@ -18,7 +15,6 @@ export class GameComponent implements OnInit {
   @Input() yourTurn: boolean;
   private gamePlayers: GamePlayer[] = [];
   private civDefs: CivDef[] = [];
-  private imgRoot = 'https://playyourdamnturn.com/img/civs/';
 
   constructor(private router: Router) {}
 

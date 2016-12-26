@@ -6,7 +6,7 @@ import * as app from 'electron';
 import { ApiService } from 'pydt-shared';
 
 @Component({
-  selector: 'app',
+  selector: 'pydt-app',
   templateUrl: './app.component.html'
 })
 export class AppComponent implements OnInit {

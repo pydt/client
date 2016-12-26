@@ -7,12 +7,12 @@ import * as app from 'electron';
 import { ApiService } from 'pydt-shared';
 
 @Component({
-  selector: 'home',
+  selector: 'pydt-home',
   templateUrl: './playTurn.component.html'
 })
 export class PlayTurnComponent implements OnInit {
   private busy: Promise<any>;
-  private status = "Downloading Save File...";
+  private status = 'Downloading Save File...';
   private gameId: string;
   private saveDir: string;
   private saveFileToPlay: string;
@@ -63,7 +63,7 @@ export class PlayTurnComponent implements OnInit {
 
   private downloadFile(url) {
     return new Promise((resolve, reject) => {
-      var xhr = new XMLHttpRequest();
+      const xhr = new XMLHttpRequest();
       xhr.open('GET', url, true);
       xhr.responseType = 'arraybuffer';
 
@@ -83,7 +83,7 @@ export class PlayTurnComponent implements OnInit {
           } else {
             setTimeout(() => {
               this.curBytes = this.maxBytes = null;
-              this.status = "Downloaded file!  Play Your Damn Turn!";
+              this.status = 'Downloaded file!  Play Your Damn Turn!';
               resolve();
             }, 500);
           }
@@ -102,7 +102,7 @@ export class PlayTurnComponent implements OnInit {
       //////
 
       function newSaveDetected(event, arg) {
-        ptThis.status = "Detected new save, submit turn?";
+        ptThis.status = 'Detected new save, submit turn?';
         ptThis.saveFileToUpload = arg;
         app.ipcRenderer.removeListener('new-save-detected', newSaveDetected);
         resolve();
@@ -110,14 +110,15 @@ export class PlayTurnComponent implements OnInit {
     });
   }
 
+  // tslint:disable-next-line:no-unused-variable
   private submitFile() {
-    this.status = "Uploading...";
+    this.status = 'Uploading...';
     const fileData = fs.readFileSync(this.saveFileToUpload);
     this.saveFileToUpload = null;
 
     this.apiService.startTurnSubmit(this.gameId).then(response => {
       return new Promise((resolve, reject) => {
-        let xhr = new XMLHttpRequest();
+        const xhr = new XMLHttpRequest();
         xhr.open('PUT', response.putUrl, true);
 
         xhr.upload.onprogress = e => {
@@ -161,6 +162,7 @@ export class PlayTurnComponent implements OnInit {
     });
   }
 
+  // tslint:disable-next-line:no-unused-variable
   private goHome() {
     this.router.navigate(['/']);
   }
