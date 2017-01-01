@@ -19,6 +19,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private profile: SteamProfile;
   private gamePlayerProfiles: any = {};
   private timerSub: Subscription;
+  private destroyed = false;
   private lastNotification: Date;
 
   constructor(private apiService: ApiService, private profileCache: ProfileCacheService, private router: Router) {}
@@ -31,6 +32,10 @@ export class HomeComponent implements OnInit, OnDestroy {
       let pollUrl;
 
       this.timerSub = timer.subscribe(() => {
+        if (this.destroyed) {
+          return this.ngOnDestroy();
+        }
+
         let req;
 
         if (pollUrl) {
@@ -83,6 +88,8 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.timerSub.unsubscribe();
       this.timerSub = null;
     }
+
+    this.destroyed = true;
   }
 
   yourTurnGames() {
