@@ -15,10 +15,14 @@ export class GameComponent implements OnInit {
   @Input() yourTurn: boolean;
   private gamePlayers: GamePlayer[] = [];
   private civDefs: CivDef[] = [];
+  private now: Date;
 
   constructor(private router: Router) {}
 
   ngOnInit() {
+    // Save current date to prevent "changed after it was checked" bugs
+    this.now = new Date();
+    
     for (let i = 0; i < this.game.slots; i++) {
       if (this.game.players.length > i && !this.game.players[i].hasSurrendered) {
         this.gamePlayers.push(this.game.players[i]);
@@ -37,6 +41,6 @@ export class GameComponent implements OnInit {
   }
 
   lastTurn() {
-    return countdown(Date.parse(this.game.updatedAt), null, countdown.HOURS | countdown.MINUTES);
+    return countdown(Date.parse(this.game.updatedAt), this.now, countdown.HOURS | countdown.MINUTES);
   }
 }
