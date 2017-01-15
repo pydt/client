@@ -22,7 +22,7 @@ export class GameComponent implements OnInit {
   ngOnInit() {
     // Save current date to prevent "changed after it was checked" bugs
     this.now = new Date();
-    
+
     for (let i = 0; i < this.game.slots; i++) {
       if (this.game.players.length > i && !this.game.players[i].hasSurrendered) {
         this.gamePlayers.push(this.game.players[i]);

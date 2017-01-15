@@ -11,6 +11,7 @@
     "electron-log": "^1.2.2",
     "electron-squirrel-startup": "^1.0.0",
     "node-notifier": "^4.6.1",
+    "opn": "^4.0.2",
     "rollbar": "^0.6.2"
   }
 }

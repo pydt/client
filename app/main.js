@@ -6,6 +6,7 @@ const fs = require('fs');
 const storage = require('electron-json-storage');
 const chokidar = require('chokidar');
 const notifier = require('node-notifier');
+const opn = require('opn');
 
 // Module to control application life.
 const {app} = electron;
@@ -184,6 +185,10 @@ function createWindow() {
     rollbar.handleUncaughtExceptionsAndRejections("67488d20e1444df7ab91d279659d519a", {
       environment: "prod"
     });
+  });
+
+  electron.ipcMain.on('launch-civ6', (event, arg) => {
+    opn('steam://run/289070');
   });
 }
 

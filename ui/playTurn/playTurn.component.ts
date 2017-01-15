@@ -84,6 +84,7 @@ export class PlayTurnComponent implements OnInit {
             setTimeout(() => {
               this.curBytes = this.maxBytes = null;
               this.status = 'Downloaded file!  Play Your Damn Turn!';
+              app.ipcRenderer.send('launch-civ6');
               resolve();
             }, 500);
           }
