@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import * as fs from 'fs';
+import * as path from 'path';
 import * as mkdirp from 'mkdirp';
 import * as app from 'electron';
 
@@ -94,6 +95,13 @@ export class PlayTurnComponent implements OnInit {
     });
   }
 
+  // tslint:disable-next-line:no-unused-variable
+  private ignoreSave() {
+    this.status = 'Downloaded file!  Play Your Damn Turn!';
+    this.saveFileToUpload = null;
+    this.watchForSave();
+  }
+
   private watchForSave() {
     const ptThis = this;
     return new Promise((resolve, reject) => {
@@ -103,7 +111,7 @@ export class PlayTurnComponent implements OnInit {
       //////
 
       function newSaveDetected(event, arg) {
-        ptThis.status = 'Detected new save, submit turn?';
+        ptThis.status = `Detected new save: ${path.basename(arg).replace('.Civ6Save', '')}.  Submit turn?`;
         ptThis.saveFileToUpload = arg;
         app.ipcRenderer.removeListener('new-save-detected', newSaveDetected);
         resolve();
@@ -159,6 +167,7 @@ export class PlayTurnComponent implements OnInit {
         this.status = err.json().errorMessage;
       }
 
+      this.curBytes = this.maxBytes = null;
       this.abort = true;
     });
   }
