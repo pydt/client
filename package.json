@@ -43,7 +43,7 @@
     "core-js": "2.4.1",
     "countdown": "2.6.0",
     "css-loader": "0.25.0",
-    "electron": "1.4.6",
+    "electron": "1.4.13",
     "electron-builder": "8.5.3",
     "electron-contextmenu-middleware": "1.0.2",
     "electron-input-menu": "2.0.3",
