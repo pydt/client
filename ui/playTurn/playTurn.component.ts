@@ -16,6 +16,7 @@ export class PlayTurnComponent implements OnInit {
   private status = 'Downloading Save File...';
   private gameId: string;
   private saveDir: string;
+  private archiveDir: string;
   private saveFileToPlay: string;
   private saveFileToUpload: string;
   private abort: boolean;
@@ -29,6 +30,12 @@ export class PlayTurnComponent implements OnInit {
       this.saveDir = app.remote.app.getPath('appData') + SUFFIX;
     } else {
       this.saveDir = app.remote.app.getPath('documents') + '/My Games' + SUFFIX;
+    }
+
+    this.archiveDir = path.join(this.saveDir, 'pydt-archive');
+
+    if (!fs.existsSync(this.archiveDir)) {
+      fs.mkdirSync(this.archiveDir);
     }
 
     this.saveFileToPlay = this.saveDir + '(PYDT) Play This One!.Civ6Save';
@@ -123,6 +130,8 @@ export class PlayTurnComponent implements OnInit {
   private submitFile() {
     this.status = 'Uploading...';
     const fileData = fs.readFileSync(this.saveFileToUpload);
+    const moveFrom = this.saveFileToUpload;
+    const moveTo = path.join(this.archiveDir, path.basename(this.saveFileToUpload));
     this.saveFileToUpload = null;
 
     this.apiService.startTurnSubmit(this.gameId).then(response => {
@@ -158,6 +167,7 @@ export class PlayTurnComponent implements OnInit {
       return this.busy = this.apiService.finishTurnSubmit(this.gameId);
     })
     .then(() => {
+      fs.renameSync(moveFrom, moveTo);
       this.router.navigate(['/']);
     })
     .catch(err => {
