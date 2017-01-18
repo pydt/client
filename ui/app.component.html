@@ -19,6 +19,30 @@
   </div>
 </div>
 
+<div bsModal #settingsModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="settingsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="settingsModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Settings</h4>
+      </div>
+      <div class="modal-body">
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" name="launchCiv" [(ngModel)]="settings.launchCiv"> Automatically launch Civ after downloading save
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="saveSettings()">Save</button>
+        <button type="button" class="btn btn-default" (click)="settingsModal.hide()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div bsModal #updateModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">

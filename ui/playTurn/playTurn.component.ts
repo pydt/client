@@ -6,6 +6,7 @@ import * as mkdirp from 'mkdirp';
 import * as app from 'electron';
 
 import { ApiService } from 'pydt-shared';
+import { PydtSettings } from '../shared/pydtSettings';
 
 @Component({
   selector: 'pydt-home',
@@ -92,7 +93,13 @@ export class PlayTurnComponent implements OnInit {
             setTimeout(() => {
               this.curBytes = this.maxBytes = null;
               this.status = 'Downloaded file!  Play Your Damn Turn!';
-              app.ipcRenderer.send('launch-civ6');
+
+              PydtSettings.getSettings().then(settings => {
+                if (settings.launchCiv) {
+                  app.ipcRenderer.send('launch-civ6');
+                }
+              });
+
               resolve();
             }, 500);
           }

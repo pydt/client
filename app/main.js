@@ -95,9 +95,17 @@ function createWindow() {
     win.send('show-about-modal', app.getVersion());
   };
 
+  const settingsClick = (item, focusedWindow) => {
+    win.show();
+    win.send('show-settings-modal');
+  };
+
   const menuTemplate = [{
       label: 'About',
       click: aboutClick
+    },{
+      label: 'Settings',
+      click: settingsClick
     },{
       label: 'Debug',
       submenu: [
@@ -123,6 +131,7 @@ function createWindow() {
       label: app.getName(),
       submenu: [
         { label: 'About', click: aboutClick },
+        { label: 'Settings', click: settingsClick },
         { type: 'separator' },
         { role: 'quit' }
       ]
