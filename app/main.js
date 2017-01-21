@@ -199,7 +199,9 @@ function createWindow() {
   });
 
   electron.ipcMain.on('launch-civ6', (event, arg) => {
-    opn('steam://run/289070');
+    opn('steam://run/289070').catch(err => {
+      console.log('Could not open civ 6: ' + err.message);
+    });
   });
 }
 
