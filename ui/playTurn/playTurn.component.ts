@@ -33,6 +33,10 @@ export class PlayTurnComponent implements OnInit {
       this.saveDir = app.remote.app.getPath('documents') + '/My Games' + SUFFIX;
     }
 
+    if (!fs.existsSync(this.saveDir)) {
+      mkdirp.sync(this.saveDir);
+    }
+
     this.archiveDir = path.join(this.saveDir, 'pydt-archive');
 
     if (!fs.existsSync(this.archiveDir)) {
@@ -40,14 +44,6 @@ export class PlayTurnComponent implements OnInit {
     }
 
     this.saveFileToPlay = this.saveDir + '(PYDT) Play This One!.Civ6Save';
-  }
-
-  ifExists(path: string): boolean {
-    try {
-      return fs.statSync(path) != null;
-    } catch (error) {
-      return false;
-    }
   }
 
   ngOnInit() {
@@ -85,7 +81,6 @@ export class PlayTurnComponent implements OnInit {
       };
 
       xhr.onload = e => {
-        mkdirp.sync(this.saveDir);
         fs.writeFile(this.saveFileToPlay, new Buffer(new Uint8Array(xhr.response)), (err) => {
           if (err) {
             reject(err);
