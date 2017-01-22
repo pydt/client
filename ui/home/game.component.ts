@@ -3,6 +3,7 @@ import { Router }    from '@angular/router';
 import { SteamProfile, Game, GamePlayer, CivDef, Civ6Leaders } from 'pydt-shared';
 import * as _ from 'lodash';
 import * as countdown from 'countdown';
+import * as app from 'electron';
 
 @Component({
   selector: 'pydt-game',
@@ -36,8 +37,12 @@ export class GameComponent implements OnInit {
     }
   }
 
-  playTurn(game) {
-    this.router.navigate(['/playTurn/' + game.gameId]);
+  playTurn() {
+    this.router.navigate(['/playTurn/' + this.game.gameId]);
+  }
+
+  openGameOnWeb() {
+    app.ipcRenderer.send('opn-url', 'https://playyourdamnturn.com/game/' + this.game.gameId);
   }
 
   lastTurn() {

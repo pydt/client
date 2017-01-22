@@ -6,8 +6,11 @@
         <pydt-player [game]="game" [player]="player" [gamePlayerProfiles]="gamePlayerProfiles" [civDef]="civDefs[i]"></pydt-player>
       </div>
     </div>
-    <div *ngIf="yourTurn">
-      <button type="submit" class="btn btn-primary btn-xs btn-block" (click)="playTurn(game)">Play Your Damn Turn!</button>
+    <div *ngIf="yourTurn && game.round > 1">
+      <button type="submit" class="btn btn-primary btn-xs btn-block" (click)="playTurn()">Play Your Damn Turn!</button>
+    </div>
+    <div *ngIf="yourTurn && game.round === 1">
+      <button type="submit" class="btn btn-primary btn-xs btn-block" (click)="openGameOnWeb()">You must submit the initial game turn on the website.</button>
     </div>
   </div>
 </div>

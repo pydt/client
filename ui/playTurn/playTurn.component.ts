@@ -91,7 +91,7 @@ export class PlayTurnComponent implements OnInit {
 
               PydtSettings.getSettings().then(settings => {
                 if (settings.launchCiv) {
-                  app.ipcRenderer.send('launch-civ6');
+                  app.ipcRenderer.send('opn-url', 'steam://run/289070');
                 }
               });
 
