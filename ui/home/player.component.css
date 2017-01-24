@@ -5,3 +5,7 @@
 .thumbnail {
   margin-bottom: 0px;
 }
+
+a {
+  cursor: default;
+}
