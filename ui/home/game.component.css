@@ -18,3 +18,13 @@ small {
   font-size: 11px;
   line-height: 22px;
 }
+
+.panel-primary a, .panel-primary a:hover {
+  color: white;
+  text-decoration: underline;
+}
+
+.panel-default a, .panel-default a:hover {
+  color: black;
+  text-decoration: underline;
+}
