@@ -80,25 +80,33 @@ export class PlayTurnComponent implements OnInit {
         }
       };
 
+      xhr.onerror = () => {
+        reject(xhr.status);
+      };
+
       xhr.onload = e => {
-        fs.writeFile(this.saveFileToPlay, new Buffer(new Uint8Array(xhr.response)), (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            setTimeout(() => {
-              this.curBytes = this.maxBytes = null;
-              this.status = 'Downloaded file!  Play Your Damn Turn!';
+        try {
+          fs.writeFile(this.saveFileToPlay, new Buffer(new Uint8Array(xhr.response)), (err) => {
+            if (err) {
+              reject(err);
+            } else {
+              setTimeout(() => {
+                this.curBytes = this.maxBytes = null;
+                this.status = 'Downloaded file!  Play Your Damn Turn!';
 
-              PydtSettings.getSettings().then(settings => {
-                if (settings.launchCiv) {
-                  app.ipcRenderer.send('opn-url', 'steam://run/289070');
-                }
-              });
+                PydtSettings.getSettings().then(settings => {
+                  if (settings.launchCiv) {
+                    app.ipcRenderer.send('opn-url', 'steam://run/289070');
+                  }
+                });
 
-              resolve();
-            }, 500);
-          }
-        });
+                resolve();
+              }, 500);
+            }
+          });
+        } catch (err) {
+          reject(err);
+        }
       };
       xhr.send();
     });
