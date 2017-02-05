@@ -1,4 +1,4 @@
-<div class="container">
+<div [pydtBusy]="busy" class="container">
     <h2>Enter your token... <i style="font-size:20px;margin-left:20px;" class="glyphicon glyphicon-question-sign" tooltip="You can find your token in the 'Your Profile' section of the website." tooltipPlacement="bottom"></i></h2>
     <form (ngSubmit)="onSubmit()" #tokenForm="ngForm">
       <div class="form-group">

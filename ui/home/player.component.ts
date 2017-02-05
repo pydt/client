@@ -15,10 +15,10 @@ export class GamePlayerComponent implements OnDestroy {
 
   getTooltip() {
     if (this.player) {
-      let playerName = '?';
+      let playerName = 'AI';
       let profile = this.gamePlayerProfiles[this.player.steamId];
 
-      if (profile) {
+      if (profile && !this.player.hasSurrendered) {
         playerName = profile.personaname;
       }
 
@@ -26,6 +26,14 @@ export class GamePlayerComponent implements OnDestroy {
     } else {
       return 'AI';
     }
+  }
+
+  getProfileImg() {
+    if (this.player && this.player.steamId && !this.player.hasSurrendered) {
+      return (this.gamePlayerProfiles[this.player.steamId] || {}).avatarmedium;
+    }
+
+    return 'https://playyourdamnturn.com/img/android.png';
   }
 
   ngOnDestroy() {
