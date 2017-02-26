@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Router }    from '@angular/router';
 import { SteamProfile, Game, GamePlayer, CivDef, Civ6Leaders } from 'pydt-shared';
+import { PlayTurnState } from '../playTurn/playTurnState.service';
 import * as _ from 'lodash';
 import * as countdown from 'countdown';
 import * as app from 'electron';
@@ -18,7 +19,7 @@ export class GameComponent implements OnInit {
   private civDefs: CivDef[] = [];
   private now: Date;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private playTurnState: PlayTurnState) {}
 
   ngOnInit() {
     // Save current date to prevent "changed after it was checked" bugs
@@ -38,7 +39,8 @@ export class GameComponent implements OnInit {
   }
 
   playTurn() {
-    this.router.navigate(['/playTurn/' + this.game.gameId]);
+    this.playTurnState.game = this.game;
+    this.router.navigate(['/playTurn']);
   }
 
   openGameOnWeb() {

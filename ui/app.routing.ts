@@ -7,7 +7,7 @@ import { PlayTurnComponent } from './playTurn/playTurn.component';
 const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'auth', component: AuthComponent },
-  { path: 'playTurn/:gameId', component: PlayTurnComponent }
+  { path: 'playTurn', component: PlayTurnComponent }
 ];
 
 export const routing = RouterModule.forRoot(routes, { useHash: true });

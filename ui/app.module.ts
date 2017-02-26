@@ -11,6 +11,7 @@ import { HomeComponent } from './home/home.component';
 import { GameComponent } from './home/game.component';
 import { GamePlayerComponent } from './home/player.component';
 import { PlayTurnComponent } from './playTurn/playTurn.component';
+import { PlayTurnState } from './playTurn/playTurnState.service';
 
 import { ApiService, BusyModule, ProfileCacheService, API_URL_PROVIDER_TOKEN, API_CREDENTIALS_PROVIDER_TOKEN } from 'pydt-shared';
 import { WebApiUrlProvider, WebApiCredentialsProvider } from './shared/electronApiServiceImplementations';
@@ -38,7 +39,8 @@ import { WebApiUrlProvider, WebApiCredentialsProvider } from './shared/electronA
     ApiService,
     { provide: API_URL_PROVIDER_TOKEN, useClass: WebApiUrlProvider },
     { provide: API_CREDENTIALS_PROVIDER_TOKEN, useClass: WebApiCredentialsProvider },
-    ProfileCacheService
+    ProfileCacheService,
+    PlayTurnState
   ],
   bootstrap: [AppComponent]
 })

@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { ActivatedRoute, Router, Params } from '@angular/router';
+import { Router } from '@angular/router';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as mkdirp from 'mkdirp';
@@ -7,15 +7,16 @@ import * as app from 'electron';
 
 import { ApiService } from 'pydt-shared';
 import { PydtSettings } from '../shared/pydtSettings';
+import { PlayTurnState } from './playTurnState.service';
 
 @Component({
   selector: 'pydt-home',
-  templateUrl: './playTurn.component.html'
+  templateUrl: './playTurn.component.html',
+  styleUrls: ['./playTurn.component.css']
 })
 export class PlayTurnComponent implements OnInit {
   private busy: Promise<any>;
   private status = 'Downloading Save File...';
-  private gameId: string;
   private saveDir: string;
   private archiveDir: string;
   private saveFileToPlay: string;
@@ -24,7 +25,12 @@ export class PlayTurnComponent implements OnInit {
   private curBytes: number;
   private maxBytes: number;
 
-  constructor(private route: ActivatedRoute, private apiService: ApiService, private router: Router, private cdRef: ChangeDetectorRef) {
+  constructor(
+    private apiService: ApiService,
+    private playTurnState: PlayTurnState,
+    private router: Router,
+    private cdRef: ChangeDetectorRef
+    ) {
     const SUFFIX = '/Sid Meier\'s Civilization VI/Saves/Hotseat/';
 
     if (process.platform === 'darwin') {
@@ -49,21 +55,17 @@ export class PlayTurnComponent implements OnInit {
   ngOnInit() {
     this.abort = false;
 
-    this.route.params.forEach((params: Params) => {
-      this.gameId = params['gameId'];
-
-      this.apiService.getTurnUrl(this.gameId)
-        .then(url => {
-          console.log(url);
-          return this.downloadFile(url);
-        })
-        .then(() => {
-          return this.watchForSave();
-        })
-        .catch(err => {
-          this.status = err;
-        });
-   });
+    this.apiService.getTurnUrl(this.playTurnState.game.gameId)
+      .then(url => {
+        console.log(url);
+        return this.downloadFile(url);
+      })
+      .then(() => {
+        return this.watchForSave();
+      })
+      .catch(err => {
+        this.status = err;
+      });
   }
 
   private downloadFile(url) {
@@ -144,7 +146,7 @@ export class PlayTurnComponent implements OnInit {
     const moveTo = path.join(this.archiveDir, path.basename(this.saveFileToUpload));
     this.saveFileToUpload = null;
 
-    this.apiService.startTurnSubmit(this.gameId).then(response => {
+    this.apiService.startTurnSubmit(this.playTurnState.game.gameId).then(response => {
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.open('PUT', response.putUrl, true);
@@ -174,7 +176,7 @@ export class PlayTurnComponent implements OnInit {
       });
     })
     .then(() => {
-      return this.busy = this.apiService.finishTurnSubmit(this.gameId);
+      return this.busy = this.apiService.finishTurnSubmit(this.playTurnState.game.gameId);
     })
     .then(() => {
       fs.renameSync(moveFrom, moveTo);
