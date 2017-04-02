@@ -1,6 +1,7 @@
 if (require('electron-squirrel-startup')) return;
 
 const electron = require('electron');
+const log = require('electron-log');
 const path = require('path');
 const fs = require('fs');
 const storage = require('electron-json-storage');
@@ -200,7 +201,32 @@ function createWindow() {
 
   electron.ipcMain.on('opn-url', (event, arg) => {
     opn(arg).catch(err => {
-      console.log(`Could not open URL ${arg}: ${err.message}`);
+      log.error(`Could not open URL ${arg}: ${err.message}`);
+    });
+  });
+
+  electron.ipcMain.on('set-autostart', (event, arg) => {
+    log.info('set-autostart');
+
+    const AutoLaunch = require('auto-launch');
+ 
+    const launcher = new AutoLaunch({
+      name: 'Play Your Damn Turn Client',
+      isHidden: true
+    });
+
+    launcher.isEnabled().then(isEnabled => {
+      if (isEnabled && !arg) {
+        log.warn('Disabling auto start...');
+        return launcher.disable();
+      }
+
+      if (!isEnabled && !!arg) {
+        log.warn('Enabling auto start...');
+        return launcher.enable();
+      }
+    }).catch(err => {
+      log.error('Error toggling auto-start: ', err.message);
     });
   });
 }

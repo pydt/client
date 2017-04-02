@@ -58,6 +58,7 @@ export class AppComponent implements OnInit {
 
   saveSettings() {
     PydtSettings.saveSettings(this.settings);
+    app.ipcRenderer.send('set-autostart', this.settings.startOnBoot);
     this.settingsModal.hide();
   }
 

@@ -34,6 +34,11 @@
             <input type="checkbox" name="launchCiv" [(ngModel)]="settings.launchCiv"> Automatically launch Civ after downloading save
           </label>
         </div>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" name="startOnBoot" [(ngModel)]="settings.startOnBoot"> Start client on boot
+          </label>
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" (click)="saveSettings()">Save</button>

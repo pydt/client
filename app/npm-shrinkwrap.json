@@ -1,6 +1,6 @@
 {
   "name": "playyourdamnturn",
-  "version": "1.1.7",
+  "version": "1.1.16",
   "dependencies": {
     "ansi-regex": {
       "version": "2.0.0",
@@ -21,6 +21,11 @@
       "version": "1.3.0",
       "from": "anymatch@>=1.3.0 <2.0.0",
       "resolved": "https://registry.npmjs.org/anymatch/-/anymatch-1.3.0.tgz"
+    },
+    "applescript": {
+      "version": "1.0.0",
+      "from": "applescript@>=1.0.0 <2.0.0",
+      "resolved": "https://registry.npmjs.org/applescript/-/applescript-1.0.0.tgz"
     },
     "arr-diff": {
       "version": "2.0.0",
@@ -51,6 +56,11 @@
       "version": "1.0.1",
       "from": "async-each@>=1.0.0 <2.0.0",
       "resolved": "https://registry.npmjs.org/async-each/-/async-each-1.0.1.tgz"
+    },
+    "auto-launch": {
+      "version": "5.0.1",
+      "from": "auto-launch@latest",
+      "resolved": "https://registry.npmjs.org/auto-launch/-/auto-launch-5.0.1.tgz"
     },
     "balanced-match": {
       "version": "0.4.2",
@@ -419,6 +429,18 @@
       "from": "minimist@>=1.1.1 <2.0.0",
       "resolved": "https://registry.npmjs.org/minimist/-/minimist-1.2.0.tgz"
     },
+    "mkdirp": {
+      "version": "0.5.1",
+      "from": "mkdirp@>=0.5.1 <0.6.0",
+      "resolved": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.5.1.tgz",
+      "dependencies": {
+        "minimist": {
+          "version": "0.0.8",
+          "from": "minimist@0.0.8",
+          "resolved": "https://registry.npmjs.org/minimist/-/minimist-0.0.8.tgz"
+        }
+      }
+    },
     "ms": {
       "version": "0.7.1",
       "from": "ms@0.7.1",
@@ -587,6 +609,11 @@
       "resolved": "https://registry.npmjs.org/traverse-chain/-/traverse-chain-0.1.0.tgz",
       "optional": true
     },
+    "untildify": {
+      "version": "3.0.2",
+      "from": "untildify@>=3.0.2 <4.0.0",
+      "resolved": "https://registry.npmjs.org/untildify/-/untildify-3.0.2.tgz"
+    },
     "util-deprecate": {
       "version": "1.0.2",
       "from": "util-deprecate@>=1.0.1 <1.1.0",
@@ -596,6 +623,11 @@
       "version": "1.2.11",
       "from": "which@>=1.0.5 <2.0.0",
       "resolved": "https://registry.npmjs.org/which/-/which-1.2.11.tgz"
+    },
+    "winreg": {
+      "version": "1.2.2",
+      "from": "winreg@1.2.2",
+      "resolved": "https://registry.npmjs.org/winreg/-/winreg-1.2.2.tgz"
     },
     "wrappy": {
       "version": "1.0.2",

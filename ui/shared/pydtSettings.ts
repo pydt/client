@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 
 export class PydtSettings {
   launchCiv: boolean = true;
+  startOnBoot: boolean = false;
 
   static getSettings(): Promise<PydtSettings> {
     return new Promise((resolve, reject) => {
@@ -21,7 +22,7 @@ export class PydtSettings {
   }
 
   static saveSettings(settings: PydtSettings): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       storage.set('settings', settings, err => {
         if (err) {
           return reject(err);
