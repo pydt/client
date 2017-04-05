@@ -56,7 +56,7 @@
     "mkdirp": "0.5.1",
     "ng2-bootstrap": "1.1.16",
     "node-sass": "3.12.2",
-    "pydt-shared": "git+https://github.com/pydt/shared.git#cc95d00fa846401806359e7784a4e41b98639fe4",
+    "pydt-shared": "git+https://github.com/pydt/shared.git#f69c11eacddd5733b81bfa3a530ad055367f4600",
     "raw-loader": "0.5.1",
     "reflect-metadata": "0.1.8",
     "resolve-url-loader": "1.6.0",
