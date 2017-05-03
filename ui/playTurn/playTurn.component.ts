@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as mkdirp from 'mkdirp';
 import * as app from 'electron';
+import * as pako from 'pako';
 
 import { ApiService } from 'pydt-shared';
 import { PydtSettings } from '../shared/pydtSettings';
@@ -55,7 +56,7 @@ export class PlayTurnComponent implements OnInit {
   ngOnInit() {
     this.abort = false;
 
-    this.apiService.getTurnUrl(this.playTurnState.game.gameId)
+    this.apiService.getTurnUrl(this.playTurnState.game.gameId, true)
       .then(url => {
         console.log(url);
         return this.downloadFile(url);
@@ -65,6 +66,7 @@ export class PlayTurnComponent implements OnInit {
       })
       .catch(err => {
         this.status = err;
+        this.abort = true;
       });
   }
 
@@ -88,7 +90,15 @@ export class PlayTurnComponent implements OnInit {
 
       xhr.onload = e => {
         try {
-          fs.writeFile(this.saveFileToPlay, new Buffer(new Uint8Array(xhr.response)), (err) => {
+          let data = new Uint8Array(xhr.response);
+
+          try {
+            data = pako.ungzip(new Uint8Array(xhr.response));
+          } catch (e) {
+            // Ignore - file probably wasn't gzipped...
+          }
+
+          fs.writeFile(this.saveFileToPlay, new Buffer(data), (err) => {
             if (err) {
               reject(err);
             } else {
@@ -141,7 +151,7 @@ export class PlayTurnComponent implements OnInit {
   // tslint:disable-next-line:no-unused-variable
   private submitFile() {
     this.status = 'Uploading...';
-    const fileData = fs.readFileSync(this.saveFileToUpload);
+    const fileData = pako.gzip(fs.readFileSync(this.saveFileToUpload));
     const moveFrom = this.saveFileToUpload;
     const moveTo = path.join(this.archiveDir, path.basename(this.saveFileToUpload));
     this.saveFileToUpload = null;
