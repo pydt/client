@@ -22,7 +22,13 @@ export class GamePlayerComponent implements OnDestroy {
         playerName = profile.personaname;
       }
 
-      return `${playerName} /<br />${this.civDef.getFullDisplayName()}`;
+      let civDesc = 'Unknown Civ';
+
+      if (this.civDef) {
+        civDesc = this.civDef.getFullDisplayName();
+      }
+
+      return `${playerName} /<br />${civDesc}`;
     } else {
       return 'AI';
     }

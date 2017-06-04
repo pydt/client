@@ -1,6 +1,6 @@
 <div [tooltipHtml]="getTooltip()" [tooltipAppendToBody]="true" #tooltip="bs-tooltip">
   <a href="javascript:void(0)" *ngIf="player" class="thumbnail" [class.currentTurn]="game.currentPlayerSteamId === player.steamId">
-    <img #profileImg [src]="getProfileImg()" style="height:32px;" on-mouseover="profileImg.src = 'https://playyourdamnturn.com/img/civs/' + civDef?.getImageFileName();" on-mouseleave="profileImg.src = getProfileImg();">
+    <img #profileImg [src]="getProfileImg()" style="height:32px;" on-mouseover="profileImg.src = 'https://playyourdamnturn.com/img/civs/' + (civDef?.getImageFileName() || 'RANDOM_RANDOM.png');" on-mouseleave="profileImg.src = getProfileImg();">
   </a>
   <a href="javascript:void(0)" *ngIf="!player" class="thumbnail">
     <img [src]="getProfileImg()" style="height: 32px;">
