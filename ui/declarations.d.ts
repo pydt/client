@@ -3,3 +3,4 @@ declare module 'electron';
 declare module 'fs';
 declare module 'path';
 declare module 'mkdirp';
+declare module 'aws-iot-device-sdk';

@@ -45,6 +45,7 @@ module.exports = {
   module: {
     preLoaders: [{test: /\.ts$/, exclude: /node_modules/, loader: 'tslint'}],
     loaders: [
+      { test: /node_modules.mqtt/, loader: 'shebang' },
       { test: /\.ts$/, loaders: ['ts', 'angular2-template-loader'], exclude: [ /node_modules\/(?!(pydt-.+))/, /app\/node_modules/ ] },
       { test: /\.(html|css)$/, loader: 'raw-loader' },
       // Hack for chokidar, doesn't work without this?
