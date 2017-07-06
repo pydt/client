@@ -7,7 +7,7 @@ import * as _ from 'lodash';
 import * as app from 'electron';
 import * as awsIot from 'aws-iot-device-sdk';
 
-const POLL_INTERVAL: number = 60 * 1000;
+const POLL_INTERVAL: number = 600 * 1000;
 const TOAST_INTERVAL: number = 14.5 * 60 * 1000;
 
 @Component({
