@@ -53,7 +53,11 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   }
 
-  loadGames() {
+  loadGames(retry = 0) {
+    if (retry >= 3) {
+      return;
+    }
+
     let pollUrl;
     let req;
 
@@ -95,6 +99,10 @@ export class HomeComponent implements OnInit, OnDestroy {
       }
     }).catch(err => {
       console.log('Error polling user games...', err);
+      
+      setTimeout(() => {
+        this.loadGames(retry + 1);
+      }, 5000);
     });
 
     // Only show busy overlay on initial load...
