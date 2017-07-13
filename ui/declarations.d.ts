@@ -4,3 +4,8 @@ declare module 'fs';
 declare module 'path';
 declare module 'mkdirp';
 declare module 'aws-iot-device-sdk';
+
+declare const PYDT_CONFIG: {
+    PROD: boolean;
+    API_URL: string;
+};

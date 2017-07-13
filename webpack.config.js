@@ -60,7 +60,7 @@ module.exports = {
     new CommonsChunkPlugin({ name: 'common',   filename: 'common.js' }),
     new webpack.DefinePlugin({
       // Environment helpers
-      'process.env': {
+      'PYDT_CONFIG': {
         PROD: JSON.stringify(isProd),
         API_URL: JSON.stringify(apiUrl)
       }

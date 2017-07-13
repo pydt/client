@@ -10,7 +10,7 @@ context.use(inputMenu);
 context.activate();
 
 // depending on the env mode, enable prod mode or add debugging modules
-if (process.env.PROD) {
+if (PYDT_CONFIG.PROD) {
   enableProdMode();
 }
 

@@ -99,7 +99,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       }
     }).catch(err => {
       console.log('Error polling user games...', err);
-      
+
       setTimeout(() => {
         this.loadGames(retry + 1);
       }, 5000);
@@ -112,7 +112,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   configureIot() {
-    const env = process.env.PROD ? 'prod' : 'dev';
+    const env = PYDT_CONFIG.PROD ? 'prod' : 'dev';
     const topic = `/pydt/${env}/user/${this.profile.steamid}/gameupdate`;
 
     this.iotDevice = awsIot.device({

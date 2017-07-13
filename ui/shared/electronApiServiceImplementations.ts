@@ -48,5 +48,5 @@ export class WebApiCredentialsProvider implements ApiCredentialsProvider {
 
 @Injectable()
 export class WebApiUrlProvider implements ApiUrlProvider {
-  url: string = process.env.API_URL;
+  url: string = PYDT_CONFIG.API_URL;
 }
