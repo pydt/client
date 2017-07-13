@@ -118,6 +118,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.iotDevice = awsIot.device({
       region: 'us-east-1',
       protocol: 'wss',
+      keepalive: 600,
       // This is OK because the AMI user only has read-only IOT permissions
       accessKeyId: 'AKIAJKL667K45IU4KHTQ',
       secretKey: '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',
