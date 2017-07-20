@@ -4,3 +4,4 @@ app/ui_compiled
 dist
 npm-debug.log
 /.vscode
+/iot-client-creds.json

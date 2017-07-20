@@ -16,6 +16,18 @@ if (!isProd) {
   }
 }
 
+var iotCreds = {
+  accessKey: process.env.IOT_CLIENT_ACCESS_KEY,
+  secretKey: process.env.IOT_CLIENT_SECRET_KEY
+};
+
+if (fs.existsSync("iot-client-creds.json")) {
+  console.log("Using IoT creds from file...");
+  iotCreds = JSON.parse(fs.readFileSync("iot-client-creds.json"));
+} else {
+  console.log("Using IoT creds from environment...")
+}
+
 module.exports = {
   devtool: 'source-map',
   debug: true,
@@ -62,7 +74,9 @@ module.exports = {
       // Environment helpers
       'PYDT_CONFIG': {
         PROD: JSON.stringify(isProd),
-        API_URL: JSON.stringify(apiUrl)
+        API_URL: JSON.stringify(apiUrl),
+        IOT_CLIENT_ACCESS_KEY: JSON.stringify(iotCreds.accessKey),
+        IOT_CLIENT_SECRET_KEY: JSON.stringify(iotCreds.secretKey),
       }
     })
   ],

@@ -119,9 +119,8 @@ export class HomeComponent implements OnInit, OnDestroy {
       region: 'us-east-1',
       protocol: 'wss',
       keepalive: 600,
-      // This is OK because the AMI user only has read-only IOT permissions
-      accessKeyId: 'AKIAJKL667K45IU4KHTQ',
-      secretKey: '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',
+      accessKeyId: PYDT_CONFIG.IOT_CLIENT_ACCESS_KEY,
+      secretKey: PYDT_CONFIG.IOT_CLIENT_SECRET_KEY,
       host: 'a21s639tnrshxf.iot.us-east-1.amazonaws.com'
     });
 
