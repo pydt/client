@@ -3625,9 +3625,9 @@ punycode@^1.2.4, punycode@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-1.4.1.tgz#c0d5a63b2718800ad8e1eb0fa5269c84dd41845e"
 
-"pydt-shared@git+https://github.com/pydt/shared.git#dd33fd07c6c38d888182e6b6e9808bf786967e7d":
+"pydt-shared@git+https://github.com/pydt/shared.git#b4a3eb2e9a580bb2f7c208dad760f75cbde68c5a":
   version "1.0.0"
-  resolved "git+https://github.com/pydt/shared.git#dd33fd07c6c38d888182e6b6e9808bf786967e7d"
+  resolved "git+https://github.com/pydt/shared.git#b4a3eb2e9a580bb2f7c208dad760f75cbde68c5a"
 
 q@^1.1.2:
   version "1.5.0"
