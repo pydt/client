@@ -125,6 +125,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
 
     this.iotDevice.on('connect', () => {
+      console.log('connected to IoT!');
       this.iotDevice.subscribe(topic);
     });
 
