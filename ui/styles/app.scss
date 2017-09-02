@@ -347,34 +347,28 @@ a.list-group-item {
 
 // END FLATLY
 
-.pydt-busy {
-  z-index: 1002;
-}
-.pydt-busy-backdrop {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1001;
-  background: #000;
-  opacity: .7;
-}
 @keyframes busy-spinner-anim {
   50% { transform: rotate(180deg) scale(1.5); }
   100% { transform: rotate(360deg) scale(1); }
 }
 
-.pydt-spinner {
-  z-index:1003;
-  position: fixed;
+.pydt-busy {
+  position:fixed;
   top:0;
   left:0;
-  background: url(img/pydt_large.png) no-repeat fixed center;
-  background-size: 100px;
-  height: 100%;
+  z-index:100000;
   width:100%;
-  animation: busy-spinner-anim 2s linear infinite;
+  height:100%;
+
+  &.backdrop {
+    background: rgba(0, 0, 0, 0.75);
+  }
+
+  &.spinner {
+    background: url('./img/pydt_large.png') no-repeat fixed center;
+    background-size: 100px;
+    animation: busy-spinner-anim 2s linear infinite;
+  }
 }
 
 .modal-header, .modal-body, .modal-footer {
