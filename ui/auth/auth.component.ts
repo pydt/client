@@ -9,13 +9,12 @@ import { ApiService } from 'pydt-shared';
 })
 export class AuthComponent {
   private model = new AuthModel();
-  private busy: Promise<any>;
 
   constructor(private apiService: ApiService, private router: Router) {}
 
   onSubmit() {
-    this.busy = this.apiService.setToken(this.model.token)
-      .then(() => {
+    this.apiService.setToken(this.model.token)
+      .subscribe(() => {
         this.router.navigate(['/']);
       });
   }

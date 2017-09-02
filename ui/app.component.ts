@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ViewContainerRef  } from '@angular/core';
-import { ModalDirective } from 'ng2-bootstrap/ng2-bootstrap';
+import { ModalDirective } from 'ngx-bootstrap/modal';
 import { Router }    from '@angular/router';
 import * as app from 'electron';
 
@@ -22,7 +22,7 @@ export class AppComponent implements OnInit {
   constructor(private api: ApiService, private router: Router, private viewContainerRef: ViewContainerRef) {}
 
   ngOnInit() {
-    this.api.isLoggedIn().then(isLoggedIn => {
+    this.api.isLoggedIn().subscribe(isLoggedIn => {
       if (!isLoggedIn) {
         this.router.navigate(['/auth']);
       }

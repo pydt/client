@@ -9,6 +9,7 @@ import * as pako from 'pako';
 import { ApiService } from 'pydt-shared';
 import { PydtSettings } from '../shared/pydtSettings';
 import { PlayTurnState } from './playTurnState.service';
+import { Observable } from "rxjs/Observable";
 
 @Component({
   selector: 'pydt-home',
@@ -16,7 +17,6 @@ import { PlayTurnState } from './playTurnState.service';
   styleUrls: ['./playTurn.component.css']
 })
 export class PlayTurnComponent implements OnInit {
-  private busy: Promise<any>;
   private status = 'Downloading Save File...';
   private saveDir: string;
   private archiveDir: string;
@@ -57,14 +57,13 @@ export class PlayTurnComponent implements OnInit {
     this.abort = false;
 
     this.apiService.getTurnUrl(this.playTurnState.game.gameId, true)
-      .then(url => {
+      .flatMap(url => {
         console.log(url);
-        return this.downloadFile(url);
+        return Observable.fromPromise(this.downloadFile(url));
       })
-      .then(() => {
-        return this.watchForSave();
-      })
-      .catch(err => {
+      .subscribe(() => {
+        return Observable.fromPromise(this.watchForSave());
+      }, err => {
         this.status = err;
         this.abort = true;
       });
@@ -156,8 +155,8 @@ export class PlayTurnComponent implements OnInit {
     const moveTo = path.join(this.archiveDir, path.basename(this.saveFileToUpload));
     this.saveFileToUpload = null;
 
-    this.apiService.startTurnSubmit(this.playTurnState.game.gameId).then(response => {
-      return new Promise((resolve, reject) => {
+    this.apiService.startTurnSubmit(this.playTurnState.game.gameId).flatMap(response => {
+      return Observable.fromPromise(new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.open('PUT', response.putUrl, true);
 
@@ -183,16 +182,15 @@ export class PlayTurnComponent implements OnInit {
 
         xhr.setRequestHeader('Content-Type', 'application/octet-stream');
         xhr.send(fileData);
-      });
+      }));
     })
-    .then(() => {
-      return this.busy = this.apiService.finishTurnSubmit(this.playTurnState.game.gameId);
+    .flatMap(() => {
+      return this.apiService.finishTurnSubmit(this.playTurnState.game.gameId);
     })
-    .then(() => {
+    .subscribe(() => {
       fs.renameSync(moveFrom, moveTo);
       this.router.navigate(['/']);
-    })
-    .catch(err => {
+    }, err => {
       this.status = 'There was an error submitting your turn.  Please try again.';
 
       if (err.json && err.json().errorMessage) {

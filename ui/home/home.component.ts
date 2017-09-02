@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { Router }    from '@angular/router';
 
 import { ApiService, ProfileCacheService, SteamProfile, Game } from 'pydt-shared';
@@ -15,7 +15,6 @@ const TOAST_INTERVAL: number = 14.5 * 60 * 1000;
   templateUrl: './home.component.html'
 })
 export class HomeComponent implements OnInit, OnDestroy {
-  private busy: Promise<any>;
   private games: Game[];
   private profile: SteamProfile;
   private gamePlayerProfiles: any = {};
@@ -24,10 +23,15 @@ export class HomeComponent implements OnInit, OnDestroy {
   private lastNotification: Date;
   private iotDevice;
 
-  constructor(private apiService: ApiService, private profileCache: ProfileCacheService, private router: Router) {}
+  constructor(
+    private apiService: ApiService,
+    private profileCache: ProfileCacheService,
+    private router: Router,
+    private cdRef: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
-    this.apiService.getSteamProfile().then(profile => {
+    this.apiService.getSteamProfile().subscribe(profile => {
       this.profile = profile;
       const timer = Observable.timer(10, POLL_INTERVAL);
       this.configureIot();
@@ -59,7 +63,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     let pollUrl;
-    let req;
+    let req: Observable<Game[]>;
 
     if (this.destroyed) {
       return this.ngOnDestroy();
@@ -68,16 +72,16 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (pollUrl) {
       req = this.apiService.getPublicJson(pollUrl);
     } else {
-      req = this.apiService.getUserGames().then(games => {
+      req = this.apiService.getUserGames().map(games => {
         pollUrl = games.pollUrl;
         return games.data;
       });
     }
 
-    this.busy = req.then(games => {
+    req.subscribe(games => {
       this.games = games;
 
-      this.profileCache.getProfilesForGames(games).then(profiles => {
+      this.profileCache.getProfilesForGames(games).subscribe(profiles => {
         this.gamePlayerProfiles = profiles;
       });
 
@@ -97,18 +101,16 @@ export class HomeComponent implements OnInit, OnDestroy {
         });
         this.lastNotification = new Date();
       }
-    }).catch(err => {
+
+      // Why is this necessary???
+      this.cdRef.detectChanges();
+    }, err => {
       console.log('Error polling user games...', err);
 
       setTimeout(() => {
         this.loadGames(retry + 1);
       }, 5000);
     });
-
-    // Only show busy overlay on initial load...
-    if (this.games) {
-      this.busy = null;
-    }
   }
 
   configureIot() {

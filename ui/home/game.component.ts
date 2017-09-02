@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Router }    from '@angular/router';
-import { SteamProfile, Game, GamePlayer, CivDef, Civ6Leaders } from 'pydt-shared';
+import { SteamProfile, Game, GamePlayer, CivDef, CIV6_LEADERS } from 'pydt-shared';
 import { PlayTurnState } from '../playTurn/playTurnState.service';
 import * as _ from 'lodash';
 import * as countdown from 'countdown';
@@ -28,7 +28,7 @@ export class GameComponent implements OnInit {
     for (let i = 0; i < this.game.slots; i++) {
       if (this.game.players.length > i) {
         this.gamePlayers.push(this.game.players[i]);
-        this.civDefs.push(_.find(Civ6Leaders, leader => {
+        this.civDefs.push(_.find(CIV6_LEADERS, leader => {
           return leader.leaderKey === this.game.players[i].civType;
         }));
       } else {
