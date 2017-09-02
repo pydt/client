@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Router }    from '@angular/router';
+import { Router } from '@angular/router';
 import { SteamProfile, Game, GamePlayer, CivDef, CIV6_LEADERS } from 'pydt-shared';
 import { PlayTurnState } from '../playTurn/playTurnState.service';
 import * as _ from 'lodash';

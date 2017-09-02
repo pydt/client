@@ -1,5 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { Router }    from '@angular/router';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 
 import { ApiService, ProfileCacheService, SteamProfile, Game } from 'pydt-shared';
 import { Observable, Subscription } from 'rxjs';
@@ -25,9 +24,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   constructor(
     private apiService: ApiService,
-    private profileCache: ProfileCacheService,
-    private router: Router,
-    private cdRef: ChangeDetectorRef
+    private profileCache: ProfileCacheService
   ) {}
 
   ngOnInit() {
@@ -114,7 +111,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (!this.profile) {
       return;
     }
-    
+
     const env = PYDT_CONFIG.PROD ? 'prod' : 'dev';
     const topic = `/pydt/${env}/user/${this.profile.steamid}/gameupdate`;
 

@@ -2,10 +2,10 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpModule, XHRBackend, RequestOptions, Http } from '@angular/http';
-import { FormsModule }   from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { routing } from './app.routing';
 import { ModalModule } from 'ngx-bootstrap/modal';
-import { ProgressbarModule} from 'ngx-bootstrap/progressbar';
+import { ProgressbarModule } from 'ngx-bootstrap/progressbar';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
 
 import { AppComponent } from './app.component';
@@ -16,7 +16,9 @@ import { GamePlayerComponent } from './home/player.component';
 import { PlayTurnComponent } from './playTurn/playTurn.component';
 import { PlayTurnState } from './playTurn/playTurnState.service';
 
-import { ApiService, BusyService, BusyComponent, PydtHttp, ProfileCacheService, API_URL_PROVIDER_TOKEN, API_CREDENTIALS_PROVIDER_TOKEN } from 'pydt-shared';
+import {
+  ApiService, BusyService, BusyComponent, PydtHttp, ProfileCacheService, API_URL_PROVIDER_TOKEN, API_CREDENTIALS_PROVIDER_TOKEN
+} from 'pydt-shared';
 import { WebApiUrlProvider, WebApiCredentialsProvider } from './shared/electronApiServiceImplementations';
 
 @NgModule({
@@ -57,5 +59,4 @@ import { WebApiUrlProvider, WebApiCredentialsProvider } from './shared/electronA
   bootstrap: [AppComponent]
 })
 export class AppModule {
-  constructor() {}
 }

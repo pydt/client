@@ -2,8 +2,8 @@ import * as storage from 'electron-json-storage';
 import * as _ from 'lodash';
 
 export class PydtSettings {
-  launchCiv: boolean = true;
-  startOnBoot: boolean = false;
+  launchCiv = true;
+  startOnBoot = false;
 
   static getSettings(): Promise<PydtSettings> {
     return new Promise((resolve, reject) => {

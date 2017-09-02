@@ -9,7 +9,8 @@
     "pack": "bash -c \"npm run build-prod; build --dir\"",
     "dist-win": "bash -c \"npm run build-prod; node_modules/.bin/build --win squirrel --publish always\"",
     "dist-mac": "bash -c \"npm run build-prod; node_modules/.bin/build --mac --publish always\"",
-    "postinstall": "install-app-deps"
+    "postinstall": "install-app-deps",
+    "lint": "tslint --type-check --project tsconfig.json ./ui/**/*.ts"
   },
   "build": {
     "appId": "play.your.damn.turn.client",

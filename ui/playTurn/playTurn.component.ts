@@ -9,7 +9,7 @@ import * as pako from 'pako';
 import { ApiService } from 'pydt-shared';
 import { PydtSettings } from '../shared/pydtSettings';
 import { PlayTurnState } from './playTurnState.service';
-import { Observable } from "rxjs/Observable";
+import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'pydt-home',

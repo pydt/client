@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewChild, ViewContainerRef  } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ModalDirective } from 'ngx-bootstrap/modal';
-import { Router }    from '@angular/router';
+import { Router } from '@angular/router';
 import * as app from 'electron';
 
 import { ApiService } from 'pydt-shared';
@@ -19,7 +19,7 @@ export class AppComponent implements OnInit {
   @ViewChild('updateModal') updateModal: ModalDirective;
   @ViewChild('settingsModal') settingsModal: ModalDirective;
 
-  constructor(private api: ApiService, private router: Router, private viewContainerRef: ViewContainerRef) {}
+  constructor(private api: ApiService, private router: Router) {}
 
   ngOnInit() {
     this.api.isLoggedIn().subscribe(isLoggedIn => {

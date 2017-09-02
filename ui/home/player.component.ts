@@ -15,8 +15,8 @@ export class GamePlayerComponent implements OnDestroy {
 
   getTooltip() {
     if (this.player) {
+      const profile = this.gamePlayerProfiles[this.player.steamId];
       let playerName = 'AI';
-      let profile = this.gamePlayerProfiles[this.player.steamId];
 
       if (profile && !this.player.hasSurrendered) {
         playerName = profile.personaname;
