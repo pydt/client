@@ -101,9 +101,6 @@ export class HomeComponent implements OnInit, OnDestroy {
         });
         this.lastNotification = new Date();
       }
-
-      // Why is this necessary???
-      this.cdRef.detectChanges();
     }, err => {
       console.log('Error polling user games...', err);
 
@@ -114,6 +111,10 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   configureIot() {
+    if (!this.profile) {
+      return;
+    }
+    
     const env = PYDT_CONFIG.PROD ? 'prod' : 'dev';
     const topic = `/pydt/${env}/user/${this.profile.steamid}/gameupdate`;
 

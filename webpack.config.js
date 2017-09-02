@@ -33,12 +33,9 @@ module.exports = {
 
   entry: {
     'rollbar': './ui/rollbar.js',
-    'zone': 'zone.js',
-    'vendor': [
-      'reflect-metadata',
-      'bootstrap-loader'
-    ],
-    'app': './ui/bootstrap.ts'
+    'bootstrap': 'bootstrap-loader',
+    'polyfills': './ui/polyfills.ts',
+    'app': './ui/main.ts'
   },
 
   output: {
@@ -67,7 +64,6 @@ module.exports = {
   },
 
   plugins: [
-    new CommonsChunkPlugin({ name: 'common',   filename: 'common.js' }),
     new webpack.DefinePlugin({
       // Environment helpers
       'PYDT_CONFIG': {

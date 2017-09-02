@@ -4125,10 +4125,6 @@ punycode@^1.2.4, punycode@^1.4.1:
   version "1.0.0"
   resolved "git+https://github.com/pydt/shared.git#408513d65c9c4f3746e951fd8eaff8a346521a92"
 
-"pydt-shared@git+https://github.com/pydt/shared.git#7bfbc0d034da6f9cd7147564a4aad8fb7c160b12":
-  version "1.0.0"
-  resolved "git+https://github.com/pydt/shared.git#7bfbc0d034da6f9cd7147564a4aad8fb7c160b12"
-
 q@^1.1.2:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/q/-/q-1.5.0.tgz#dd01bac9d06d30e6f219aecb8253ee9ebdc308f1"
@@ -4279,10 +4275,6 @@ reduce-function-call@^1.0.1:
   resolved "https://registry.yarnpkg.com/reduce-function-call/-/reduce-function-call-1.0.2.tgz#5a200bf92e0e37751752fe45b0ab330fd4b6be99"
   dependencies:
     balanced-match "^0.4.2"
-
-reflect-metadata@^0.1.10:
-  version "0.1.10"
-  resolved "https://registry.yarnpkg.com/reflect-metadata/-/reflect-metadata-0.1.10.tgz#b4f83704416acad89988c9b15635d47e03b9344a"
 
 regenerate@^1.2.1:
   version "1.3.2"
