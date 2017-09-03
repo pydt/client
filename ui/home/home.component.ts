@@ -1,10 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 
 import { ApiService, ProfileCacheService, SteamProfile, Game } from 'pydt-shared';
-import { Observable, Subscription } from 'rxjs';
+import { Observable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs/Subscription';
 import * as _ from 'lodash';
 import * as app from 'electron';
 import * as awsIot from 'aws-iot-device-sdk';
+import 'rxjs/add/observable/timer';
 
 const POLL_INTERVAL: number = 600 * 1000;
 const TOAST_INTERVAL: number = 14.5 * 60 * 1000;
@@ -14,9 +16,9 @@ const TOAST_INTERVAL: number = 14.5 * 60 * 1000;
   templateUrl: './home.component.html'
 })
 export class HomeComponent implements OnInit, OnDestroy {
-  private games: Game[];
+  games: Game[];
+  gamePlayerProfiles: any = {};
   private profile: SteamProfile;
-  private gamePlayerProfiles: any = {};
   private timerSub: Subscription;
   private destroyed = false;
   private lastNotification: Date;

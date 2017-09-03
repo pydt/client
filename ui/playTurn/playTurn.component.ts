@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -17,20 +17,20 @@ import { Observable } from 'rxjs/Observable';
   styleUrls: ['./playTurn.component.css']
 })
 export class PlayTurnComponent implements OnInit {
-  private status = 'Downloading Save File...';
+  status = 'Downloading Save File...';
+  saveFileToUpload: string;
+  abort: boolean;
+  curBytes: number;
+  maxBytes: number;
   private saveDir: string;
   private archiveDir: string;
   private saveFileToPlay: string;
-  private saveFileToUpload: string;
-  private abort: boolean;
-  private curBytes: number;
-  private maxBytes: number;
 
   constructor(
+    public playTurnState: PlayTurnState,
     private apiService: ApiService,
-    private playTurnState: PlayTurnState,
     private router: Router,
-    private cdRef: ChangeDetectorRef
+    private ngZone: NgZone
     ) {
     const SUFFIX = '/Sid Meier\'s Civilization VI/Saves/Hotseat/';
 
@@ -62,7 +62,7 @@ export class PlayTurnComponent implements OnInit {
         return Observable.fromPromise(this.downloadFile(url));
       })
       .subscribe(() => {
-        return Observable.fromPromise(this.watchForSave());
+        this.watchForSave();
       }, err => {
         this.status = err;
         this.abort = true;
@@ -76,11 +76,12 @@ export class PlayTurnComponent implements OnInit {
       xhr.responseType = 'arraybuffer';
 
       xhr.onprogress = e => {
-        if (e.lengthComputable) {
-          this.curBytes = Math.round(e.loaded / 1024);
-          this.maxBytes = Math.round(e.total / 1024);
-          this.cdRef.detectChanges();
-        }
+        this.ngZone.run(() => {
+          if (e.lengthComputable) {
+            this.curBytes = Math.round(e.loaded / 1024);
+            this.maxBytes = Math.round(e.total / 1024);
+          }
+        });
       };
 
       xhr.onerror = () => {
@@ -123,8 +124,7 @@ export class PlayTurnComponent implements OnInit {
     });
   }
 
-  // tslint:disable-next-line:no-unused-variable
-  private ignoreSave() {
+  ignoreSave() {
     this.status = 'Downloaded file!  Play Your Damn Turn!';
     this.saveFileToUpload = null;
     this.watchForSave();
@@ -132,23 +132,21 @@ export class PlayTurnComponent implements OnInit {
 
   private watchForSave() {
     const ptThis = this;
-    return new Promise((resolve, reject) => {
-      app.ipcRenderer.send('start-chokidar', this.saveDir);
-      app.ipcRenderer.on('new-save-detected', newSaveDetected);
+    app.ipcRenderer.send('start-chokidar', this.saveDir);
+    app.ipcRenderer.on('new-save-detected', newSaveDetected);
 
-      //////
+    //////
 
-      function newSaveDetected(event, arg) {
+    function newSaveDetected(event, arg) {
+      ptThis.ngZone.run(() => {
         ptThis.status = `Detected new save: ${path.basename(arg).replace('.Civ6Save', '')}.  Submit turn?`;
         ptThis.saveFileToUpload = arg;
         app.ipcRenderer.removeListener('new-save-detected', newSaveDetected);
-        resolve();
-      }
-    });
+      });
+    }
   }
 
-  // tslint:disable-next-line:no-unused-variable
-  private submitFile() {
+  submitFile() {
     this.status = 'Uploading...';
     const fileData = pako.gzip(fs.readFileSync(this.saveFileToUpload));
     const moveFrom = this.saveFileToUpload;
@@ -161,11 +159,12 @@ export class PlayTurnComponent implements OnInit {
         xhr.open('PUT', response.putUrl, true);
 
         xhr.upload.onprogress = e => {
-          if (e.lengthComputable) {
-            this.curBytes = Math.round(e.loaded / 1024);
-            this.maxBytes = Math.round(e.total / 1024);
-            this.cdRef.detectChanges();
-          }
+          this.ngZone.run(() => {
+            if (e.lengthComputable) {
+              this.curBytes = Math.round(e.loaded / 1024);
+              this.maxBytes = Math.round(e.total / 1024);
+            }
+          });
         };
 
         xhr.onload = () => {
@@ -202,8 +201,7 @@ export class PlayTurnComponent implements OnInit {
     });
   }
 
-  // tslint:disable-next-line:no-unused-variable
-  private goHome() {
+  goHome() {
     this.router.navigate(['/']);
   }
 }

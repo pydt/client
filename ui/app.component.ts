@@ -11,9 +11,9 @@ import { PydtSettings } from './shared/pydtSettings';
   templateUrl: './app.component.html'
 })
 export class AppComponent implements OnInit {
-  private version: string;
-  private newVersion: string;
-  private settings = new PydtSettings();
+  version: string;
+  newVersion: string;
+  settings = new PydtSettings();
 
   @ViewChild('aboutModal') aboutModal: ModalDirective;
   @ViewChild('updateModal') updateModal: ModalDirective;

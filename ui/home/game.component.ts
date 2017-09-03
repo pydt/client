@@ -15,8 +15,8 @@ export class GameComponent implements OnInit {
   @Input() game: Game;
   @Input() gamePlayerProfiles: Map<String, SteamProfile>;
   @Input() yourTurn: boolean;
-  private gamePlayers: GamePlayer[] = [];
-  private civDefs: CivDef[] = [];
+  gamePlayers: GamePlayer[] = [];
+  civDefs: CivDef[] = [];
   private now: Date;
 
   constructor(private router: Router, private playTurnState: PlayTurnState) {}
@@ -48,6 +48,7 @@ export class GameComponent implements OnInit {
   }
 
   lastTurn() {
+    // tslint:disable-next-line:no-bitwise
     return countdown(Date.parse(this.game.updatedAt), this.now, countdown.HOURS | countdown.MINUTES);
   }
 }

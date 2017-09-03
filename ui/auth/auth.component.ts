@@ -7,7 +7,7 @@ import { ApiService } from 'pydt-shared';
   templateUrl: './auth.component.html'
 })
 export class AuthComponent {
-  private model = new AuthModel();
+  model = new AuthModel();
 
   constructor(private apiService: ApiService, private router: Router) {}
 
