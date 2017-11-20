@@ -55,7 +55,7 @@ export class PlayTurnComponent implements OnInit {
   ngOnInit() {
     this.abort = false;
 
-    this.api.gameGetTurn(this.playTurnState.game.gameId, true)
+    this.api.gameGetTurn(this.playTurnState.game.gameId, "yup")
       .flatMap(resp => {
         return Observable.fromPromise(this.downloadFile(resp.downloadUrl));
       })

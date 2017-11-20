@@ -164,9 +164,10 @@ export class DefaultApi {
     /**
      * 
      * @param gameId 
+     * @param compressed 
      */
-    public gameGetTurn(gameId: string, extraHttpRequestParams?: any): Observable<models.GameTurnResponse> {
-        return this.gameGetTurnWithHttpInfo(gameId, extraHttpRequestParams)
+    public gameGetTurn(gameId: string, compressed?: string, extraHttpRequestParams?: any): Observable<models.GameTurnResponse> {
+        return this.gameGetTurnWithHttpInfo(gameId, compressed, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -745,8 +746,9 @@ export class DefaultApi {
      * 
      * 
      * @param gameId 
+     * @param compressed 
      */
-    public gameGetTurnWithHttpInfo(gameId: string, extraHttpRequestParams?: any): Observable<Response> {
+    public gameGetTurnWithHttpInfo(gameId: string, compressed?: string, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + '/game/${gameId}/turn'
                     .replace('${' + 'gameId' + '}', String(gameId));
 
@@ -756,6 +758,10 @@ export class DefaultApi {
         if (gameId === null || gameId === undefined) {
             throw new Error('Required parameter gameId was null or undefined when calling gameGetTurn.');
         }
+        if (compressed !== undefined) {
+            queryParameters.set('compressed', <any>compressed);
+        }
+
         // to determine the Content-Type header
         let consumes: string[] = [
             'application/json'
