@@ -251,6 +251,17 @@ app-package-builder@1.5.0:
     int64-buffer "^0.1.9"
     rabin-bindings "~1.7.3"
 
+app-package-builder@1.5.1:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/app-package-builder/-/app-package-builder-1.5.1.tgz#92bc9bf8821a7d61eb057171515718cc1f6f4514"
+  dependencies:
+    bluebird-lst "^1.0.5"
+    builder-util "^3.4.0"
+    builder-util-runtime "^3.2.0"
+    fs-extra-p "^4.4.4"
+    int64-buffer "^0.1.9"
+    rabin-bindings "~1.7.3"
+
 app-root-path@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/app-root-path/-/app-root-path-2.0.1.tgz#cd62dcf8e4fd5a417efc664d2e5b10653c651b46"
@@ -723,7 +734,7 @@ builder-util@3.2.2:
     temp-file "^2.0.3"
     tunnel-agent "^0.6.0"
 
-builder-util@^3.2.1, builder-util@^3.4.0:
+builder-util@3.4.0, builder-util@^3.2.1, builder-util@^3.4.0:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/builder-util/-/builder-util-3.4.0.tgz#ff077d4bcee1194d0ebe22ce7eaaa414e8f8d610"
   dependencies:
@@ -1485,6 +1496,18 @@ dmg-builder@2.1.6:
     js-yaml "^3.10.0"
     parse-color "^1.0.0"
 
+dmg-builder@2.1.7:
+  version "2.1.7"
+  resolved "https://registry.yarnpkg.com/dmg-builder/-/dmg-builder-2.1.7.tgz#0d672ee00929f6a1ff321b3b660d0350e4c880eb"
+  dependencies:
+    bluebird-lst "^1.0.5"
+    builder-util "^3.4.0"
+    debug "^3.1.0"
+    fs-extra-p "^4.4.4"
+    iconv-lite "^0.4.19"
+    js-yaml "^3.10.0"
+    parse-color "^1.0.0"
+
 dns-equal@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/dns-equal/-/dns-equal-1.0.0.tgz#b39e7f1da6eb0a75ba9c17324b34753c47e0654d"
@@ -1586,6 +1609,37 @@ ee-first@1.1.1:
 ejs@^2.5.7:
   version "2.5.7"
   resolved "https://registry.yarnpkg.com/ejs/-/ejs-2.5.7.tgz#cc872c168880ae3c7189762fd5ffc00896c9518a"
+
+electron-builder-lib@^19.46.3:
+  version "19.46.3"
+  resolved "https://registry.yarnpkg.com/electron-builder-lib/-/electron-builder-lib-19.46.3.tgz#a409e350b32a9a08bc1e217a22e73a9129b4e842"
+  dependencies:
+    "7zip-bin" "^2.2.7"
+    app-package-builder "1.5.1"
+    asar-integrity "0.2.3"
+    async-exit-hook "^2.0.1"
+    bluebird-lst "^1.0.5"
+    builder-util "3.4.0"
+    builder-util-runtime "3.2.0"
+    chromium-pickle-js "^0.2.0"
+    debug "^3.1.0"
+    dmg-builder "2.1.7"
+    ejs "^2.5.7"
+    electron-osx-sign "0.4.7"
+    electron-publish "19.46.0"
+    fs-extra-p "^4.4.4"
+    hosted-git-info "^2.5.0"
+    is-ci "^1.0.10"
+    isbinaryfile "^3.0.2"
+    js-yaml "^3.10.0"
+    lazy-val "^1.0.2"
+    minimatch "^3.0.4"
+    normalize-package-data "^2.4.0"
+    plist "^2.1.0"
+    read-config-file "1.2.0"
+    sanitize-filename "^1.6.1"
+    semver "^5.4.1"
+    temp-file "^2.1.0"
 
 electron-builder-squirrel-windows@^19.46.0:
   version "19.46.0"
@@ -1700,6 +1754,17 @@ electron-publish@19.45.0:
     bluebird-lst "^1.0.5"
     builder-util "^3.2.1"
     builder-util-runtime "^3.1.0"
+    chalk "^2.3.0"
+    fs-extra-p "^4.4.4"
+    mime "^2.0.3"
+
+electron-publish@19.46.0:
+  version "19.46.0"
+  resolved "https://registry.yarnpkg.com/electron-publish/-/electron-publish-19.46.0.tgz#ad26773ffe2c4ea0e88379434832327c0e187398"
+  dependencies:
+    bluebird-lst "^1.0.5"
+    builder-util "^3.4.0"
+    builder-util-runtime "^3.2.0"
     chalk "^2.3.0"
     fs-extra-p "^4.4.4"
     mime "^2.0.3"
