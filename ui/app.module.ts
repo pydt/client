@@ -17,7 +17,7 @@ import { PlayTurnComponent } from './playTurn/playTurn.component';
 import { PlayTurnState } from './playTurn/playTurnState.service';
 
 import { BusyService, BusyComponent, ProfileCacheService } from 'pydt-shared';
-import { DefaultApi } from './swagger/api/index';
+import { DefaultApi, BASE_PATH } from './swagger/api';
 import { PydtHttp } from './shared/pydtHttp';
 import { AuthService } from './shared/authService';
 
@@ -43,15 +43,22 @@ import { AuthService } from './shared/authService';
   ],
   providers: [
     AuthService,
-    ProfileCacheService,
+    {
+      provide: ProfileCacheService,
+      useFactory: (api: DefaultApi) => {
+        return new ProfileCacheService(api);
+      },
+      deps: [DefaultApi]
+    },
     PlayTurnState,
     BusyService,
+    { provide: BASE_PATH, useValue: PYDT_CONFIG.API_URL },
     {
       provide: Http,
       useFactory: (backend: XHRBackend, options: RequestOptions, busy: BusyService, auth: AuthService) => {
         return new PydtHttp(backend, options, busy, auth);
       },
-      deps: [XHRBackend, RequestOptions, BusyService]
+      deps: [XHRBackend, RequestOptions, BusyService, AuthService]
     },
     DefaultApi
   ],
