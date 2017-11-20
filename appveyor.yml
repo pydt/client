@@ -19,8 +19,7 @@ init:
 install:
   - ps: Install-Product node 6 x64
   - git reset --hard HEAD
-  - npm install
-  - npm prune
+  - yarn install
 
 build_script:
   - node --version
