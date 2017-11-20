@@ -1,14 +1,12 @@
 import { Injectable } from '@angular/core';
 import * as storage from 'electron-json-storage';
-import { ApiUrlProvider, ApiCredentialsProvider, SteamProfile } from 'pydt-shared';
 
 @Injectable()
-export class WebApiCredentialsProvider implements ApiCredentialsProvider {
-  store(token: string, profile: SteamProfile): Promise<void> {
+export class AuthService {
+  store(token: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       const config = {
-        token: token,
-        profile: profile
+        token: token
       };
 
       storage.set('configData', config, err => {
@@ -27,12 +25,6 @@ export class WebApiCredentialsProvider implements ApiCredentialsProvider {
     });
   }
 
-  getSteamProfile(): Promise<SteamProfile> {
-    return this.getConfig().then(config => {
-      return config.profile;
-    });
-  }
-
   getConfig(): Promise<any> {
     return new Promise((resolve, reject) => {
       storage.get('configData', (err, config) => {
@@ -44,9 +36,4 @@ export class WebApiCredentialsProvider implements ApiCredentialsProvider {
       });
     });
   }
-}
-
-@Injectable()
-export class WebApiUrlProvider implements ApiUrlProvider {
-  url: string = PYDT_CONFIG.API_URL;
 }

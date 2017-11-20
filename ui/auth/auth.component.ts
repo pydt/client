@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { ApiService } from 'pydt-shared';
+import { AuthService } from '../shared/authService';
 
 @Component({
   selector: 'pydt-auth',
@@ -9,11 +9,11 @@ import { ApiService } from 'pydt-shared';
 export class AuthComponent {
   model = new AuthModel();
 
-  constructor(private apiService: ApiService, private router: Router) {}
+  constructor(private auth: AuthService, private router: Router) {}
 
   onSubmit() {
-    this.apiService.setToken(this.model.token)
-      .subscribe(() => {
+    this.auth.store(this.model.token)
+      .then(() => {
         this.router.navigate(['/']);
       });
   }

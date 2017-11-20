@@ -1,5 +1,6 @@
 import { Component, Input, OnDestroy, ViewChild } from '@angular/core';
-import { SteamProfile, Game, GamePlayer, CivDef } from 'pydt-shared';
+import { CivDef, PcsProfileMap, PcsSteamProfile } from 'pydt-shared';
+import { Game, GamePlayer } from '../swagger/api';
 
 @Component({
   selector: 'pydt-player',
@@ -9,7 +10,7 @@ import { SteamProfile, Game, GamePlayer, CivDef } from 'pydt-shared';
 export class GamePlayerComponent implements OnDestroy {
   @Input() game: Game;
   @Input() player: GamePlayer;
-  @Input() gamePlayerProfiles: Map<String, SteamProfile>;
+  @Input() gamePlayerProfiles: PcsProfileMap;
   @Input() civDef: CivDef;
   @ViewChild('tooltip') tooltip: any;
 
@@ -36,7 +37,7 @@ export class GamePlayerComponent implements OnDestroy {
 
   getProfileImg() {
     if (this.player && this.player.steamId && !this.player.hasSurrendered) {
-      return (this.gamePlayerProfiles[this.player.steamId] || {}).avatarmedium;
+      return (this.gamePlayerProfiles[this.player.steamId] || {} as PcsSteamProfile).avatarmedium;
     }
 
     return 'https://playyourdamnturn.com/img/android.png';

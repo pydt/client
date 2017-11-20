@@ -1,7 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { SteamProfile, Game, GamePlayer, CivDef, CIV6_LEADERS } from 'pydt-shared';
+import { CivDef, CIV6_LEADERS, PcsProfileMap } from 'pydt-shared';
 import { PlayTurnState } from '../playTurn/playTurnState.service';
+import { Game, GamePlayer } from '../swagger/api';
 import * as _ from 'lodash';
 import * as countdown from 'countdown';
 import * as app from 'electron';
@@ -13,7 +14,7 @@ import * as app from 'electron';
 })
 export class GameComponent implements OnInit {
   @Input() game: Game;
-  @Input() gamePlayerProfiles: Map<String, SteamProfile>;
+  @Input() gamePlayerProfiles: PcsProfileMap;
   @Input() yourTurn: boolean;
   gamePlayers: GamePlayer[] = [];
   civDefs: CivDef[] = [];
@@ -49,6 +50,6 @@ export class GameComponent implements OnInit {
 
   lastTurn() {
     // tslint:disable-next-line:no-bitwise
-    return countdown(Date.parse(this.game.updatedAt), this.now, countdown.HOURS | countdown.MINUTES);
+    return countdown(Date.parse(this.game.updatedAt as any), this.now, countdown.HOURS | countdown.MINUTES);
   }
 }

@@ -1,8 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-
-import { ApiService, ProfileCacheService, SteamProfile, Game } from 'pydt-shared';
+import { Http } from '@angular/http';
+import { ProfileCacheService } from 'pydt-shared';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
+import { Game, SteamProfile, DefaultApi } from '../swagger/api';
 import * as _ from 'lodash';
 import * as app from 'electron';
 import * as awsIot from 'aws-iot-device-sdk';
@@ -25,12 +26,13 @@ export class HomeComponent implements OnInit, OnDestroy {
   private iotDevice;
 
   constructor(
-    private apiService: ApiService,
+    private api: DefaultApi,
+    private http: Http,
     private profileCache: ProfileCacheService
   ) {}
 
   ngOnInit() {
-    this.apiService.getSteamProfile().subscribe(profile => {
+    this.api.userSteamProfile().subscribe(profile => {
       this.profile = profile;
       const timer = Observable.timer(10, POLL_INTERVAL);
       this.configureIot();
@@ -69,9 +71,11 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     if (pollUrl) {
-      req = this.apiService.getPublicJson(pollUrl);
+      req = this.http.get(pollUrl).map(resp => {
+        return resp.json();
+      });
     } else {
-      req = this.apiService.getUserGames().map(games => {
+      req = this.api.userGames().map(games => {
         pollUrl = games.pollUrl;
         return games.data;
       });
@@ -80,7 +84,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     req.subscribe(games => {
       this.games = games;
 
-      this.profileCache.getProfilesForGames(games).subscribe(profiles => {
+      this.profileCache.getProfilesForGames(games).then(profiles => {
         this.gamePlayerProfiles = profiles;
       });
 

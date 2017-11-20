@@ -1,10 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { Router } from '@angular/router';
-import * as app from 'electron';
-
-import { ApiService } from 'pydt-shared';
 import { PydtSettings } from './shared/pydtSettings';
+import * as app from 'electron';
+import { AuthService } from './shared/authService';
 
 @Component({
   selector: 'pydt-app',
@@ -19,11 +18,11 @@ export class AppComponent implements OnInit {
   @ViewChild('updateModal') updateModal: ModalDirective;
   @ViewChild('settingsModal') settingsModal: ModalDirective;
 
-  constructor(private api: ApiService, private router: Router) {}
+  constructor(private auth: AuthService, private router: Router) {}
 
   ngOnInit() {
-    this.api.isLoggedIn().subscribe(isLoggedIn => {
-      if (!isLoggedIn) {
+    this.auth.getToken().then(token => {
+      if (!token) {
         this.router.navigate(['/auth']);
       }
     });

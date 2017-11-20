@@ -1,15 +1,14 @@
 import { Component, OnInit, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
+import { PydtSettings } from '../shared/pydtSettings';
+import { PlayTurnState } from './playTurnState.service';
+import { Observable } from 'rxjs/Observable';
+import { DefaultApi } from '../swagger/api';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as mkdirp from 'mkdirp';
 import * as app from 'electron';
 import * as pako from 'pako';
-
-import { ApiService } from 'pydt-shared';
-import { PydtSettings } from '../shared/pydtSettings';
-import { PlayTurnState } from './playTurnState.service';
-import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'pydt-home',
@@ -28,7 +27,7 @@ export class PlayTurnComponent implements OnInit {
 
   constructor(
     public playTurnState: PlayTurnState,
-    private apiService: ApiService,
+    private api: DefaultApi,
     private router: Router,
     private ngZone: NgZone
     ) {
@@ -56,10 +55,9 @@ export class PlayTurnComponent implements OnInit {
   ngOnInit() {
     this.abort = false;
 
-    this.apiService.getTurnUrl(this.playTurnState.game.gameId, true)
-      .flatMap(url => {
-        console.log(url);
-        return Observable.fromPromise(this.downloadFile(url));
+    this.api.gameGetTurn(this.playTurnState.game.gameId, true)
+      .flatMap(resp => {
+        return Observable.fromPromise(this.downloadFile(resp.downloadUrl));
       })
       .subscribe(() => {
         this.watchForSave();
@@ -69,7 +67,7 @@ export class PlayTurnComponent implements OnInit {
       });
   }
 
-  private downloadFile(url) {
+  private downloadFile(url: string) {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhr.open('GET', url, true);
@@ -153,7 +151,7 @@ export class PlayTurnComponent implements OnInit {
     const moveTo = path.join(this.archiveDir, path.basename(this.saveFileToUpload));
     this.saveFileToUpload = null;
 
-    this.apiService.startTurnSubmit(this.playTurnState.game.gameId).flatMap(response => {
+    this.api.gameStartSubmit(this.playTurnState.game.gameId).flatMap(response => {
       return Observable.fromPromise(new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.open('PUT', response.putUrl, true);
@@ -184,7 +182,7 @@ export class PlayTurnComponent implements OnInit {
       }));
     })
     .flatMap(() => {
-      return this.apiService.finishTurnSubmit(this.playTurnState.game.gameId);
+      return this.api.gameFinishSubmit(this.playTurnState.game.gameId);
     })
     .subscribe(() => {
       fs.renameSync(moveFrom, moveTo);

@@ -16,10 +16,10 @@ import { GamePlayerComponent } from './home/player.component';
 import { PlayTurnComponent } from './playTurn/playTurn.component';
 import { PlayTurnState } from './playTurn/playTurnState.service';
 
-import {
-  ApiService, BusyService, BusyComponent, PydtHttp, ProfileCacheService, API_URL_PROVIDER_TOKEN, API_CREDENTIALS_PROVIDER_TOKEN
-} from 'pydt-shared';
-import { WebApiUrlProvider, WebApiCredentialsProvider } from './shared/electronApiServiceImplementations';
+import { BusyService, BusyComponent, ProfileCacheService } from 'pydt-shared';
+import { DefaultApi } from './swagger/api/index';
+import { PydtHttp } from './shared/pydtHttp';
+import { AuthService } from './shared/authService';
 
 @NgModule({
   imports: [
@@ -42,19 +42,18 @@ import { WebApiUrlProvider, WebApiCredentialsProvider } from './shared/electronA
     BusyComponent
   ],
   providers: [
-    ApiService,
-    { provide: API_URL_PROVIDER_TOKEN, useClass: WebApiUrlProvider },
-    { provide: API_CREDENTIALS_PROVIDER_TOKEN, useClass: WebApiCredentialsProvider },
+    AuthService,
     ProfileCacheService,
     PlayTurnState,
     BusyService,
     {
       provide: Http,
-      useFactory: (backend: XHRBackend, options: RequestOptions, busy: BusyService) => {
-        return new PydtHttp(backend, options, busy);
+      useFactory: (backend: XHRBackend, options: RequestOptions, busy: BusyService, auth: AuthService) => {
+        return new PydtHttp(backend, options, busy, auth);
       },
       deps: [XHRBackend, RequestOptions, BusyService]
-    }
+    },
+    DefaultApi
   ],
   bootstrap: [AppComponent]
 })
