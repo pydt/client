@@ -55,7 +55,7 @@ export class PlayTurnComponent implements OnInit {
   ngOnInit() {
     this.abort = false;
 
-    this.api.gameGetTurn(this.playTurnState.game.gameId, "yup")
+    this.api.gameGetTurn(this.playTurnState.game.gameId, 'yup')
       .flatMap(resp => {
         return Observable.fromPromise(this.downloadFile(resp.downloadUrl));
       })
@@ -144,17 +144,19 @@ export class PlayTurnComponent implements OnInit {
     }
   }
 
-  submitFile() {
+  async submitFile() {
     this.status = 'Uploading...';
     const fileData = pako.gzip(fs.readFileSync(this.saveFileToUpload));
     const moveFrom = this.saveFileToUpload;
     const moveTo = path.join(this.archiveDir, path.basename(this.saveFileToUpload));
     this.saveFileToUpload = null;
 
-    this.api.gameStartSubmit(this.playTurnState.game.gameId).flatMap(response => {
-      return Observable.fromPromise(new Promise((resolve, reject) => {
+    try {
+      const startResp = await this.api.gameStartSubmit(this.playTurnState.game.gameId).toPromise();
+
+      await new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
-        xhr.open('PUT', response.putUrl, true);
+        xhr.open('PUT', startResp.putUrl, true);
 
         xhr.upload.onprogress = e => {
           this.ngZone.run(() => {
@@ -179,15 +181,32 @@ export class PlayTurnComponent implements OnInit {
 
         xhr.setRequestHeader('Content-Type', 'application/octet-stream');
         xhr.send(fileData);
-      }));
-    })
-    .flatMap(() => {
-      return this.api.gameFinishSubmit(this.playTurnState.game.gameId);
-    })
-    .subscribe(() => {
+      });
+
+      await this.api.gameFinishSubmit(this.playTurnState.game.gameId).toPromise();
+
+      const settings = await PydtSettings.getSettings();
+
       fs.renameSync(moveFrom, moveTo);
+
+      // If we've got too many archived files, delete some...
+      const files: string[] = fs.readdirSync(this.archiveDir)
+        .map(x => {
+          const file = path.join(this.archiveDir, x);
+          return {
+            file,
+            time: fs.statSync(file).ctime.getTime()
+          };
+        })
+        .sort((a, b) => a.time - b.time)
+        .map(x => x.file);
+
+      while (files.length > settings.numSaves) {
+        fs.unlinkSync(files.shift());
+      }
+
       this.router.navigate(['/']);
-    }, err => {
+    } catch (err) {
       this.status = 'There was an error submitting your turn.  Please try again.';
 
       if (err.json && err.json().errorMessage) {
@@ -196,7 +215,7 @@ export class PlayTurnComponent implements OnInit {
 
       this.curBytes = this.maxBytes = null;
       this.abort = true;
-    });
+    }
   }
 
   goHome() {

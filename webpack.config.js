@@ -5,7 +5,7 @@ var CommonsChunkPlugin = webpack.optimize.CommonsChunkPlugin;
 
 var ENV = process.env.npm_lifecycle_event;
 var isProd = ENV === 'build-prod';
-var apiUrl = "https://5wa5xzappj.execute-api.us-east-1.amazonaws.com/prod";
+var apiUrl = "https://api.playyourdamnturn.com";
 
 if (!isProd) {
   try {

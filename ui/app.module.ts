@@ -7,6 +7,7 @@ import { routing } from './app.routing';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { ProgressbarModule } from 'ngx-bootstrap/progressbar';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
+import { CustomFormsModule } from 'ng2-validation';
 
 import { AppComponent } from './app.component';
 import { AuthComponent } from './auth/auth.component';
@@ -25,6 +26,7 @@ import { AuthService } from './shared/authService';
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    CustomFormsModule,
     HttpModule,
     FormsModule,
     ModalModule.forRoot(),

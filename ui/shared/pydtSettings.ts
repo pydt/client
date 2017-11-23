@@ -4,6 +4,7 @@ import * as _ from 'lodash';
 export class PydtSettings {
   launchCiv = true;
   startOnBoot = false;
+  numSaves = 100;
 
   static getSettings(): Promise<PydtSettings> {
     return new Promise((resolve, reject) => {
@@ -12,11 +13,16 @@ export class PydtSettings {
           return reject(err);
         }
 
-        if (_.isEmpty(settings)) {
-          settings = new PydtSettings();
+        const result = new PydtSettings();
+
+        if (!_.isEmpty(settings)) {
+          _.assign(result, settings);
         }
 
-        resolve(settings);
+        // Make sure numSaves is an int
+        result.numSaves = parseInt(result.numSaves.toString(), 10);
+
+        resolve(result);
       });
     });
   }

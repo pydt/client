@@ -3,6 +3,7 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
 import { Router } from '@angular/router';
 import { PydtSettings } from './shared/pydtSettings';
 import * as app from 'electron';
+import { NgZone } from '@angular/core';
 import { AuthService } from './shared/authService';
 
 @Component({
@@ -18,7 +19,7 @@ export class AppComponent implements OnInit {
   @ViewChild('updateModal') updateModal: ModalDirective;
   @ViewChild('settingsModal') settingsModal: ModalDirective;
 
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(private auth: AuthService, private router: Router, private zone: NgZone) {}
 
   ngOnInit() {
     this.auth.getToken().then(token => {
@@ -37,8 +38,10 @@ export class AppComponent implements OnInit {
       this.hideAllModals();
 
       PydtSettings.getSettings().then(settings => {
-        this.settings = settings;
-        this.settingsModal.show();
+        this.zone.run(() => {
+          this.settings = settings;
+          this.settingsModal.show();
+        });
       });
     });
 

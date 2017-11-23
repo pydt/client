@@ -78,5 +78,8 @@
     "webpack": "^3.8.1",
     "webpack-dev-server": "^2.9.4",
     "zone.js": "^0.8.18"
+  },
+  "dependencies": {
+    "ng2-validation": "^4.2.0"
   }
 }
