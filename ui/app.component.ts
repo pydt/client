@@ -29,16 +29,17 @@ export class AppComponent implements OnInit {
     });
 
     app.ipcRenderer.on('show-about-modal', (e, data) => {
-      this.hideAllModals();
-      this.version = data;
-      this.aboutModal.show();
+      this.zone.run(() => {
+        this.hideAllModals();
+        this.version = data;
+        this.aboutModal.show();
+      });
     });
 
     app.ipcRenderer.on('show-settings-modal', (e, data) => {
-      this.hideAllModals();
-
       PydtSettings.getSettings().then(settings => {
         this.zone.run(() => {
+          this.hideAllModals();
           this.settings = settings;
           this.settingsModal.show();
         });

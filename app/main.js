@@ -104,11 +104,14 @@ function createWindow() {
   };
 
   const menuTemplate = [{
-      label: 'About',
-      click: aboutClick
-    },{
-      label: 'Settings',
-      click: settingsClick
+      label: 'Options', 
+      submenu: [{
+        label: 'About',
+        click: aboutClick
+      },{
+        label: 'Settings',
+        click: settingsClick
+      }]
     },{
       label: 'Debug',
       submenu: [

@@ -35,6 +35,8 @@ export class PlayTurnComponent implements OnInit {
 
     if (process.platform === 'darwin') {
       this.saveDir = app.remote.app.getPath('appData') + SUFFIX;
+    } else if (process.platform === 'linux') {
+      this.saveDir = app.remote.app.getPath('home') + '/.local/share/aspyr-media/' + SUFFIX;
     } else {
       this.saveDir = app.remote.app.getPath('documents') + '/My Games' + SUFFIX;
     }
