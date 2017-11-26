@@ -1,14 +1,16 @@
-os: osx
-osx_image: xcode8.3
+os:
+  - linux
+  - osx
 
-install:
-- nvm install 6
-- brew update
-- brew install yarn
-- yarn install
+osx_image: xcode8.3
+sudo: true
+dist: trusty
+language: node_js
+node_js:
+  - "6"
 
 script:
-- npm run dist-mac
+  - ./.travis/script.sh
 
 branches:
   only:
