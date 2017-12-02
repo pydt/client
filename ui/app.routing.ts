@@ -5,7 +5,7 @@ import { AuthComponent } from './auth/auth.component';
 import { PlayTurnComponent } from './playTurn/playTurn.component';
 
 const routes: Routes = [
-  { path: '', component: HomeComponent },
+  { path: '', component: HomeComponent, pathMatch: 'full' },
   { path: 'auth', component: AuthComponent },
   { path: 'playTurn', component: PlayTurnComponent }
 ];
