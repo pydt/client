@@ -17,6 +17,7 @@ export class AppComponent implements OnInit {
 
   @ViewChild('aboutModal') aboutModal: ModalDirective;
   @ViewChild('updateModal') updateModal: ModalDirective;
+  @ViewChild('manualUpdateModal') manualUpdateModal: ModalDirective;
   @ViewChild('settingsModal') settingsModal: ModalDirective;
 
   constructor(private auth: AuthService, private router: Router, private zone: NgZone) {}
@@ -47,9 +48,19 @@ export class AppComponent implements OnInit {
     });
 
     app.ipcRenderer.on('show-update-modal', (e, data) => {
-      this.hideAllModals();
-      this.newVersion = data;
-      this.updateModal.show();
+      this.zone.run(() => {
+        this.hideAllModals();
+        this.newVersion = data;
+        this.updateModal.show();
+      });
+    });
+
+    app.ipcRenderer.on('manual-update-modal', (e, data) => {
+      this.zone.run(() => {
+        this.hideAllModals();
+        this.newVersion = data;
+        this.manualUpdateModal.show();
+      });
     });
   }
 
@@ -57,6 +68,7 @@ export class AppComponent implements OnInit {
     this.aboutModal.hide();
     this.settingsModal.hide();
     this.updateModal.hide();
+    this.manualUpdateModal.hide();
   }
 
   saveSettings() {

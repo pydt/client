@@ -1,8 +1,12 @@
 const electron = require('electron');
 const log = require('electron-log');
+const request = require('request');
 const autoUpdater = electron.autoUpdater;
 
 const UPDATE_SERVER_HOST = "updates.playyourdamnturn.com";
+
+// Check for updates every 30 minutes
+const UPDATE_INTERVAL = 30 * 60 * 1000;
 
 module.exports.checkForUpdates = (window) => {
   const platform = process.platform;
@@ -16,6 +20,7 @@ module.exports.checkForUpdates = (window) => {
   }
 
   if (platform === "linux") {
+    justCheckNoUpdate(window, version);
     return;
   }
 
@@ -48,12 +53,27 @@ module.exports.checkForUpdates = (window) => {
 
   window.webContents.once("did-frame-finish-load", event => {
     autoUpdater.checkForUpdates();
-
-    // Check for updates every 30 minutes
+    
     setInterval(function() {
       autoUpdater.checkForUpdates();
-    }, 30 * 60 * 1000);
+    }, UPDATE_INTERVAL);
   });
+};
+
+function justCheckNoUpdate(window, version) {
+  // poll win32 feed to see if there's a new version...
+  const url = `https://${UPDATE_SERVER_HOST}/update/win32/${version}`;
+
+  setInterval(() => {
+    request({
+      url,
+      json: true
+    }, (err, resp, body) => {
+      if (body && body.name) {
+        window.send('manual-update-modal', body.name);
+      }
+    });
+  }, UPDATE_INTERVAL);
 };
 
 

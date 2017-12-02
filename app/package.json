@@ -13,6 +13,7 @@
     "electron-squirrel-startup": "^1.0.0",
     "node-notifier": "4.6.1",
     "opn": "^5.1.0",
+    "request": "^2.83.0",
     "rollbar": "^2.2.6"
   }
 }
