@@ -11,7 +11,7 @@
     "electron-json-storage": "^3.1.0",
     "electron-log": "^2.2.7",
     "electron-squirrel-startup": "^1.0.0",
-    "node-notifier": "^5.1.2",
+    "node-notifier": "4.6.1",
     "opn": "^5.1.0",
     "rollbar": "^2.2.6"
   }

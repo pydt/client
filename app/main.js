@@ -187,10 +187,6 @@ function createWindow() {
       arg.icon = path.join(__dirname, 'icon.png');
     }
 
-    if (process.platform === 'win32') {
-      arg.appID = 'com.squirrel.play.your.damn.turn.client';
-    }
-
     arg.wait = true;
     notifier.notify(arg);
   });
