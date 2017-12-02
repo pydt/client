@@ -181,9 +181,14 @@ function createWindow() {
       const rootPath = path.join.apply(this, splitDirname.slice(0, splitDirname.length - 2));
       
       arg.icon = path.join(rootPath, 'Contents/app/icon.png');
+
       if (!fs.existsSync(arg.icon)) arg.icon = path.join(rootPath, 'app/icon.png');
     } else {
       arg.icon = path.join(__dirname, 'icon.png');
+    }
+
+    if (process.platform === 'win32') {
+      arg.appID = 'com.squirrel.play.your.damn.turn.client';
     }
 
     arg.wait = true;

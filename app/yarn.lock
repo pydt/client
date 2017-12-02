@@ -88,14 +88,14 @@ asynckit@^0.4.0:
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
 
 auto-launch@^5.0.1:
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/auto-launch/-/auto-launch-5.0.1.tgz#2015a8a30384abe0e7f98cbdca8145cf154753ae"
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/auto-launch/-/auto-launch-5.0.3.tgz#59de27204ad8bd3018ca5fc5603185f4ec373940"
   dependencies:
     applescript "^1.0.0"
     mkdirp "^0.5.1"
     path-is-absolute "^1.0.0"
     untildify "^3.0.2"
-    winreg "1.2.2"
+    winreg "1.2.4"
 
 aws-sign2@~0.6.0:
   version "0.6.0"
@@ -207,7 +207,13 @@ dashdash@^1.12.0:
   dependencies:
     assert-plus "^1.0.0"
 
-debug@2.6.8, debug@^2.2.0:
+debug@2.6.9:
+  version "2.6.9"
+  resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.9.tgz#5d128515df134ff327e90a4c93f4e077a536341f"
+  dependencies:
+    ms "2.0.0"
+
+debug@^2.2.0:
   version "2.6.8"
   resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.8.tgz#e731531ca2ede27d188222427da17821d68ff4fc"
   dependencies:
@@ -248,8 +254,8 @@ electron-json-storage@^3.1.0:
     rwlock "^5.0.0"
 
 electron-log@^2.2.7:
-  version "2.2.7"
-  resolved "https://registry.yarnpkg.com/electron-log/-/electron-log-2.2.7.tgz#8da0d2586b53b175392ae6b91dc510a67c195341"
+  version "2.2.11"
+  resolved "https://registry.yarnpkg.com/electron-log/-/electron-log-2.2.11.tgz#dc99118cda054aa866e47d081d1431c76baacd68"
 
 electron-squirrel-startup@^1.0.0:
   version "1.0.0"
@@ -882,12 +888,12 @@ rimraf@2, rimraf@^2.5.1, rimraf@^2.6.1:
     glob "^7.0.5"
 
 rollbar@^2.2.6:
-  version "2.2.6"
-  resolved "https://registry.yarnpkg.com/rollbar/-/rollbar-2.2.6.tgz#7a90541648d4c4714dbd4de6308e906cb29c6152"
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/rollbar/-/rollbar-2.3.2.tgz#2c148be59e55ecdfe1beee5d7f3c3d0203e5dc76"
   dependencies:
     async "~1.2.1"
     console-polyfill "0.3.0"
-    debug "2.6.8"
+    debug "2.6.9"
     error-stack-parser "1.3.3"
     extend "3.0.0"
     json-stringify-safe "~5.0.0"
@@ -1056,9 +1062,9 @@ wide-align@^1.1.0:
   dependencies:
     string-width "^1.0.2"
 
-winreg@1.2.2:
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/winreg/-/winreg-1.2.2.tgz#8509afa3b71c5bbd110a6d7c6247ec67736c598f"
+winreg@1.2.4:
+  version "1.2.4"
+  resolved "https://registry.yarnpkg.com/winreg/-/winreg-1.2.4.tgz#ba065629b7a925130e15779108cf540990e98d1b"
 
 wrappy@1:
   version "1.0.2"
