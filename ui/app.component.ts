@@ -1,10 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ModalDirective } from 'ngx-bootstrap/modal';
-import { Router } from '@angular/router';
 import { PydtSettings } from './shared/pydtSettings';
-import * as app from 'electron';
 import { NgZone } from '@angular/core';
-import { AuthService } from './shared/authService';
+import * as app from 'electron';
 
 @Component({
   selector: 'pydt-app',
@@ -20,15 +18,9 @@ export class AppComponent implements OnInit {
   @ViewChild('manualUpdateModal') manualUpdateModal: ModalDirective;
   @ViewChild('settingsModal') settingsModal: ModalDirective;
 
-  constructor(private auth: AuthService, private router: Router, private zone: NgZone) {}
+  constructor(private zone: NgZone) {}
 
   ngOnInit() {
-    this.auth.getToken().then(token => {
-      if (!token) {
-        this.router.navigate(['/auth']);
-      }
-    });
-
     app.ipcRenderer.on('show-about-modal', (e, data) => {
       this.zone.run(() => {
         this.hideAllModals();

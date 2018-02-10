@@ -9,54 +9,31 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+import { GamePlayer } from './gamePlayer';
 
-import * as models from './models';
 
 export interface Game {
     gameId: string;
-
     createdBySteamId: string;
-
     inProgress?: boolean;
-
     hashedPassword?: string;
-
-    players: Array<models.GamePlayer>;
-
+    players: Array<GamePlayer>;
     discourseTopicId?: number;
-
     currentPlayerSteamId: string;
-
     turnTimerMinutes?: number;
-
     round?: number;
-
     gameTurnRangeKey?: number;
-
     completed?: boolean;
-
     createdAt?: Date;
-
     updatedAt?: Date;
-
     version?: number;
-
     displayName: string;
-
     description?: string;
-
     dlc: Array<string>;
-
     slots: number;
-
     humans: number;
-
     gameSpeed: string;
-
     mapFile?: string;
-
     mapSize: string;
-
     allowJoinAfterStart?: boolean;
-
 }

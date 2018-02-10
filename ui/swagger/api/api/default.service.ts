@@ -9,28 +9,44 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-
 /* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
 import { Http, Headers, URLSearchParams }                    from '@angular/http';
 import { RequestMethod, RequestOptions, RequestOptionsArgs } from '@angular/http';
 import { Response, ResponseContentType }                     from '@angular/http';
+import { CustomQueryEncoderHelper }                          from '../encoder';
 
 import { Observable }                                        from 'rxjs/Observable';
-import 'rxjs/add/operator/map';
+import '../rxjs-operators';
 
-import * as models                                           from '../model/models';
+import { AuthenticateResponse } from '../model/authenticateResponse';
+import { ChangeCivRequestBody } from '../model/changeCivRequestBody';
+import { CreateGameRequestBody } from '../model/createGameRequestBody';
+import { ErrorResponse } from '../model/errorResponse';
+import { Game } from '../model/game';
+import { GameRequestBody } from '../model/gameRequestBody';
+import { GameTurnResponse } from '../model/gameTurnResponse';
+import { GamesByUserResponse } from '../model/gamesByUserResponse';
+import { JoinGameRequestBody } from '../model/joinGameRequestBody';
+import { OpenGamesResponse } from '../model/openGamesResponse';
+import { SetNotificationEmailBody } from '../model/setNotificationEmailBody';
+import { StartTurnSubmitResponse } from '../model/startTurnSubmitResponse';
+import { SteamProfile } from '../model/steamProfile';
+import { SurrenderBody } from '../model/surrenderBody';
+import { User } from '../model/user';
+import { ValidateResponse } from '../model/validateResponse';
+
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 
 
 @Injectable()
-export class DefaultApi {
+export class DefaultService {
 
     protected basePath = 'https://localhost:3000';
-    public defaultHeaders: Headers = new Headers();
-    public configuration: Configuration = new Configuration();
+    public defaultHeaders = new Headers();
+    public configuration = new Configuration();
 
     constructor(protected http: Http, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
         if (basePath) {
@@ -38,13 +54,28 @@ export class DefaultApi {
         }
         if (configuration) {
             this.configuration = configuration;
+            this.basePath = basePath || configuration.basePath || this.basePath;
         }
+    }
+
+    /**
+     * @param consumes string[] mime-types
+     * @return true: consumes contains 'multipart/form-data', false: otherwise
+     */
+    private canConsumeForm(consumes: string[]): boolean {
+        const form = 'multipart/form-data';
+        for (let consume of consumes) {
+            if (form === consume) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
      * 
      */
-    public authAuthenticate(extraHttpRequestParams?: any): Observable<models.AuthenticateResponse> {
+    public authAuthenticate(extraHttpRequestParams?: RequestOptionsArgs): Observable<AuthenticateResponse> {
         return this.authAuthenticateWithHttpInfo(extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -58,7 +89,7 @@ export class DefaultApi {
     /**
      * 
      */
-    public authValidate(extraHttpRequestParams?: any): Observable<models.ValidateResponse> {
+    public authValidate(extraHttpRequestParams?: RequestOptionsArgs): Observable<ValidateResponse> {
         return this.authValidateWithHttpInfo(extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -74,7 +105,7 @@ export class DefaultApi {
      * @param gameId 
      * @param body 
      */
-    public gameChangeCiv(gameId: string, body: models.ChangeCivRequestBody, extraHttpRequestParams?: any): Observable<models.Game> {
+    public gameChangeCiv(gameId: string, body: ChangeCivRequestBody, extraHttpRequestParams?: RequestOptionsArgs): Observable<Game> {
         return this.gameChangeCivWithHttpInfo(gameId, body, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -89,7 +120,7 @@ export class DefaultApi {
      * 
      * @param body 
      */
-    public gameCreate(body: models.CreateGameRequestBody, extraHttpRequestParams?: any): Observable<models.Game> {
+    public gameCreate(body: CreateGameRequestBody, extraHttpRequestParams?: RequestOptionsArgs): Observable<Game> {
         return this.gameCreateWithHttpInfo(body, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -104,7 +135,7 @@ export class DefaultApi {
      * 
      * @param gameId 
      */
-    public gameDelete(gameId: string, extraHttpRequestParams?: any): Observable<{}> {
+    public gameDelete(gameId: string, extraHttpRequestParams?: RequestOptionsArgs): Observable<{}> {
         return this.gameDeleteWithHttpInfo(gameId, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -120,7 +151,7 @@ export class DefaultApi {
      * @param gameId 
      * @param body 
      */
-    public gameEdit(gameId: string, body: models.GameRequestBody, extraHttpRequestParams?: any): Observable<models.Game> {
+    public gameEdit(gameId: string, body: GameRequestBody, extraHttpRequestParams?: RequestOptionsArgs): Observable<Game> {
         return this.gameEditWithHttpInfo(gameId, body, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -135,7 +166,7 @@ export class DefaultApi {
      * 
      * @param gameId 
      */
-    public gameFinishSubmit(gameId: string, extraHttpRequestParams?: any): Observable<models.Game> {
+    public gameFinishSubmit(gameId: string, extraHttpRequestParams?: RequestOptionsArgs): Observable<Game> {
         return this.gameFinishSubmitWithHttpInfo(gameId, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -150,7 +181,7 @@ export class DefaultApi {
      * 
      * @param gameId 
      */
-    public gameGet(gameId: string, extraHttpRequestParams?: any): Observable<models.Game> {
+    public gameGet(gameId: string, extraHttpRequestParams?: RequestOptionsArgs): Observable<Game> {
         return this.gameGetWithHttpInfo(gameId, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -166,7 +197,7 @@ export class DefaultApi {
      * @param gameId 
      * @param compressed 
      */
-    public gameGetTurn(gameId: string, compressed?: string, extraHttpRequestParams?: any): Observable<models.GameTurnResponse> {
+    public gameGetTurn(gameId: string, compressed?: string, extraHttpRequestParams?: RequestOptionsArgs): Observable<GameTurnResponse> {
         return this.gameGetTurnWithHttpInfo(gameId, compressed, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -182,7 +213,7 @@ export class DefaultApi {
      * @param gameId 
      * @param body 
      */
-    public gameJoin(gameId: string, body: models.JoinGameRequestBody, extraHttpRequestParams?: any): Observable<models.Game> {
+    public gameJoin(gameId: string, body: JoinGameRequestBody, extraHttpRequestParams?: RequestOptionsArgs): Observable<Game> {
         return this.gameJoinWithHttpInfo(gameId, body, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -197,7 +228,7 @@ export class DefaultApi {
      * 
      * @param gameId 
      */
-    public gameLeave(gameId: string, extraHttpRequestParams?: any): Observable<models.Game> {
+    public gameLeave(gameId: string, extraHttpRequestParams?: RequestOptionsArgs): Observable<Game> {
         return this.gameLeaveWithHttpInfo(gameId, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -211,7 +242,7 @@ export class DefaultApi {
     /**
      * 
      */
-    public gameListOpen(extraHttpRequestParams?: any): Observable<models.OpenGamesResponse> {
+    public gameListOpen(extraHttpRequestParams?: RequestOptionsArgs): Observable<OpenGamesResponse> {
         return this.gameListOpenWithHttpInfo(extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -226,7 +257,7 @@ export class DefaultApi {
      * 
      * @param gameId 
      */
-    public gameRevert(gameId: string, extraHttpRequestParams?: any): Observable<models.Game> {
+    public gameRevert(gameId: string, extraHttpRequestParams?: RequestOptionsArgs): Observable<Game> {
         return this.gameRevertWithHttpInfo(gameId, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -241,7 +272,7 @@ export class DefaultApi {
      * 
      * @param gameId 
      */
-    public gameStart(gameId: string, extraHttpRequestParams?: any): Observable<models.Game> {
+    public gameStart(gameId: string, extraHttpRequestParams?: RequestOptionsArgs): Observable<Game> {
         return this.gameStartWithHttpInfo(gameId, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -256,7 +287,7 @@ export class DefaultApi {
      * 
      * @param gameId 
      */
-    public gameStartSubmit(gameId: string, extraHttpRequestParams?: any): Observable<models.StartTurnSubmitResponse> {
+    public gameStartSubmit(gameId: string, extraHttpRequestParams?: RequestOptionsArgs): Observable<StartTurnSubmitResponse> {
         return this.gameStartSubmitWithHttpInfo(gameId, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -272,7 +303,7 @@ export class DefaultApi {
      * @param gameId 
      * @param body 
      */
-    public gameSurrender(gameId: string, body: models.SurrenderBody, extraHttpRequestParams?: any): Observable<models.Game> {
+    public gameSurrender(gameId: string, body: SurrenderBody, extraHttpRequestParams?: RequestOptionsArgs): Observable<Game> {
         return this.gameSurrenderWithHttpInfo(gameId, body, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -286,7 +317,7 @@ export class DefaultApi {
     /**
      * 
      */
-    public userAll(extraHttpRequestParams?: any): Observable<Array<models.User>> {
+    public userAll(extraHttpRequestParams?: RequestOptionsArgs): Observable<Array<User>> {
         return this.userAllWithHttpInfo(extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -301,7 +332,7 @@ export class DefaultApi {
      * 
      * @param steamId 
      */
-    public userById(steamId: string, extraHttpRequestParams?: any): Observable<models.User> {
+    public userById(steamId: string, extraHttpRequestParams?: RequestOptionsArgs): Observable<User> {
         return this.userByIdWithHttpInfo(steamId, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -315,7 +346,7 @@ export class DefaultApi {
     /**
      * 
      */
-    public userGames(extraHttpRequestParams?: any): Observable<models.GamesByUserResponse> {
+    public userGames(extraHttpRequestParams?: RequestOptionsArgs): Observable<GamesByUserResponse> {
         return this.userGamesWithHttpInfo(extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -329,7 +360,7 @@ export class DefaultApi {
     /**
      * 
      */
-    public userGetCurrent(extraHttpRequestParams?: any): Observable<models.User> {
+    public userGetCurrent(extraHttpRequestParams?: RequestOptionsArgs): Observable<User> {
         return this.userGetCurrentWithHttpInfo(extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -344,7 +375,7 @@ export class DefaultApi {
      * 
      * @param body 
      */
-    public userSetNotificationEmail(body: models.SetNotificationEmailBody, extraHttpRequestParams?: any): Observable<models.User> {
+    public userSetNotificationEmail(body: SetNotificationEmailBody, extraHttpRequestParams?: RequestOptionsArgs): Observable<User> {
         return this.userSetNotificationEmailWithHttpInfo(body, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -358,7 +389,7 @@ export class DefaultApi {
     /**
      * 
      */
-    public userSteamProfile(extraHttpRequestParams?: any): Observable<models.SteamProfile> {
+    public userSteamProfile(extraHttpRequestParams?: RequestOptionsArgs): Observable<SteamProfile> {
         return this.userSteamProfileWithHttpInfo(extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -373,7 +404,7 @@ export class DefaultApi {
      * 
      * @param steamIds 
      */
-    public userSteamProfiles(steamIds: string, extraHttpRequestParams?: any): Observable<Array<models.SteamProfile>> {
+    public userSteamProfiles(steamIds: string, extraHttpRequestParams?: RequestOptionsArgs): Observable<Array<SteamProfile>> {
         return this.userSteamProfilesWithHttpInfo(steamIds, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -387,7 +418,7 @@ export class DefaultApi {
     /**
      * 
      */
-    public usersAll(extraHttpRequestParams?: any): Observable<Array<models.User>> {
+    public usersAll(extraHttpRequestParams?: RequestOptionsArgs): Observable<Array<User>> {
         return this.usersAllWithHttpInfo(extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -402,26 +433,29 @@ export class DefaultApi {
     /**
      * 
      * 
+     
      */
-    public authAuthenticateWithHttpInfo(extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/auth/steam';
+    public authAuthenticateWithHttpInfo(extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
 
-        let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-        // to determine the Content-Type header
-        let consumes: string[] = [
-            'application/json'
-        ];
 
         // to determine the Accept header
-        let produces: string[] = [
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers.set("Accept", httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        let consumes: string[] = [
             'application/json'
         ];
 
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });
         // https://github.com/swagger-api/swagger-codegen/issues/4037
@@ -429,32 +463,35 @@ export class DefaultApi {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        return this.http.request(path, requestOptions);
+        return this.http.request(`${this.basePath}/auth/steam`, requestOptions);
     }
 
     /**
      * 
      * 
+     
      */
-    public authValidateWithHttpInfo(extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/auth/steam/validate';
+    public authValidateWithHttpInfo(extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
 
-        let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-        // to determine the Content-Type header
-        let consumes: string[] = [
-            'application/json'
-        ];
 
         // to determine the Accept header
-        let produces: string[] = [
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers.set("Accept", httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        let consumes: string[] = [
             'application/json'
         ];
 
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });
         // https://github.com/swagger-api/swagger-codegen/issues/4037
@@ -462,7 +499,7 @@ export class DefaultApi {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        return this.http.request(path, requestOptions);
+        return this.http.request(`${this.basePath}/auth/steam/validate`, requestOptions);
     }
 
     /**
@@ -470,43 +507,45 @@ export class DefaultApi {
      * 
      * @param gameId 
      * @param body 
+     
      */
-    public gameChangeCivWithHttpInfo(gameId: string, body: models.ChangeCivRequestBody, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/game/${gameId}/changeCiv'
-                    .replace('${' + 'gameId' + '}', String(gameId));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-        // verify required parameter 'gameId' is not null or undefined
+    public gameChangeCivWithHttpInfo(gameId: string, body: ChangeCivRequestBody, extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
         if (gameId === null || gameId === undefined) {
             throw new Error('Required parameter gameId was null or undefined when calling gameChangeCiv.');
         }
-        // verify required parameter 'body' is not null or undefined
         if (body === null || body === undefined) {
             throw new Error('Required parameter body was null or undefined when calling gameChangeCiv.');
         }
+
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // authentication (api_key) required
+        if (this.configuration.apiKeys["Authorization"]) {
+            headers.set('Authorization', this.configuration.apiKeys["Authorization"]);
+        }
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers.set("Accept", httpHeaderAcceptSelected);
+        }
+
         // to determine the Content-Type header
         let consumes: string[] = [
             'application/json'
         ];
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
-
-        // authentication (api_key) required
-        if (this.configuration.apiKey) {
-            headers.set('Authorization', this.configuration.apiKey);
+        let httpContentTypeSelected:string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers.set('Content-Type', httpContentTypeSelected);
         }
-
-        headers.set('Content-Type', 'application/json');
 
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Post,
             headers: headers,
             body: body == null ? '' : JSON.stringify(body), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });
         // https://github.com/swagger-api/swagger-codegen/issues/4037
@@ -514,45 +553,49 @@ export class DefaultApi {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        return this.http.request(path, requestOptions);
+        return this.http.request(`${this.basePath}/game/${encodeURIComponent(String(gameId))}/changeCiv`, requestOptions);
     }
 
     /**
      * 
      * 
      * @param body 
+     
      */
-    public gameCreateWithHttpInfo(body: models.CreateGameRequestBody, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/game/create';
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-        // verify required parameter 'body' is not null or undefined
+    public gameCreateWithHttpInfo(body: CreateGameRequestBody, extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
         if (body === null || body === undefined) {
             throw new Error('Required parameter body was null or undefined when calling gameCreate.');
         }
+
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // authentication (api_key) required
+        if (this.configuration.apiKeys["Authorization"]) {
+            headers.set('Authorization', this.configuration.apiKeys["Authorization"]);
+        }
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers.set("Accept", httpHeaderAcceptSelected);
+        }
+
         // to determine the Content-Type header
         let consumes: string[] = [
             'application/json'
         ];
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
-
-        // authentication (api_key) required
-        if (this.configuration.apiKey) {
-            headers.set('Authorization', this.configuration.apiKey);
+        let httpContentTypeSelected:string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers.set('Content-Type', httpContentTypeSelected);
         }
-
-        headers.set('Content-Type', 'application/json');
 
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Post,
             headers: headers,
             body: body == null ? '' : JSON.stringify(body), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });
         // https://github.com/swagger-api/swagger-codegen/issues/4037
@@ -560,43 +603,44 @@ export class DefaultApi {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        return this.http.request(path, requestOptions);
+        return this.http.request(`${this.basePath}/game/create`, requestOptions);
     }
 
     /**
      * 
      * 
      * @param gameId 
+     
      */
-    public gameDeleteWithHttpInfo(gameId: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/game/${gameId}/delete'
-                    .replace('${' + 'gameId' + '}', String(gameId));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-        // verify required parameter 'gameId' is not null or undefined
+    public gameDeleteWithHttpInfo(gameId: string, extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
         if (gameId === null || gameId === undefined) {
             throw new Error('Required parameter gameId was null or undefined when calling gameDelete.');
         }
+
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // authentication (api_key) required
+        if (this.configuration.apiKeys["Authorization"]) {
+            headers.set('Authorization', this.configuration.apiKeys["Authorization"]);
+        }
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers.set("Accept", httpHeaderAcceptSelected);
+        }
+
         // to determine the Content-Type header
         let consumes: string[] = [
             'application/json'
         ];
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
-
-        // authentication (api_key) required
-        if (this.configuration.apiKey) {
-            headers.set('Authorization', this.configuration.apiKey);
-        }
-
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Post,
             headers: headers,
-            search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });
         // https://github.com/swagger-api/swagger-codegen/issues/4037
@@ -604,7 +648,7 @@ export class DefaultApi {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        return this.http.request(path, requestOptions);
+        return this.http.request(`${this.basePath}/game/${encodeURIComponent(String(gameId))}/delete`, requestOptions);
     }
 
     /**
@@ -612,43 +656,45 @@ export class DefaultApi {
      * 
      * @param gameId 
      * @param body 
+     
      */
-    public gameEditWithHttpInfo(gameId: string, body: models.GameRequestBody, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/game/${gameId}/edit'
-                    .replace('${' + 'gameId' + '}', String(gameId));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-        // verify required parameter 'gameId' is not null or undefined
+    public gameEditWithHttpInfo(gameId: string, body: GameRequestBody, extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
         if (gameId === null || gameId === undefined) {
             throw new Error('Required parameter gameId was null or undefined when calling gameEdit.');
         }
-        // verify required parameter 'body' is not null or undefined
         if (body === null || body === undefined) {
             throw new Error('Required parameter body was null or undefined when calling gameEdit.');
         }
+
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // authentication (api_key) required
+        if (this.configuration.apiKeys["Authorization"]) {
+            headers.set('Authorization', this.configuration.apiKeys["Authorization"]);
+        }
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers.set("Accept", httpHeaderAcceptSelected);
+        }
+
         // to determine the Content-Type header
         let consumes: string[] = [
             'application/json'
         ];
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
-
-        // authentication (api_key) required
-        if (this.configuration.apiKey) {
-            headers.set('Authorization', this.configuration.apiKey);
+        let httpContentTypeSelected:string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers.set('Content-Type', httpContentTypeSelected);
         }
-
-        headers.set('Content-Type', 'application/json');
 
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Post,
             headers: headers,
             body: body == null ? '' : JSON.stringify(body), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });
         // https://github.com/swagger-api/swagger-codegen/issues/4037
@@ -656,43 +702,44 @@ export class DefaultApi {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        return this.http.request(path, requestOptions);
+        return this.http.request(`${this.basePath}/game/${encodeURIComponent(String(gameId))}/edit`, requestOptions);
     }
 
     /**
      * 
      * 
      * @param gameId 
+     
      */
-    public gameFinishSubmitWithHttpInfo(gameId: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/game/${gameId}/turn/finishSubmit'
-                    .replace('${' + 'gameId' + '}', String(gameId));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-        // verify required parameter 'gameId' is not null or undefined
+    public gameFinishSubmitWithHttpInfo(gameId: string, extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
         if (gameId === null || gameId === undefined) {
             throw new Error('Required parameter gameId was null or undefined when calling gameFinishSubmit.');
         }
+
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // authentication (api_key) required
+        if (this.configuration.apiKeys["Authorization"]) {
+            headers.set('Authorization', this.configuration.apiKeys["Authorization"]);
+        }
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers.set("Accept", httpHeaderAcceptSelected);
+        }
+
         // to determine the Content-Type header
         let consumes: string[] = [
             'application/json'
         ];
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
-
-        // authentication (api_key) required
-        if (this.configuration.apiKey) {
-            headers.set('Authorization', this.configuration.apiKey);
-        }
 
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Post,
             headers: headers,
-            search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });
         // https://github.com/swagger-api/swagger-codegen/issues/4037
@@ -700,38 +747,39 @@ export class DefaultApi {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        return this.http.request(path, requestOptions);
+        return this.http.request(`${this.basePath}/game/${encodeURIComponent(String(gameId))}/turn/finishSubmit`, requestOptions);
     }
 
     /**
      * 
      * 
      * @param gameId 
+     
      */
-    public gameGetWithHttpInfo(gameId: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/game/${gameId}'
-                    .replace('${' + 'gameId' + '}', String(gameId));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-        // verify required parameter 'gameId' is not null or undefined
+    public gameGetWithHttpInfo(gameId: string, extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
         if (gameId === null || gameId === undefined) {
             throw new Error('Required parameter gameId was null or undefined when calling gameGet.');
         }
-        // to determine the Content-Type header
-        let consumes: string[] = [
-            'application/json'
-        ];
+
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
 
         // to determine the Accept header
-        let produces: string[] = [
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers.set("Accept", httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        let consumes: string[] = [
             'application/json'
         ];
 
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });
         // https://github.com/swagger-api/swagger-codegen/issues/4037
@@ -739,7 +787,7 @@ export class DefaultApi {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        return this.http.request(path, requestOptions);
+        return this.http.request(`${this.basePath}/game/${encodeURIComponent(String(gameId))}`, requestOptions);
     }
 
     /**
@@ -747,35 +795,38 @@ export class DefaultApi {
      * 
      * @param gameId 
      * @param compressed 
+     
      */
-    public gameGetTurnWithHttpInfo(gameId: string, compressed?: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/game/${gameId}/turn'
-                    .replace('${' + 'gameId' + '}', String(gameId));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-        // verify required parameter 'gameId' is not null or undefined
+    public gameGetTurnWithHttpInfo(gameId: string, compressed?: string, extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
         if (gameId === null || gameId === undefined) {
             throw new Error('Required parameter gameId was null or undefined when calling gameGetTurn.');
         }
+
+        let queryParameters = new URLSearchParams('', new CustomQueryEncoderHelper());
         if (compressed !== undefined) {
             queryParameters.set('compressed', <any>compressed);
         }
 
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // authentication (api_key) required
+        if (this.configuration.apiKeys["Authorization"]) {
+            headers.set('Authorization', this.configuration.apiKeys["Authorization"]);
+        }
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers.set("Accept", httpHeaderAcceptSelected);
+        }
+
         // to determine the Content-Type header
         let consumes: string[] = [
             'application/json'
         ];
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
-
-        // authentication (api_key) required
-        if (this.configuration.apiKey) {
-            headers.set('Authorization', this.configuration.apiKey);
-        }
 
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
@@ -788,7 +839,7 @@ export class DefaultApi {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        return this.http.request(path, requestOptions);
+        return this.http.request(`${this.basePath}/game/${encodeURIComponent(String(gameId))}/turn`, requestOptions);
     }
 
     /**
@@ -796,43 +847,45 @@ export class DefaultApi {
      * 
      * @param gameId 
      * @param body 
+     
      */
-    public gameJoinWithHttpInfo(gameId: string, body: models.JoinGameRequestBody, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/game/${gameId}/join'
-                    .replace('${' + 'gameId' + '}', String(gameId));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-        // verify required parameter 'gameId' is not null or undefined
+    public gameJoinWithHttpInfo(gameId: string, body: JoinGameRequestBody, extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
         if (gameId === null || gameId === undefined) {
             throw new Error('Required parameter gameId was null or undefined when calling gameJoin.');
         }
-        // verify required parameter 'body' is not null or undefined
         if (body === null || body === undefined) {
             throw new Error('Required parameter body was null or undefined when calling gameJoin.');
         }
+
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // authentication (api_key) required
+        if (this.configuration.apiKeys["Authorization"]) {
+            headers.set('Authorization', this.configuration.apiKeys["Authorization"]);
+        }
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers.set("Accept", httpHeaderAcceptSelected);
+        }
+
         // to determine the Content-Type header
         let consumes: string[] = [
             'application/json'
         ];
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
-
-        // authentication (api_key) required
-        if (this.configuration.apiKey) {
-            headers.set('Authorization', this.configuration.apiKey);
+        let httpContentTypeSelected:string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers.set('Content-Type', httpContentTypeSelected);
         }
-
-        headers.set('Content-Type', 'application/json');
 
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Post,
             headers: headers,
             body: body == null ? '' : JSON.stringify(body), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });
         // https://github.com/swagger-api/swagger-codegen/issues/4037
@@ -840,43 +893,44 @@ export class DefaultApi {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        return this.http.request(path, requestOptions);
+        return this.http.request(`${this.basePath}/game/${encodeURIComponent(String(gameId))}/join`, requestOptions);
     }
 
     /**
      * 
      * 
      * @param gameId 
+     
      */
-    public gameLeaveWithHttpInfo(gameId: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/game/${gameId}/leave'
-                    .replace('${' + 'gameId' + '}', String(gameId));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-        // verify required parameter 'gameId' is not null or undefined
+    public gameLeaveWithHttpInfo(gameId: string, extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
         if (gameId === null || gameId === undefined) {
             throw new Error('Required parameter gameId was null or undefined when calling gameLeave.');
         }
+
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // authentication (api_key) required
+        if (this.configuration.apiKeys["Authorization"]) {
+            headers.set('Authorization', this.configuration.apiKeys["Authorization"]);
+        }
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers.set("Accept", httpHeaderAcceptSelected);
+        }
+
         // to determine the Content-Type header
         let consumes: string[] = [
             'application/json'
         ];
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
-
-        // authentication (api_key) required
-        if (this.configuration.apiKey) {
-            headers.set('Authorization', this.configuration.apiKey);
-        }
-
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Post,
             headers: headers,
-            search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });
         // https://github.com/swagger-api/swagger-codegen/issues/4037
@@ -884,32 +938,35 @@ export class DefaultApi {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        return this.http.request(path, requestOptions);
+        return this.http.request(`${this.basePath}/game/${encodeURIComponent(String(gameId))}/leave`, requestOptions);
     }
 
     /**
      * 
      * 
+     
      */
-    public gameListOpenWithHttpInfo(extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/game/listOpen';
+    public gameListOpenWithHttpInfo(extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
 
-        let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-        // to determine the Content-Type header
-        let consumes: string[] = [
-            'application/json'
-        ];
 
         // to determine the Accept header
-        let produces: string[] = [
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers.set("Accept", httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        let consumes: string[] = [
             'application/json'
         ];
 
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });
         // https://github.com/swagger-api/swagger-codegen/issues/4037
@@ -917,43 +974,44 @@ export class DefaultApi {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        return this.http.request(path, requestOptions);
+        return this.http.request(`${this.basePath}/game/listOpen`, requestOptions);
     }
 
     /**
      * 
      * 
      * @param gameId 
+     
      */
-    public gameRevertWithHttpInfo(gameId: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/game/${gameId}/turn/revert'
-                    .replace('${' + 'gameId' + '}', String(gameId));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-        // verify required parameter 'gameId' is not null or undefined
+    public gameRevertWithHttpInfo(gameId: string, extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
         if (gameId === null || gameId === undefined) {
             throw new Error('Required parameter gameId was null or undefined when calling gameRevert.');
         }
+
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // authentication (api_key) required
+        if (this.configuration.apiKeys["Authorization"]) {
+            headers.set('Authorization', this.configuration.apiKeys["Authorization"]);
+        }
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers.set("Accept", httpHeaderAcceptSelected);
+        }
+
         // to determine the Content-Type header
         let consumes: string[] = [
             'application/json'
         ];
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
-
-        // authentication (api_key) required
-        if (this.configuration.apiKey) {
-            headers.set('Authorization', this.configuration.apiKey);
-        }
-
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Post,
             headers: headers,
-            search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });
         // https://github.com/swagger-api/swagger-codegen/issues/4037
@@ -961,43 +1019,44 @@ export class DefaultApi {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        return this.http.request(path, requestOptions);
+        return this.http.request(`${this.basePath}/game/${encodeURIComponent(String(gameId))}/turn/revert`, requestOptions);
     }
 
     /**
      * 
      * 
      * @param gameId 
+     
      */
-    public gameStartWithHttpInfo(gameId: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/game/${gameId}/start'
-                    .replace('${' + 'gameId' + '}', String(gameId));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-        // verify required parameter 'gameId' is not null or undefined
+    public gameStartWithHttpInfo(gameId: string, extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
         if (gameId === null || gameId === undefined) {
             throw new Error('Required parameter gameId was null or undefined when calling gameStart.');
         }
+
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // authentication (api_key) required
+        if (this.configuration.apiKeys["Authorization"]) {
+            headers.set('Authorization', this.configuration.apiKeys["Authorization"]);
+        }
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers.set("Accept", httpHeaderAcceptSelected);
+        }
+
         // to determine the Content-Type header
         let consumes: string[] = [
             'application/json'
         ];
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
-
-        // authentication (api_key) required
-        if (this.configuration.apiKey) {
-            headers.set('Authorization', this.configuration.apiKey);
-        }
-
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Post,
             headers: headers,
-            search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });
         // https://github.com/swagger-api/swagger-codegen/issues/4037
@@ -1005,43 +1064,44 @@ export class DefaultApi {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        return this.http.request(path, requestOptions);
+        return this.http.request(`${this.basePath}/game/${encodeURIComponent(String(gameId))}/start`, requestOptions);
     }
 
     /**
      * 
      * 
      * @param gameId 
+     
      */
-    public gameStartSubmitWithHttpInfo(gameId: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/game/${gameId}/turn/startSubmit'
-                    .replace('${' + 'gameId' + '}', String(gameId));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-        // verify required parameter 'gameId' is not null or undefined
+    public gameStartSubmitWithHttpInfo(gameId: string, extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
         if (gameId === null || gameId === undefined) {
             throw new Error('Required parameter gameId was null or undefined when calling gameStartSubmit.');
         }
+
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // authentication (api_key) required
+        if (this.configuration.apiKeys["Authorization"]) {
+            headers.set('Authorization', this.configuration.apiKeys["Authorization"]);
+        }
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers.set("Accept", httpHeaderAcceptSelected);
+        }
+
         // to determine the Content-Type header
         let consumes: string[] = [
             'application/json'
         ];
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
-
-        // authentication (api_key) required
-        if (this.configuration.apiKey) {
-            headers.set('Authorization', this.configuration.apiKey);
-        }
-
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Post,
             headers: headers,
-            search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });
         // https://github.com/swagger-api/swagger-codegen/issues/4037
@@ -1049,7 +1109,7 @@ export class DefaultApi {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        return this.http.request(path, requestOptions);
+        return this.http.request(`${this.basePath}/game/${encodeURIComponent(String(gameId))}/turn/startSubmit`, requestOptions);
     }
 
     /**
@@ -1057,43 +1117,45 @@ export class DefaultApi {
      * 
      * @param gameId 
      * @param body 
+     
      */
-    public gameSurrenderWithHttpInfo(gameId: string, body: models.SurrenderBody, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/game/${gameId}/surrender'
-                    .replace('${' + 'gameId' + '}', String(gameId));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-        // verify required parameter 'gameId' is not null or undefined
+    public gameSurrenderWithHttpInfo(gameId: string, body: SurrenderBody, extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
         if (gameId === null || gameId === undefined) {
             throw new Error('Required parameter gameId was null or undefined when calling gameSurrender.');
         }
-        // verify required parameter 'body' is not null or undefined
         if (body === null || body === undefined) {
             throw new Error('Required parameter body was null or undefined when calling gameSurrender.');
         }
+
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // authentication (api_key) required
+        if (this.configuration.apiKeys["Authorization"]) {
+            headers.set('Authorization', this.configuration.apiKeys["Authorization"]);
+        }
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers.set("Accept", httpHeaderAcceptSelected);
+        }
+
         // to determine the Content-Type header
         let consumes: string[] = [
             'application/json'
         ];
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
-
-        // authentication (api_key) required
-        if (this.configuration.apiKey) {
-            headers.set('Authorization', this.configuration.apiKey);
+        let httpContentTypeSelected:string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers.set('Content-Type', httpContentTypeSelected);
         }
-
-        headers.set('Content-Type', 'application/json');
 
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Post,
             headers: headers,
             body: body == null ? '' : JSON.stringify(body), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });
         // https://github.com/swagger-api/swagger-codegen/issues/4037
@@ -1101,37 +1163,40 @@ export class DefaultApi {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        return this.http.request(path, requestOptions);
+        return this.http.request(`${this.basePath}/game/${encodeURIComponent(String(gameId))}/surrender`, requestOptions);
     }
 
     /**
      * 
      * 
+     
      */
-    public userAllWithHttpInfo(extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/user/';
+    public userAllWithHttpInfo(extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
 
-        let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // authentication (api_key) required
+        if (this.configuration.apiKeys["Authorization"]) {
+            headers.set('Authorization', this.configuration.apiKeys["Authorization"]);
+        }
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers.set("Accept", httpHeaderAcceptSelected);
+        }
+
         // to determine the Content-Type header
         let consumes: string[] = [
             'application/json'
         ];
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
-
-        // authentication (api_key) required
-        if (this.configuration.apiKey) {
-            headers.set('Authorization', this.configuration.apiKey);
-        }
-
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });
         // https://github.com/swagger-api/swagger-codegen/issues/4037
@@ -1139,38 +1204,39 @@ export class DefaultApi {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        return this.http.request(path, requestOptions);
+        return this.http.request(`${this.basePath}/user/`, requestOptions);
     }
 
     /**
      * 
      * 
      * @param steamId 
+     
      */
-    public userByIdWithHttpInfo(steamId: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/user/${steamId}'
-                    .replace('${' + 'steamId' + '}', String(steamId));
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-        // verify required parameter 'steamId' is not null or undefined
+    public userByIdWithHttpInfo(steamId: string, extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
         if (steamId === null || steamId === undefined) {
             throw new Error('Required parameter steamId was null or undefined when calling userById.');
         }
-        // to determine the Content-Type header
-        let consumes: string[] = [
-            'application/json'
-        ];
+
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
 
         // to determine the Accept header
-        let produces: string[] = [
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers.set("Accept", httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        let consumes: string[] = [
             'application/json'
         ];
 
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });
         // https://github.com/swagger-api/swagger-codegen/issues/4037
@@ -1178,37 +1244,40 @@ export class DefaultApi {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        return this.http.request(path, requestOptions);
+        return this.http.request(`${this.basePath}/user/${encodeURIComponent(String(steamId))}`, requestOptions);
     }
 
     /**
      * 
      * 
+     
      */
-    public userGamesWithHttpInfo(extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/user/games';
+    public userGamesWithHttpInfo(extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
 
-        let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // authentication (api_key) required
+        if (this.configuration.apiKeys["Authorization"]) {
+            headers.set('Authorization', this.configuration.apiKeys["Authorization"]);
+        }
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers.set("Accept", httpHeaderAcceptSelected);
+        }
+
         // to determine the Content-Type header
         let consumes: string[] = [
             'application/json'
         ];
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
-
-        // authentication (api_key) required
-        if (this.configuration.apiKey) {
-            headers.set('Authorization', this.configuration.apiKey);
-        }
-
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });
         // https://github.com/swagger-api/swagger-codegen/issues/4037
@@ -1216,37 +1285,40 @@ export class DefaultApi {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        return this.http.request(path, requestOptions);
+        return this.http.request(`${this.basePath}/user/games`, requestOptions);
     }
 
     /**
      * 
      * 
+     
      */
-    public userGetCurrentWithHttpInfo(extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/user/getCurrent';
+    public userGetCurrentWithHttpInfo(extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
 
-        let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // authentication (api_key) required
+        if (this.configuration.apiKeys["Authorization"]) {
+            headers.set('Authorization', this.configuration.apiKeys["Authorization"]);
+        }
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers.set("Accept", httpHeaderAcceptSelected);
+        }
+
         // to determine the Content-Type header
         let consumes: string[] = [
             'application/json'
         ];
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
-
-        // authentication (api_key) required
-        if (this.configuration.apiKey) {
-            headers.set('Authorization', this.configuration.apiKey);
-        }
-
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });
         // https://github.com/swagger-api/swagger-codegen/issues/4037
@@ -1254,45 +1326,49 @@ export class DefaultApi {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        return this.http.request(path, requestOptions);
+        return this.http.request(`${this.basePath}/user/getCurrent`, requestOptions);
     }
 
     /**
      * 
      * 
      * @param body 
+     
      */
-    public userSetNotificationEmailWithHttpInfo(body: models.SetNotificationEmailBody, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/user/setNotificationEmail';
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-        // verify required parameter 'body' is not null or undefined
+    public userSetNotificationEmailWithHttpInfo(body: SetNotificationEmailBody, extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
         if (body === null || body === undefined) {
             throw new Error('Required parameter body was null or undefined when calling userSetNotificationEmail.');
         }
+
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // authentication (api_key) required
+        if (this.configuration.apiKeys["Authorization"]) {
+            headers.set('Authorization', this.configuration.apiKeys["Authorization"]);
+        }
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers.set("Accept", httpHeaderAcceptSelected);
+        }
+
         // to determine the Content-Type header
         let consumes: string[] = [
             'application/json'
         ];
-
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
-
-        // authentication (api_key) required
-        if (this.configuration.apiKey) {
-            headers.set('Authorization', this.configuration.apiKey);
+        let httpContentTypeSelected:string | undefined = this.configuration.selectHeaderContentType(consumes);
+        if (httpContentTypeSelected != undefined) {
+            headers.set('Content-Type', httpContentTypeSelected);
         }
-
-        headers.set('Content-Type', 'application/json');
 
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Post,
             headers: headers,
             body: body == null ? '' : JSON.stringify(body), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });
         // https://github.com/swagger-api/swagger-codegen/issues/4037
@@ -1300,37 +1376,40 @@ export class DefaultApi {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        return this.http.request(path, requestOptions);
+        return this.http.request(`${this.basePath}/user/setNotificationEmail`, requestOptions);
     }
 
     /**
      * 
      * 
+     
      */
-    public userSteamProfileWithHttpInfo(extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/user/steamProfile';
+    public userSteamProfileWithHttpInfo(extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
 
-        let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // authentication (api_key) required
+        if (this.configuration.apiKeys["Authorization"]) {
+            headers.set('Authorization', this.configuration.apiKeys["Authorization"]);
+        }
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers.set("Accept", httpHeaderAcceptSelected);
+        }
+
         // to determine the Content-Type header
         let consumes: string[] = [
             'application/json'
         ];
 
-        // to determine the Accept header
-        let produces: string[] = [
-            'application/json'
-        ];
-
-        // authentication (api_key) required
-        if (this.configuration.apiKey) {
-            headers.set('Authorization', this.configuration.apiKey);
-        }
-
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });
         // https://github.com/swagger-api/swagger-codegen/issues/4037
@@ -1338,34 +1417,38 @@ export class DefaultApi {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        return this.http.request(path, requestOptions);
+        return this.http.request(`${this.basePath}/user/steamProfile`, requestOptions);
     }
 
     /**
      * 
      * 
      * @param steamIds 
+     
      */
-    public userSteamProfilesWithHttpInfo(steamIds: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/user/steamProfiles';
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-        // verify required parameter 'steamIds' is not null or undefined
+    public userSteamProfilesWithHttpInfo(steamIds: string, extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
         if (steamIds === null || steamIds === undefined) {
             throw new Error('Required parameter steamIds was null or undefined when calling userSteamProfiles.');
         }
+
+        let queryParameters = new URLSearchParams('', new CustomQueryEncoderHelper());
         if (steamIds !== undefined) {
             queryParameters.set('steamIds', <any>steamIds);
         }
 
-        // to determine the Content-Type header
-        let consumes: string[] = [
-            'application/json'
-        ];
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
 
         // to determine the Accept header
-        let produces: string[] = [
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers.set("Accept", httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        let consumes: string[] = [
             'application/json'
         ];
 
@@ -1380,32 +1463,35 @@ export class DefaultApi {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        return this.http.request(path, requestOptions);
+        return this.http.request(`${this.basePath}/user/steamProfiles`, requestOptions);
     }
 
     /**
      * 
      * 
+     
      */
-    public usersAllWithHttpInfo(extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/users/';
+    public usersAllWithHttpInfo(extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
 
-        let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-        // to determine the Content-Type header
-        let consumes: string[] = [
-            'application/json'
-        ];
 
         // to determine the Accept header
-        let produces: string[] = [
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers.set("Accept", httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        let consumes: string[] = [
             'application/json'
         ];
 
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters,
             withCredentials:this.configuration.withCredentials
         });
         // https://github.com/swagger-api/swagger-codegen/issues/4037
@@ -1413,7 +1499,7 @@ export class DefaultApi {
             requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
         }
 
-        return this.http.request(path, requestOptions);
+        return this.http.request(`${this.basePath}/users/`, requestOptions);
     }
 
 }

@@ -9,12 +9,10 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+import { Game } from './game';
 
-import * as models from './models';
 
 export interface GamesByUserResponse {
-    data: Array<models.Game>;
-
+    data: Array<Game>;
     pollUrl: string;
-
 }

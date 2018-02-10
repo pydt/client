@@ -130,6 +130,11 @@ function createWindow() {
           }
         }
       ]
+  }, {
+    label: 'Donate!',
+    click: () => {
+      opn('https://patreon.com/pydt');
+    }
   }];
 
   if (process.platform === 'darwin') {

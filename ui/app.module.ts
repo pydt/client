@@ -18,12 +18,13 @@ import { PlayTurnComponent } from './playTurn/playTurn.component';
 import { PlayTurnState } from './playTurn/playTurnState.service';
 
 import { BusyService, BusyComponent, ProfileCacheService } from 'pydt-shared';
-import { DefaultApi, BASE_PATH } from './swagger/api';
+import { ApiModule, DefaultService, Configuration } from './swagger/api';
 import { PydtHttp } from './shared/pydtHttp';
 import { AuthService } from './shared/authService';
 
 @NgModule({
   imports: [
+    ApiModule,
     BrowserModule,
     BrowserAnimationsModule,
     CustomFormsModule,
@@ -46,23 +47,27 @@ import { AuthService } from './shared/authService';
   providers: [
     AuthService,
     {
+      provide: Configuration,
+      useValue: new Configuration({
+        basePath: PYDT_CONFIG.API_URL
+      })
+    },
+    {
       provide: ProfileCacheService,
-      useFactory: (api: DefaultApi) => {
+      useFactory: (api: DefaultService) => {
         return new ProfileCacheService(api);
       },
-      deps: [DefaultApi]
+      deps: [DefaultService]
     },
     PlayTurnState,
     BusyService,
-    { provide: BASE_PATH, useValue: PYDT_CONFIG.API_URL },
     {
       provide: Http,
-      useFactory: (backend: XHRBackend, options: RequestOptions, busy: BusyService, auth: AuthService) => {
-        return new PydtHttp(backend, options, busy, auth);
+      useFactory: (backend: XHRBackend, options: RequestOptions, busy: BusyService) => {
+        return new PydtHttp(backend, options, busy);
       },
-      deps: [XHRBackend, RequestOptions, BusyService, AuthService]
-    },
-    DefaultApi
+      deps: [XHRBackend, RequestOptions, BusyService]
+    }
   ],
   bootstrap: [AppComponent]
 })

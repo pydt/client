@@ -3,7 +3,9 @@ import { Http } from '@angular/http';
 import { ProfileCacheService } from 'pydt-shared';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
-import { Game, SteamProfile, DefaultApi } from '../swagger/api';
+import { Game, SteamProfile, DefaultService } from '../swagger/api';
+import { Router } from '@angular/router';
+import { AuthService } from '../shared/authService';
 import * as _ from 'lodash';
 import * as app from 'electron';
 import * as awsIot from 'aws-iot-device-sdk';
@@ -26,20 +28,26 @@ export class HomeComponent implements OnInit, OnDestroy {
   private iotDevice;
 
   constructor(
-    private api: DefaultApi,
+    private api: DefaultService,
     private http: Http,
-    private profileCache: ProfileCacheService
+    private router: Router,
+    private profileCache: ProfileCacheService,
+    private authService: AuthService
   ) {}
 
-  ngOnInit() {
-    this.api.userSteamProfile().subscribe(profile => {
-      this.profile = profile;
-      const timer = Observable.timer(10, POLL_INTERVAL);
-      this.configureIot();
+  async ngOnInit() {
+    if (!await this.authService.isAuthenticated()) {
+      this.router.navigate(['/auth']);
+      return;
+    }
 
-      this.timerSub = timer.subscribe(() => {
-        this.loadGames();
-      });
+    this.profile = await this.api.userSteamProfile().toPromise();
+
+    const timer = Observable.timer(10, POLL_INTERVAL);
+    this.configureIot();
+
+    this.timerSub = timer.subscribe(() => {
+      this.loadGames();
     });
   }
 

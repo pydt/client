@@ -9,12 +9,10 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+import { Game } from './game';
 
-import * as models from './models';
 
 export interface OpenGamesResponse {
-    notStarted: Array<models.Game>;
-
-    openSlots: Array<models.Game>;
-
+    notStarted: Array<Game>;
+    openSlots: Array<Game>;
 }

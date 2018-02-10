@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { PydtSettings } from '../shared/pydtSettings';
 import { PlayTurnState } from './playTurnState.service';
 import { Observable } from 'rxjs/Observable';
-import { DefaultApi } from '../swagger/api';
+import { DefaultService } from '../swagger/api';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as mkdirp from 'mkdirp';
@@ -27,7 +27,7 @@ export class PlayTurnComponent implements OnInit {
 
   constructor(
     public playTurnState: PlayTurnState,
-    private api: DefaultApi,
+    private api: DefaultService,
     private router: Router,
     private ngZone: NgZone
     ) {
@@ -80,6 +80,7 @@ export class PlayTurnComponent implements OnInit {
           if (e.lengthComputable) {
             this.curBytes = Math.round(e.loaded / 1024);
             this.maxBytes = Math.round(e.total / 1024);
+            console.log(this.curBytes, this.maxBytes);
           }
         });
       };
@@ -89,36 +90,40 @@ export class PlayTurnComponent implements OnInit {
       };
 
       xhr.onload = e => {
-        try {
-          let data = new Uint8Array(xhr.response);
-
+        this.ngZone.run(() => {
+          this.curBytes = this.maxBytes;
+          
           try {
-            data = pako.ungzip(new Uint8Array(xhr.response));
-          } catch (e) {
-            // Ignore - file probably wasn't gzipped...
-          }
-
-          fs.writeFile(this.saveFileToPlay, new Buffer(data), (err) => {
-            if (err) {
-              reject(err);
-            } else {
-              setTimeout(() => {
-                this.curBytes = this.maxBytes = null;
-                this.status = 'Downloaded file!  Play Your Damn Turn!';
-
-                PydtSettings.getSettings().then(settings => {
-                  if (settings.launchCiv) {
-                    app.ipcRenderer.send('opn-url', 'steam://run/289070');
-                  }
-                });
-
-                resolve();
-              }, 500);
+            let data = new Uint8Array(xhr.response);
+  
+            try {
+              data = pako.ungzip(new Uint8Array(xhr.response));
+            } catch (e) {
+              // Ignore - file probably wasn't gzipped...
             }
-          });
-        } catch (err) {
-          reject(err);
-        }
+  
+            fs.writeFile(this.saveFileToPlay, new Buffer(data), (err) => {
+              if (err) {
+                reject(err);
+              } else {
+                setTimeout(() => {
+                  this.curBytes = this.maxBytes = null;
+                  this.status = 'Downloaded file!  Play Your Damn Turn!';
+  
+                  PydtSettings.getSettings().then(settings => {
+                    if (settings.launchCiv) {
+                      app.ipcRenderer.send('opn-url', 'steam://run/289070');
+                    }
+                  });
+  
+                  resolve();
+                }, 500);
+              }
+            });
+          } catch (err) {
+            reject(err);
+          }
+        });
       };
       xhr.send();
     });

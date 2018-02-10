@@ -9,12 +9,10 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+import { SteamProfile } from './steamProfile';
 
-import * as models from './models';
 
 export interface ValidateResponse {
     token: string;
-
-    steamProfile: models.SteamProfile;
-
+    steamProfile: SteamProfile;
 }

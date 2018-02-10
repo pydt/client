@@ -12,7 +12,7 @@ export class AuthComponent {
   constructor(private auth: AuthService, private router: Router) {}
 
   onSubmit() {
-    this.auth.store(this.model.token)
+    this.auth.storeToken(this.model.token)
       .then(() => {
         this.router.navigate(['/']);
       });

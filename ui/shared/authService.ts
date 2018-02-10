@@ -1,9 +1,18 @@
 import { Injectable } from '@angular/core';
+import { Configuration } from '../swagger/api';
 import * as storage from 'electron-json-storage';
 
 @Injectable()
 export class AuthService {
-  store(token: string): Promise<void> {
+  constructor(private apiConfig: Configuration) {
+  }
+
+  async isAuthenticated() {
+    await this.setApiConfig();
+    return !!this.apiConfig.apiKeys.Authorization;
+  }
+
+  storeToken(token: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       const config = {
         token: token
@@ -16,16 +25,18 @@ export class AuthService {
 
         resolve();
       });
+    }).then(() => {
+      return this.setApiConfig();
     });
   }
 
-  getToken(): Promise<string> {
+  private setApiConfig() {
     return this.getConfig().then(config => {
-      return config.token;
+      this.apiConfig.apiKeys = { Authorization: config ? config.token : null };
     });
   }
 
-  getConfig(): Promise<any> {
+  private getConfig(): Promise<any> {
     return new Promise((resolve, reject) => {
       storage.get('configData', (err, config) => {
         if (err) {

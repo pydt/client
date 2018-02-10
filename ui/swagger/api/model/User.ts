@@ -10,33 +10,19 @@
  * Do not edit the class manually.
  */
 
-import * as models from './models';
 
 export interface User {
     steamId: string;
-
     displayName: string;
-
     avatarSmall: string;
-
     avatarMedium: string;
-
     avatarFull: string;
-
     emailAddress: string;
-
     activeGameIds: Array<string>;
-
     inactiveGameIds: Array<string>;
-
     turnsPlayed: number;
-
     turnsSkipped: number;
-
     timeTaken: number;
-
     fastTurns: number;
-
     slowTurns: number;
-
 }
