@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../shared/authService';
+import { DefaultService } from '../swagger/api/index';
 
 @Component({
   selector: 'pydt-auth',
@@ -8,14 +9,26 @@ import { AuthService } from '../shared/authService';
 })
 export class AuthComponent {
   model = new AuthModel();
+  authError = false;
 
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(
+    private auth: AuthService,
+    private api: DefaultService,
+    private router: Router
+  ) {}
 
-  onSubmit() {
-    this.auth.storeToken(this.model.token)
-      .then(() => {
-        this.router.navigate(['/']);
-      });
+  async onSubmit() {
+    this.authError = false;
+    await this.auth.storeToken(this.model.token);
+
+    try {
+      await this.api.userSteamProfile().toPromise();
+      this.router.navigate(['/']);
+    } catch (err) {
+      console.log(err);
+      this.auth.storeToken('');
+      this.authError = true;
+    }
   }
 }
 

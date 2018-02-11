@@ -92,16 +92,16 @@ export class PlayTurnComponent implements OnInit {
       xhr.onload = e => {
         this.ngZone.run(() => {
           this.curBytes = this.maxBytes;
-          
+
           try {
             let data = new Uint8Array(xhr.response);
-  
+
             try {
               data = pako.ungzip(new Uint8Array(xhr.response));
             } catch (e) {
               // Ignore - file probably wasn't gzipped...
             }
-  
+
             fs.writeFile(this.saveFileToPlay, new Buffer(data), (err) => {
               if (err) {
                 reject(err);
@@ -109,13 +109,13 @@ export class PlayTurnComponent implements OnInit {
                 setTimeout(() => {
                   this.curBytes = this.maxBytes = null;
                   this.status = 'Downloaded file!  Play Your Damn Turn!';
-  
+
                   PydtSettings.getSettings().then(settings => {
                     if (settings.launchCiv) {
                       app.ipcRenderer.send('opn-url', 'steam://run/289070');
                     }
                   });
-  
+
                   resolve();
                 }, 500);
               }
