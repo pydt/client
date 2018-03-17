@@ -79,7 +79,6 @@ export class PlayTurnComponent implements OnInit {
           if (e.lengthComputable) {
             this.curBytes = Math.round(e.loaded / 1024);
             this.maxBytes = Math.round(e.total / 1024);
-            console.log(this.curBytes, this.maxBytes);
           }
         });
       };
