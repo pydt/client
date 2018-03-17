@@ -168,7 +168,7 @@ function createWindow() {
   });
 
   electron.ipcMain.on('turns-available', (event, arg) => {
-    win.setOverlayIcon(arg ? path.join(__dirname, 'star.png') : null, arg ? 'Turns Available' : null);
+    win.setOverlayIcon(arg ? path.join(__dirname, 'star.png') : null, arg ? 'Turns Available' : '');
     appIcon.setImage(arg ? path.join(__dirname, 'icon_red.png') : path.join(__dirname, 'icon.png'));
   });
 
