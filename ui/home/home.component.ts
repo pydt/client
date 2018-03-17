@@ -105,6 +105,8 @@ export class HomeComponent implements OnInit, OnDestroy {
         })
         .value();
 
+      app.ipcRenderer.send('turns-available', !!yourTurns.length);
+
       if (yourTurns.length && (!this.lastNotification || new Date().getTime() - this.lastNotification.getTime() > TOAST_INTERVAL)) {
         app.ipcRenderer.send('show-toast', {
           title: 'Play Your Damn Turn!',
