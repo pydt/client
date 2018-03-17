@@ -2,7 +2,6 @@ import { Component, OnInit, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 import { PydtSettings } from '../shared/pydtSettings';
 import { PlayTurnState } from './playTurnState.service';
-import { Observable } from 'rxjs/Observable';
 import { DefaultService } from '../swagger/api';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -19,6 +18,7 @@ export class PlayTurnComponent implements OnInit {
   status = 'Downloading Save File...';
   saveFileToUpload: string;
   abort: boolean;
+  downloaded: boolean;
   curBytes: number;
   maxBytes: number;
   private saveDir: string;
@@ -54,19 +54,18 @@ export class PlayTurnComponent implements OnInit {
     this.saveFileToPlay = this.saveDir + '(PYDT) Play This One!.Civ6Save';
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.abort = false;
 
-    this.api.gameGetTurn(this.playTurnState.game.gameId, 'yup')
-      .flatMap(resp => {
-        return Observable.fromPromise(this.downloadFile(resp.downloadUrl));
-      })
-      .subscribe(() => {
-        this.watchForSave();
-      }, err => {
+    try {
+      const resp = await this.api.gameGetTurn(this.playTurnState.game.gameId, 'yup').toPromise();
+      await this.downloadFile(resp.downloadUrl);
+    } catch (err) {
+      this.ngZone.run(() => {
         this.status = err;
         this.abort = true;
       });
+    }
   }
 
   private downloadFile(url: string) {
@@ -108,7 +107,7 @@ export class PlayTurnComponent implements OnInit {
               } else {
                 setTimeout(() => {
                   this.curBytes = this.maxBytes = null;
-                  this.status = 'Downloaded file!  Play Your Damn Turn!';
+                  this.watchForSave();
 
                   PydtSettings.getSettings().then(settings => {
                     if (settings.launchCiv) {
@@ -129,13 +128,12 @@ export class PlayTurnComponent implements OnInit {
     });
   }
 
-  ignoreSave() {
+  public watchForSave() {
     this.status = 'Downloaded file!  Play Your Damn Turn!';
     this.saveFileToUpload = null;
-    this.watchForSave();
-  }
+    this.abort = false;
+    this.downloaded = true;
 
-  private watchForSave() {
     const ptThis = this;
     app.ipcRenderer.send('start-chokidar', this.saveDir);
     app.ipcRenderer.on('new-save-detected', newSaveDetected);
@@ -145,6 +143,7 @@ export class PlayTurnComponent implements OnInit {
     function newSaveDetected(event, arg) {
       ptThis.ngZone.run(() => {
         ptThis.status = `Detected new save: ${path.basename(arg).replace('.Civ6Save', '')}.  Submit turn?`;
+        ptThis.downloaded = false;
         ptThis.saveFileToUpload = arg;
         app.ipcRenderer.removeListener('new-save-detected', newSaveDetected);
       });
@@ -153,9 +152,11 @@ export class PlayTurnComponent implements OnInit {
 
   async submitFile() {
     this.status = 'Uploading...';
+    this.abort = false;
     const fileData = pako.gzip(fs.readFileSync(this.saveFileToUpload));
     const moveFrom = this.saveFileToUpload;
     const moveTo = path.join(this.archiveDir, path.basename(this.saveFileToUpload));
+    const fileBeingUploaded = this.saveFileToUpload;
     this.saveFileToUpload = null;
 
     try {
@@ -221,6 +222,7 @@ export class PlayTurnComponent implements OnInit {
       }
 
       this.curBytes = this.maxBytes = null;
+      this.saveFileToUpload = fileBeingUploaded;
       this.abort = true;
     }
   }
