@@ -1,4 +1,4 @@
-if (process.env.PROD) {
+if (PYDT_CONFIG.PROD) {
   require('electron').ipcRenderer.send('init-rollbar');
 
   var _rollbarConfig = {
