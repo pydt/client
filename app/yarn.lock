@@ -1173,9 +1173,9 @@ rimraf@2, rimraf@^2.5.1, rimraf@^2.6.1:
   dependencies:
     glob "^7.0.5"
 
-rollbar@^2.2.6:
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/rollbar/-/rollbar-2.3.2.tgz#2c148be59e55ecdfe1beee5d7f3c3d0203e5dc76"
+rollbar@^2.3.9:
+  version "2.3.9"
+  resolved "https://registry.yarnpkg.com/rollbar/-/rollbar-2.3.9.tgz#46dc6c5531177ae282c8622ad8e930dad9cf2305"
   dependencies:
     async "~1.2.1"
     console-polyfill "0.3.0"

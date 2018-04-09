@@ -32,7 +32,6 @@ module.exports = {
   devtool: 'source-map',
 
   entry: {
-    'rollbar': './ui/rollbar.js',
     'bootstrap': 'bootstrap-loader',
     'polyfills': './ui/polyfills.ts',
     'app': './ui/main.ts'

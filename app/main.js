@@ -209,10 +209,15 @@ function createWindow() {
   });
 
   electron.ipcMain.on('init-rollbar', (event, arg) => {
-    const rollbar = require('rollbar');
+    const Rollbar = require('rollbar');
 
-    rollbar.handleUncaughtExceptionsAndRejections("67488d20e1444df7ab91d279659d519a", {
-      environment: "prod"
+    new Rollbar({
+      accessToken: "67488d20e1444df7ab91d279659d519a",
+      captureUncaught: true,
+      captureUnhandledRejections: true,
+      payload: {
+        environment: "prod"
+      }
     });
   });
 

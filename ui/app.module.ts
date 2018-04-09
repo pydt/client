@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, ErrorHandler } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpModule, XHRBackend, RequestOptions, Http } from '@angular/http';
@@ -21,6 +21,7 @@ import { BusyService, BusyComponent, ProfileCacheService } from 'pydt-shared';
 import { ApiModule, DefaultService, Configuration } from './swagger/api';
 import { PydtHttp } from './shared/pydtHttp';
 import { AuthService } from './shared/authService';
+import { RollbarErrorHandler, RollbarService, rollbarFactory } from './rollbarErrorHandler';
 
 @NgModule({
   imports: [
@@ -45,6 +46,8 @@ import { AuthService } from './shared/authService';
     BusyComponent
   ],
   providers: [
+    { provide: ErrorHandler, useClass: RollbarErrorHandler },
+    { provide: RollbarService, useFactory: rollbarFactory },
     AuthService,
     {
       provide: Configuration,

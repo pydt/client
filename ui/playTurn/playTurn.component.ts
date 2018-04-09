@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { PydtSettings } from '../shared/pydtSettings';
 import { PlayTurnState } from './playTurnState.service';
 import { DefaultService } from '../swagger/api';
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as mkdirp from 'mkdirp';
 import * as app from 'electron';
@@ -30,32 +30,39 @@ export class PlayTurnComponent implements OnInit {
     private api: DefaultService,
     private router: Router,
     private ngZone: NgZone
-    ) {
-    const SUFFIX = '/Sid Meier\'s Civilization VI/Saves/Hotseat/';
-
-    if (process.platform === 'darwin') {
-      this.saveDir = app.remote.app.getPath('appData') + SUFFIX;
-    } else if (process.platform === 'linux') {
-      this.saveDir = app.remote.app.getPath('home') + '/.local/share/aspyr-media/' + SUFFIX;
-    } else {
-      this.saveDir = app.remote.app.getPath('documents') + '/My Games' + SUFFIX;
-    }
-
-    if (!fs.existsSync(this.saveDir)) {
-      mkdirp.sync(this.saveDir);
-    }
-
-    this.archiveDir = path.join(this.saveDir, 'pydt-archive');
-
-    if (!fs.existsSync(this.archiveDir)) {
-      fs.mkdirSync(this.archiveDir);
-    }
-
-    this.saveFileToPlay = this.saveDir + '(PYDT) Play This One!.Civ6Save';
+  ) {
   }
 
   async ngOnInit() {
     this.abort = false;
+
+    try {
+      const SUFFIX = '/Sid Meier\'s Civilization VI/Saves/Hotseat/';
+
+      if (process.platform === 'darwin') {
+        this.saveDir = app.remote.app.getPath('appData') + SUFFIX;
+      } else if (process.platform === 'linux') {
+        this.saveDir = app.remote.app.getPath('home') + '/.local/share/aspyr-media/' + SUFFIX;
+      } else {
+        this.saveDir = app.remote.app.getPath('documents') + '/My Games' + SUFFIX;
+      }
+
+      if (!fs.existsSync(this.saveDir)) {
+        mkdirp.sync(this.saveDir);
+      }
+
+      this.archiveDir = path.join(this.saveDir, 'pydt-archive');
+
+      if (!fs.existsSync(this.archiveDir)) {
+        fs.mkdirSync(this.archiveDir);
+      }
+
+      this.saveFileToPlay = this.saveDir + '(PYDT) Play This One!.Civ6Save';
+    } catch (err) {
+      this.abort = true;
+      this.status = 'Unable to locate/create save file directory: ' + err;
+      throw err;
+    }
 
     try {
       const resp = await this.api.gameGetTurn(this.playTurnState.game.gameId, 'yup').toPromise();
@@ -88,7 +95,7 @@ export class PlayTurnComponent implements OnInit {
       };
 
       xhr.onload = e => {
-        this.ngZone.run(() => {
+        this.ngZone.run(async () => {
           this.curBytes = this.maxBytes;
 
           try {
@@ -100,24 +107,20 @@ export class PlayTurnComponent implements OnInit {
               // Ignore - file probably wasn't gzipped...
             }
 
-            fs.writeFile(this.saveFileToPlay, new Buffer(data), (err) => {
-              if (err) {
-                reject(err);
-              } else {
-                setTimeout(() => {
-                  this.curBytes = this.maxBytes = null;
-                  this.watchForSave();
+            await fs.writeFile(this.saveFileToPlay, new Buffer(data));
 
-                  PydtSettings.getSettings().then(settings => {
-                    if (settings.launchCiv) {
-                      app.ipcRenderer.send('opn-url', 'steam://run/289070');
-                    }
-                  });
+            setTimeout(() => {
+              this.curBytes = this.maxBytes = null;
+              this.watchForSave();
 
-                  resolve();
-                }, 500);
-              }
-            });
+              PydtSettings.getSettings().then(settings => {
+                if (settings.launchCiv) {
+                  app.ipcRenderer.send('opn-url', 'steam://run/289070');
+                }
+              });
+
+              resolve();
+            }, 500);
           } catch (err) {
             reject(err);
           }
@@ -150,13 +153,13 @@ export class PlayTurnComponent implements OnInit {
   }
 
   async submitFile() {
+    const fileBeingUploaded = this.saveFileToUpload;
     this.status = 'Uploading...';
     this.abort = false;
-    const fileData = pako.gzip(fs.readFileSync(this.saveFileToUpload));
-    const moveFrom = this.saveFileToUpload;
-    const moveTo = path.join(this.archiveDir, path.basename(this.saveFileToUpload));
-    const fileBeingUploaded = this.saveFileToUpload;
     this.saveFileToUpload = null;
+
+    const fileData = pako.gzip(await fs.readFile(fileBeingUploaded));
+    const moveTo = path.join(this.archiveDir, path.basename(fileBeingUploaded));
 
     try {
       const startResp = await this.api.gameStartSubmit(this.playTurnState.game.gameId).toPromise();
@@ -191,28 +194,7 @@ export class PlayTurnComponent implements OnInit {
       });
 
       await this.api.gameFinishSubmit(this.playTurnState.game.gameId).toPromise();
-
-      const settings = await PydtSettings.getSettings();
-
-      fs.renameSync(moveFrom, moveTo);
-
-      // If we've got too many archived files, delete some...
-      const files: string[] = fs.readdirSync(this.archiveDir)
-        .map(x => {
-          const file = path.join(this.archiveDir, x);
-          return {
-            file,
-            time: fs.statSync(file).ctime.getTime()
-          };
-        })
-        .sort((a, b) => a.time - b.time)
-        .map(x => x.file);
-
-      while (files.length > settings.numSaves) {
-        fs.unlinkSync(files.shift());
-      }
-
-      this.router.navigate(['/']);
+      await fs.rename(fileBeingUploaded, moveTo);
     } catch (err) {
       this.status = 'There was an error submitting your turn.  Please try again.';
 
@@ -224,6 +206,26 @@ export class PlayTurnComponent implements OnInit {
       this.saveFileToUpload = fileBeingUploaded;
       this.abort = true;
     }
+
+    // If we've got too many archived files, delete some...
+    const files: string[] = (await fs.readdir(this.archiveDir))
+      .map(x => {
+        const file = path.join(this.archiveDir, x);
+        return {
+          file,
+          time: fs.statSync(file).ctime.getTime()
+        };
+      })
+      .sort((a, b) => a.time - b.time)
+      .map(x => x.file);
+
+    const settings = await PydtSettings.getSettings();
+
+    while (files.length > settings.numSaves) {
+      await fs.unlink(files.shift());
+    }
+
+    this.router.navigate(['/']);
   }
 
   goHome() {

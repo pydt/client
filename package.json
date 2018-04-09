@@ -84,6 +84,8 @@
     "zone.js": "^0.8.20"
   },
   "dependencies": {
-    "ng2-validation": "^4.2.0"
+    "fs-extra": "^5.0.0",
+    "ng2-validation": "^4.2.0",
+    "rollbar": "^2.3.9"
   }
 }
