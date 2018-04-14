@@ -59,8 +59,11 @@ export class PlayTurnComponent implements OnInit {
 
       this.saveFileToPlay = this.saveDir + '(PYDT) Play This One!.Civ6Save';
     } catch (err) {
+      console.log(err);
       this.abort = true;
-      this.status = 'Unable to locate/create save file directory: ' + err;
+      this.status = 'Unable to locate/create save file directory.  ' +
+        'Are you using OneDrive and have the "Files On-Demand" option enabled?  ' +
+        'The PYDT client will not work in this mode. :(';
       throw err;
     }
 
