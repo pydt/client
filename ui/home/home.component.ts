@@ -25,7 +25,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   private timerSub: Subscription;
   private destroyed = false;
   private lastNotification: Date;
+  private refreshDisabled = false;
   private iotDevice;
+  private pollUrl;
 
   constructor(
     private api: DefaultService,
@@ -66,25 +68,32 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   }
 
+  refresh() {
+    this.loadGames();
+    this.refreshDisabled = true;
+    setTimeout(() => {
+      this.refreshDisabled = false;
+    }, 30000);
+  }
+
   loadGames(retry = 0) {
     if (retry >= 3) {
       return;
     }
 
-    let pollUrl;
     let req: Observable<Game[]>;
 
     if (this.destroyed) {
       return this.ngOnDestroy();
     }
 
-    if (pollUrl) {
-      req = this.http.get(pollUrl).map(resp => {
+    if (this.pollUrl) {
+      req = this.http.get(this.pollUrl).map(resp => {
         return resp.json();
       });
     } else {
       req = this.api.userGames().map(games => {
-        pollUrl = games.pollUrl;
+        this.pollUrl = games.pollUrl;
         return games.data;
       });
     }
