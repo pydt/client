@@ -12,7 +12,6 @@
 
 
 export interface GameRequestBody {
-    password?: string;
     displayName: string;
     description?: string;
     dlc: Array<string>;
@@ -22,4 +21,5 @@ export interface GameRequestBody {
     mapFile?: string;
     mapSize: string;
     allowJoinAfterStart?: boolean;
+    password?: string;
 }

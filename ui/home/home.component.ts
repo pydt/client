@@ -1,15 +1,18 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import 'rxjs/add/observable/timer';
+
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Http } from '@angular/http';
+import { Router } from '@angular/router';
+import * as awsIot from 'aws-iot-device-sdk';
+import * as app from 'electron';
+import * as _ from 'lodash';
 import { ProfileCacheService } from 'pydt-shared';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
-import { Game, SteamProfile, DefaultService } from '../swagger/api';
-import { Router } from '@angular/router';
+
 import { AuthService } from '../shared/authService';
-import * as _ from 'lodash';
-import * as app from 'electron';
-import * as awsIot from 'aws-iot-device-sdk';
-import 'rxjs/add/observable/timer';
+import { DiscourseInfo } from '../shared/discourseInfo';
+import { Game, SteamProfile, UserService } from '../swagger/api';
 
 const POLL_INTERVAL: number = 600 * 1000;
 const TOAST_INTERVAL: number = 14.5 * 60 * 1000;
@@ -21,6 +24,7 @@ const TOAST_INTERVAL: number = 14.5 * 60 * 1000;
 export class HomeComponent implements OnInit, OnDestroy {
   games: Game[];
   gamePlayerProfiles: any = {};
+  discourseInfo: DiscourseInfo;
   private profile: SteamProfile;
   private timerSub: Subscription;
   private destroyed = false;
@@ -30,7 +34,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private pollUrl;
 
   constructor(
-    private api: DefaultService,
+    private userService: UserService,
     private http: Http,
     private router: Router,
     private profileCache: ProfileCacheService,
@@ -43,7 +47,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.profile = await this.api.userSteamProfile().toPromise();
+    this.profile = await this.userService.steamProfile().toPromise();
 
     const timer = Observable.timer(10, POLL_INTERVAL);
     this.configureIot();
@@ -76,7 +80,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     }, 30000);
   }
 
-  loadGames(retry = 0) {
+  smackRead(gameId: string, postNumber: number) {
+    this.discourseInfo[gameId] = postNumber;
+    DiscourseInfo.saveDiscourseInfo(this.discourseInfo);
+  }
+
+  async loadGames(retry = 0) {
     if (retry >= 3) {
       return;
     }
@@ -92,11 +101,13 @@ export class HomeComponent implements OnInit, OnDestroy {
         return resp.json();
       });
     } else {
-      req = this.api.userGames().map(games => {
+      req = this.userService.games().map(games => {
         this.pollUrl = games.pollUrl;
         return games.data;
       });
     }
+
+    this.discourseInfo = await DiscourseInfo.getDiscourseInfo();
 
     req.subscribe(games => {
       this.games = games;
@@ -105,6 +116,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.gamePlayerProfiles = profiles;
       });
 
+      // Notify about turns available
       const yourTurns = _.chain(this.games)
         .filter(game => {
           return game.currentPlayerSteamId === this.profile.steamid && game.gameTurnRangeKey > 1;
@@ -116,11 +128,33 @@ export class HomeComponent implements OnInit, OnDestroy {
 
       app.ipcRenderer.send('turns-available', !!yourTurns.length);
 
-      if (yourTurns.length && (!this.lastNotification || new Date().getTime() - this.lastNotification.getTime() > TOAST_INTERVAL)) {
-        app.ipcRenderer.send('show-toast', {
-          title: 'Play Your Damn Turn!',
-          message: yourTurns.join(', ')
-        });
+      let notificationShown = false;
+
+      if ((!this.lastNotification || new Date().getTime() - this.lastNotification.getTime() > TOAST_INTERVAL)) {
+        if (yourTurns.length) {
+          app.ipcRenderer.send('show-toast', {
+            title: 'Play Your Damn Turn!',
+            message: yourTurns.join(', ')
+          });
+          notificationShown = true;
+        }
+
+        // Notify about smack talk
+        const smackTalk = this.games.filter(x =>  {
+          const readPostNumber = this.discourseInfo[x.gameId] || 0;
+          return x.latestDiscoursePostNumber && x.latestDiscoursePostNumber > readPostNumber;
+        }).map(x => x.displayName);
+
+        if (smackTalk.length) {
+          app.ipcRenderer.send('show-toast', {
+            title: 'New Smack Talk Message!',
+            message: smackTalk.join(', ')
+          });
+          notificationShown = true;
+        }
+      }
+
+      if (notificationShown) {
         this.lastNotification = new Date();
       }
     }, err => {
@@ -166,13 +200,27 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
-  yourTurnGames() {
-    return _.filter(this.games, (game: Game) => {
+  get sortedTurns(): GameWithYourTurn[] {
+    const yourTurnGames = this.games.filter((game: Game) => {
       return game.inProgress && game.currentPlayerSteamId === this.profile.steamid;
     });
-  }
+    
+    const result = yourTurnGames.map((game: Game) => {
+      return {
+        ...game,
+        yourTurn: true
+      };
+    });
 
-  notYourTurnGames() {
-    return _.difference(this.games, this.yourTurnGames());
+    return result.concat(_.difference(this.games, yourTurnGames).map((game: Game) => {
+      return {
+        ...game,
+        yourTurn: false
+      };
+    }));
   }
+}
+
+interface GameWithYourTurn {
+  yourTurn: boolean;
 }

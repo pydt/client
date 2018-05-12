@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+
 import { AuthService } from '../shared/authService';
-import { DefaultService } from '../swagger/api/index';
+import { UserService } from '../swagger/api';
 
 @Component({
   selector: 'pydt-auth',
@@ -13,7 +14,7 @@ export class AuthComponent {
 
   constructor(
     private auth: AuthService,
-    private api: DefaultService,
+    private userService: UserService,
     private router: Router
   ) {}
 
@@ -22,7 +23,7 @@ export class AuthComponent {
     await this.auth.storeToken(this.model.token);
 
     try {
-      await this.api.userSteamProfile().toPromise();
+      await this.userService.steamProfile().toPromise();
       this.router.navigate(['/']);
     } catch (err) {
       console.log(err);

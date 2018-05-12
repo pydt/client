@@ -11,7 +11,6 @@
  */
 
 
-export interface JoinGameRequestBody {
-    playerCiv: string;
-    password?: string;
+export interface NewDiscordPostBody {
+    post: any;
 }

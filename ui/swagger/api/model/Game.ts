@@ -13,17 +13,6 @@ import { GamePlayer } from './gamePlayer';
 
 
 export interface Game {
-    gameId: string;
-    createdBySteamId: string;
-    inProgress?: boolean;
-    hashedPassword?: string;
-    players: Array<GamePlayer>;
-    discourseTopicId?: number;
-    currentPlayerSteamId: string;
-    turnTimerMinutes?: number;
-    round?: number;
-    gameTurnRangeKey?: number;
-    completed?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
     version?: number;
@@ -36,4 +25,17 @@ export interface Game {
     mapFile?: string;
     mapSize: string;
     allowJoinAfterStart?: boolean;
+    gameId: string;
+    createdBySteamId: string;
+    inProgress?: boolean;
+    hashedPassword?: string;
+    players: Array<GamePlayer>;
+    discourseTopicId?: number;
+    currentPlayerSteamId: string;
+    turnTimerMinutes?: number;
+    round?: number;
+    gameTurnRangeKey?: number;
+    completed?: boolean;
+    latestDiscoursePostNumber?: number;
+    lastTurnEndDate?: Date;
 }

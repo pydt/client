@@ -1,13 +1,14 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, NgZone, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { PydtSettings } from '../shared/pydtSettings';
-import { PlayTurnState } from './playTurnState.service';
-import { DefaultService } from '../swagger/api';
-import * as fs from 'fs-extra';
-import * as path from 'path';
-import * as mkdirp from 'mkdirp';
 import * as app from 'electron';
+import * as fs from 'fs-extra';
+import * as mkdirp from 'mkdirp';
 import * as pako from 'pako';
+import * as path from 'path';
+
+import { PydtSettings } from '../shared/pydtSettings';
+import { GameService } from '../swagger/api';
+import { PlayTurnState } from './playTurnState.service';
 
 @Component({
   selector: 'pydt-home',
@@ -27,7 +28,7 @@ export class PlayTurnComponent implements OnInit {
 
   constructor(
     public playTurnState: PlayTurnState,
-    private api: DefaultService,
+    private gameService: GameService,
     private router: Router,
     private ngZone: NgZone
   ) {
@@ -68,7 +69,7 @@ export class PlayTurnComponent implements OnInit {
     }
 
     try {
-      const resp = await this.api.gameGetTurn(this.playTurnState.game.gameId, 'yup').toPromise();
+      const resp = await this.gameService.getTurn(this.playTurnState.game.gameId, 'yup').toPromise();
       await this.downloadFile(resp.downloadUrl);
     } catch (err) {
       this.ngZone.run(() => {
@@ -165,7 +166,7 @@ export class PlayTurnComponent implements OnInit {
     const moveTo = path.join(this.archiveDir, path.basename(fileBeingUploaded));
 
     try {
-      const startResp = await this.api.gameStartSubmit(this.playTurnState.game.gameId).toPromise();
+      const startResp = await this.gameService.startSubmit(this.playTurnState.game.gameId).toPromise();
 
       await new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
@@ -196,7 +197,7 @@ export class PlayTurnComponent implements OnInit {
         xhr.send(fileData);
       });
 
-      await this.api.gameFinishSubmit(this.playTurnState.game.gameId).toPromise();
+      await this.gameService.finishSubmit(this.playTurnState.game.gameId).toPromise();
       await fs.rename(fileBeingUploaded, moveTo);
     } catch (err) {
       this.status = 'There was an error submitting your turn.  Please try again.';

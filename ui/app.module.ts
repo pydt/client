@@ -18,7 +18,7 @@ import { PlayTurnComponent } from './playTurn/playTurn.component';
 import { PlayTurnState } from './playTurn/playTurnState.service';
 
 import { BusyService, BusyComponent, ProfileCacheService } from 'pydt-shared';
-import { ApiModule, DefaultService, Configuration } from './swagger/api';
+import { ApiModule, Configuration, UserService } from './swagger/api';
 import { PydtHttp } from './shared/pydtHttp';
 import { AuthService } from './shared/authService';
 import { RollbarErrorHandler, RollbarService, rollbarFactory } from './rollbarErrorHandler';
@@ -57,10 +57,14 @@ import { RollbarErrorHandler, RollbarService, rollbarFactory } from './rollbarEr
     },
     {
       provide: ProfileCacheService,
-      useFactory: (api: DefaultService) => {
-        return new ProfileCacheService(api);
+      useFactory: (userService: UserService) => {
+        return new ProfileCacheService({
+          userSteamProfiles: (steamIds: string) => {
+            return userService.steamProfiles(steamIds);
+          }
+        });
       },
-      deps: [DefaultService]
+      deps: [UserService]
     },
     PlayTurnState,
     BusyService,

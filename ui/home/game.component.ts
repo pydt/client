@@ -1,11 +1,12 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
-import { CivDef, CIV6_LEADERS, PcsProfileMap } from 'pydt-shared';
-import { PlayTurnState } from '../playTurn/playTurnState.service';
-import { Game, GamePlayer } from '../swagger/api';
-import * as _ from 'lodash';
 import * as countdown from 'countdown';
 import * as app from 'electron';
+import * as _ from 'lodash';
+import { CIV6_LEADERS, CivDef, PcsProfileMap } from 'pydt-shared';
+
+import { PlayTurnState } from '../playTurn/playTurnState.service';
+import { Game, GamePlayer } from '../swagger/api';
 
 @Component({
   selector: 'pydt-game',
@@ -16,6 +17,8 @@ export class GameComponent implements OnInit {
   @Input() game: Game;
   @Input() gamePlayerProfiles: PcsProfileMap;
   @Input() yourTurn: boolean;
+  @Input() discoursePostNumber: number;
+  @Output() smackRead = new EventEmitter<number>();
   gamePlayers: GamePlayer[] = [];
   civDefs: CivDef[] = [];
   private now: Date;
@@ -48,8 +51,18 @@ export class GameComponent implements OnInit {
     app.ipcRenderer.send('opn-url', 'https://playyourdamnturn.com/game/' + this.game.gameId);
   }
 
-  lastTurn() {
+  readSmack() {
+    app.ipcRenderer.send('opn-url', 'https://discourse.playyourdamnturn.com/t/' + this.game.discourseTopicId);
+    this.smackRead.emit(this.game.latestDiscoursePostNumber);
+  }
+
+  get newDiscoursePost() {
+    return this.game.latestDiscoursePostNumber && this.game.latestDiscoursePostNumber > (this.discoursePostNumber || 0);
+  }
+
+  get lastTurn() {
+    const lastTurnDate: any = this.game.lastTurnEndDate || this.game.updatedAt;
     // tslint:disable-next-line:no-bitwise
-    return countdown(Date.parse(this.game.updatedAt as any), this.now, countdown.HOURS | countdown.MINUTES);
+    return countdown(Date.parse(lastTurnDate), this.now, countdown.HOURS | countdown.MINUTES);
   }
 }
