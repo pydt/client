@@ -1,18 +1,15 @@
-import 'rxjs/add/observable/timer';
-
+import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Http } from '@angular/http';
 import { Router } from '@angular/router';
 import * as awsIot from 'aws-iot-device-sdk';
 import * as app from 'electron';
-import * as _ from 'lodash';
+import { difference } from 'lodash';
 import { ProfileCacheService } from 'pydt-shared';
-import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
-
+import { Observable, Subscription, timer } from 'rxjs';
 import { AuthService } from '../shared/authService';
 import { DiscourseInfo } from '../shared/discourseInfo';
 import { Game, SteamProfile, UserService } from '../swagger/api';
+import { map } from 'rxjs/operators';
 
 const POLL_INTERVAL: number = 600 * 1000;
 const TOAST_INTERVAL: number = 14.5 * 60 * 1000;
@@ -35,7 +32,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   constructor(
     private userService: UserService,
-    private http: Http,
+    private http: HttpClient,
     private router: Router,
     private profileCache: ProfileCacheService,
     private authService: AuthService
@@ -49,10 +46,10 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     this.profile = await this.userService.steamProfile().toPromise();
 
-    const timer = Observable.timer(10, POLL_INTERVAL);
+    const $timer = timer(10, POLL_INTERVAL);
     this.configureIot();
 
-    this.timerSub = timer.subscribe(() => {
+    this.timerSub = $timer.subscribe(() => {
       this.loadGames();
     });
   }
@@ -97,34 +94,31 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     if (this.pollUrl) {
-      req = this.http.get(this.pollUrl).map(resp => {
-        return resp.json();
-      });
+      req = this.http.get<Game[]>(this.pollUrl);
     } else {
-      req = this.userService.games().map(games => {
+      req = this.userService.games().pipe(map(games => {
         this.pollUrl = games.pollUrl;
         return games.data;
-      });
+      }));
     }
 
     this.discourseInfo = await DiscourseInfo.getDiscourseInfo();
 
-    req.subscribe(games => {
-      this.games = games;
+    try {
+      this.games = await req.toPromise();
 
-      this.profileCache.getProfilesForGames(games).then(profiles => {
+      this.profileCache.getProfilesForGames(this.games).then(profiles => {
         this.gamePlayerProfiles = profiles;
       });
 
       // Notify about turns available
-      const yourTurns = _.chain(this.games)
+      const yourTurns = this.games
         .filter(game => {
           return game.currentPlayerSteamId === this.profile.steamid && game.gameTurnRangeKey > 1;
         })
         .map(game => {
           return game.displayName;
-        })
-        .value();
+        });
 
       app.ipcRenderer.send('turns-available', !!yourTurns.length);
 
@@ -157,13 +151,13 @@ export class HomeComponent implements OnInit, OnDestroy {
       if (notificationShown) {
         this.lastNotification = new Date();
       }
-    }, err => {
-      console.log('Error polling user games...', err);
+    } catch (err) {
+      console.error('Error polling user games...', err);
 
       setTimeout(() => {
         this.loadGames(retry + 1);
       }, 5000);
-    });
+    }
   }
 
   configureIot() {
@@ -212,7 +206,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       };
     });
 
-    return result.concat(_.difference(this.games, yourTurnGames).map((game: Game) => {
+    return result.concat(difference(this.games, yourTurnGames).map((game: Game) => {
       return {
         ...game,
         yourTurn: false

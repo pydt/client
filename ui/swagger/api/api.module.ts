@@ -1,6 +1,6 @@
 import { NgModule, ModuleWithProviders, SkipSelf, Optional } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpModule } from '@angular/http';
+import { HttpClientModule } from '@angular/common/http';
 import { Configuration } from './configuration';
 
 import { AuthService } from './api/auth.service';
@@ -9,7 +9,7 @@ import { UserService } from './api/user.service';
 import { WebhookService } from './api/webhook.service';
 
 @NgModule({
-  imports:      [ CommonModule, HttpModule ],
+  imports:      [ CommonModule, HttpClientModule ],
   declarations: [],
   exports:      [],
   providers: [

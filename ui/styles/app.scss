@@ -6,19 +6,19 @@
   font-family: 'Lato';
   font-style: normal;
   font-weight: 400;
-  src: url('./fonts/Lato-Regular.ttf');
+  src: url('../fonts/Lato-Regular.ttf');
 }
 @font-face {
   font-family: 'Lato';
   font-style: normal;
   font-weight: 700;
-  src: url('./fonts/Lato-Bold.ttf');
+  src: url('../fonts/Lato-Bold.ttf');
 }
 @font-face {
   font-family: 'Lato';
   font-style: italic;
   font-weight: 400;
-  src: local('./fonts/Lato-Italic.ttf');
+  src: local('../fonts/Lato-Italic.ttf');
 }
 
 // Navbar =====================================================================
@@ -365,7 +365,7 @@ a.list-group-item {
   }
 
   &.spinner {
-    background: url('./img/pydt_large.png') no-repeat fixed center;
+    background: url('../img/pydt_large.png') no-repeat fixed center;
     background-size: 100px;
     animation: busy-spinner-anim 2s linear infinite;
   }

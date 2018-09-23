@@ -12,13 +12,11 @@
 /* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
-import { Http, Headers, URLSearchParams }                    from '@angular/http';
-import { RequestMethod, RequestOptions, RequestOptionsArgs } from '@angular/http';
-import { Response, ResponseContentType }                     from '@angular/http';
-import { CustomQueryEncoderHelper }                          from '../encoder';
+import { HttpClient, HttpHeaders, HttpParams,
+         HttpResponse, HttpEvent }                           from '@angular/common/http';
+import { CustomHttpUrlEncodingCodec }                        from '../encoder';
 
 import { Observable }                                        from 'rxjs/Observable';
-import '../rxjs-operators';
 
 import { ErrorResponse } from '../model/errorResponse';
 import { GamesByUserResponse } from '../model/gamesByUserResponse';
@@ -34,10 +32,10 @@ import { Configuration }                                     from '../configurat
 export class UserService {
 
     protected basePath = 'https://localhost:3000';
-    public defaultHeaders = new Headers();
+    public defaultHeaders = new HttpHeaders();
     public configuration = new Configuration();
 
-    constructor(protected http: Http, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
+    constructor(protected httpClient: HttpClient, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
         if (basePath) {
             this.basePath = basePath;
         }
@@ -61,116 +59,19 @@ export class UserService {
         return false;
     }
 
-    /**
-     * 
-     */
-    public all(extraHttpRequestParams?: RequestOptionsArgs): Observable<Array<User>> {
-        return this.allWithHttpInfo(extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * 
-     * @param steamId 
-     */
-    public byId(steamId: string, extraHttpRequestParams?: RequestOptionsArgs): Observable<User> {
-        return this.byIdWithHttpInfo(steamId, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * 
-     */
-    public games(extraHttpRequestParams?: RequestOptionsArgs): Observable<GamesByUserResponse> {
-        return this.gamesWithHttpInfo(extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * 
-     */
-    public getCurrent(extraHttpRequestParams?: RequestOptionsArgs): Observable<User> {
-        return this.getCurrentWithHttpInfo(extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * 
-     * @param body 
-     */
-    public setNotificationEmail(body: SetNotificationEmailBody, extraHttpRequestParams?: RequestOptionsArgs): Observable<User> {
-        return this.setNotificationEmailWithHttpInfo(body, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * 
-     */
-    public steamProfile(extraHttpRequestParams?: RequestOptionsArgs): Observable<SteamProfile> {
-        return this.steamProfileWithHttpInfo(extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * 
-     * @param steamIds 
-     */
-    public steamProfiles(steamIds: string, extraHttpRequestParams?: RequestOptionsArgs): Observable<Array<SteamProfile>> {
-        return this.steamProfilesWithHttpInfo(steamIds, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
 
     /**
      * 
      * 
-     
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public allWithHttpInfo(extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
+    public all(observe?: 'body', reportProgress?: boolean): Observable<Array<User>>;
+    public all(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<User>>>;
+    public all(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<User>>>;
+    public all(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+        let headers = this.defaultHeaders;
 
         // to determine the Accept header
         let httpHeaderAccepts: string[] = [
@@ -178,7 +79,7 @@ export class UserService {
         ];
         let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
         if (httpHeaderAcceptSelected != undefined) {
-            headers.set("Accept", httpHeaderAcceptSelected);
+            headers = headers.set("Accept", httpHeaderAcceptSelected);
         }
 
         // to determine the Content-Type header
@@ -186,31 +87,32 @@ export class UserService {
             'application/json'
         ];
 
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
-        }
-
-        return this.http.request(`${this.basePath}/users`, requestOptions);
+        return this.httpClient.get<Array<User>>(`${this.basePath}/users`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
      * 
      * 
      * @param steamId 
-     
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public byIdWithHttpInfo(steamId: string, extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
+    public byId(steamId: string, observe?: 'body', reportProgress?: boolean): Observable<User>;
+    public byId(steamId: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<User>>;
+    public byId(steamId: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<User>>;
+    public byId(steamId: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (steamId === null || steamId === undefined) {
             throw new Error('Required parameter steamId was null or undefined when calling byId.');
         }
 
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+        let headers = this.defaultHeaders;
 
         // to determine the Accept header
         let httpHeaderAccepts: string[] = [
@@ -218,7 +120,7 @@ export class UserService {
         ];
         let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
         if (httpHeaderAcceptSelected != undefined) {
-            headers.set("Accept", httpHeaderAcceptSelected);
+            headers = headers.set("Accept", httpHeaderAcceptSelected);
         }
 
         // to determine the Content-Type header
@@ -226,31 +128,32 @@ export class UserService {
             'application/json'
         ];
 
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
-        }
-
-        return this.http.request(`${this.basePath}/user/${encodeURIComponent(String(steamId))}`, requestOptions);
+        return this.httpClient.get<User>(`${this.basePath}/user/${encodeURIComponent(String(steamId))}`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
      * 
      * 
-     
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public gamesWithHttpInfo(extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
+    public games(observe?: 'body', reportProgress?: boolean): Observable<GamesByUserResponse>;
+    public games(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<GamesByUserResponse>>;
+    public games(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<GamesByUserResponse>>;
+    public games(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+        let headers = this.defaultHeaders;
 
         // authentication (api_key) required
         if (this.configuration.apiKeys["Authorization"]) {
-            headers.set('Authorization', this.configuration.apiKeys["Authorization"]);
+            headers = headers.set('Authorization', this.configuration.apiKeys["Authorization"]);
         }
 
         // to determine the Accept header
@@ -259,7 +162,7 @@ export class UserService {
         ];
         let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
         if (httpHeaderAcceptSelected != undefined) {
-            headers.set("Accept", httpHeaderAcceptSelected);
+            headers = headers.set("Accept", httpHeaderAcceptSelected);
         }
 
         // to determine the Content-Type header
@@ -267,31 +170,32 @@ export class UserService {
             'application/json'
         ];
 
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
-        }
-
-        return this.http.request(`${this.basePath}/user/games`, requestOptions);
+        return this.httpClient.get<GamesByUserResponse>(`${this.basePath}/user/games`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
      * 
      * 
-     
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public getCurrentWithHttpInfo(extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
+    public getCurrent(observe?: 'body', reportProgress?: boolean): Observable<User>;
+    public getCurrent(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<User>>;
+    public getCurrent(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<User>>;
+    public getCurrent(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+        let headers = this.defaultHeaders;
 
         // authentication (api_key) required
         if (this.configuration.apiKeys["Authorization"]) {
-            headers.set('Authorization', this.configuration.apiKeys["Authorization"]);
+            headers = headers.set('Authorization', this.configuration.apiKeys["Authorization"]);
         }
 
         // to determine the Accept header
@@ -300,7 +204,7 @@ export class UserService {
         ];
         let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
         if (httpHeaderAcceptSelected != undefined) {
-            headers.set("Accept", httpHeaderAcceptSelected);
+            headers = headers.set("Accept", httpHeaderAcceptSelected);
         }
 
         // to determine the Content-Type header
@@ -308,35 +212,36 @@ export class UserService {
             'application/json'
         ];
 
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
-        }
-
-        return this.http.request(`${this.basePath}/user/getCurrent`, requestOptions);
+        return this.httpClient.get<User>(`${this.basePath}/user/getCurrent`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
      * 
      * 
      * @param body 
-     
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public setNotificationEmailWithHttpInfo(body: SetNotificationEmailBody, extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
+    public setNotificationEmail(body: SetNotificationEmailBody, observe?: 'body', reportProgress?: boolean): Observable<User>;
+    public setNotificationEmail(body: SetNotificationEmailBody, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<User>>;
+    public setNotificationEmail(body: SetNotificationEmailBody, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<User>>;
+    public setNotificationEmail(body: SetNotificationEmailBody, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (body === null || body === undefined) {
             throw new Error('Required parameter body was null or undefined when calling setNotificationEmail.');
         }
 
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+        let headers = this.defaultHeaders;
 
         // authentication (api_key) required
         if (this.configuration.apiKeys["Authorization"]) {
-            headers.set('Authorization', this.configuration.apiKeys["Authorization"]);
+            headers = headers.set('Authorization', this.configuration.apiKeys["Authorization"]);
         }
 
         // to determine the Accept header
@@ -345,7 +250,7 @@ export class UserService {
         ];
         let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
         if (httpHeaderAcceptSelected != undefined) {
-            headers.set("Accept", httpHeaderAcceptSelected);
+            headers = headers.set("Accept", httpHeaderAcceptSelected);
         }
 
         // to determine the Content-Type header
@@ -354,35 +259,36 @@ export class UserService {
         ];
         let httpContentTypeSelected:string | undefined = this.configuration.selectHeaderContentType(consumes);
         if (httpContentTypeSelected != undefined) {
-            headers.set('Content-Type', httpContentTypeSelected);
+            headers = headers.set("Content-Type", httpContentTypeSelected);
         }
 
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Post,
-            headers: headers,
-            body: body == null ? '' : JSON.stringify(body), // https://github.com/angular/angular/issues/10612
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
-        }
-
-        return this.http.request(`${this.basePath}/user/setNotificationEmail`, requestOptions);
+        return this.httpClient.post<User>(`${this.basePath}/user/setNotificationEmail`,
+            body,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
      * 
      * 
-     
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public steamProfileWithHttpInfo(extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
+    public steamProfile(observe?: 'body', reportProgress?: boolean): Observable<SteamProfile>;
+    public steamProfile(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<SteamProfile>>;
+    public steamProfile(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<SteamProfile>>;
+    public steamProfile(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+        let headers = this.defaultHeaders;
 
         // authentication (api_key) required
         if (this.configuration.apiKeys["Authorization"]) {
-            headers.set('Authorization', this.configuration.apiKeys["Authorization"]);
+            headers = headers.set('Authorization', this.configuration.apiKeys["Authorization"]);
         }
 
         // to determine the Accept header
@@ -391,7 +297,7 @@ export class UserService {
         ];
         let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
         if (httpHeaderAcceptSelected != undefined) {
-            headers.set("Accept", httpHeaderAcceptSelected);
+            headers = headers.set("Accept", httpHeaderAcceptSelected);
         }
 
         // to determine the Content-Type header
@@ -399,36 +305,37 @@ export class UserService {
             'application/json'
         ];
 
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
-        }
-
-        return this.http.request(`${this.basePath}/user/steamProfile`, requestOptions);
+        return this.httpClient.get<SteamProfile>(`${this.basePath}/user/steamProfile`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
      * 
      * 
      * @param steamIds 
-     
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public steamProfilesWithHttpInfo(steamIds: string, extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
+    public steamProfiles(steamIds: string, observe?: 'body', reportProgress?: boolean): Observable<Array<SteamProfile>>;
+    public steamProfiles(steamIds: string, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<SteamProfile>>>;
+    public steamProfiles(steamIds: string, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<SteamProfile>>>;
+    public steamProfiles(steamIds: string, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
         if (steamIds === null || steamIds === undefined) {
             throw new Error('Required parameter steamIds was null or undefined when calling steamProfiles.');
         }
 
-        let queryParameters = new URLSearchParams('', new CustomQueryEncoderHelper());
+        let queryParameters = new HttpParams({encoder: new CustomHttpUrlEncodingCodec()});
         if (steamIds !== undefined) {
-            queryParameters.set('steamIds', <any>steamIds);
+            queryParameters = queryParameters.set('steamIds', <any>steamIds);
         }
 
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+        let headers = this.defaultHeaders;
 
         // to determine the Accept header
         let httpHeaderAccepts: string[] = [
@@ -436,7 +343,7 @@ export class UserService {
         ];
         let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
         if (httpHeaderAcceptSelected != undefined) {
-            headers.set("Accept", httpHeaderAcceptSelected);
+            headers = headers.set("Accept", httpHeaderAcceptSelected);
         }
 
         // to determine the Content-Type header
@@ -444,18 +351,15 @@ export class UserService {
             'application/json'
         ];
 
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
-        }
-
-        return this.http.request(`${this.basePath}/user/steamProfiles`, requestOptions);
+        return this.httpClient.get<Array<SteamProfile>>(`${this.basePath}/user/steamProfiles`,
+            {
+                params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
 }

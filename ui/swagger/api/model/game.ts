@@ -24,6 +24,7 @@ export interface Game {
     gameSpeed: string;
     mapFile?: string;
     mapSize: string;
+    randomOnly?: boolean;
     allowJoinAfterStart?: boolean;
     gameId: string;
     createdBySteamId: string;

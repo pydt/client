@@ -1,5 +1,5 @@
 import * as storage from 'electron-json-storage';
-import * as _ from 'lodash';
+import { isEmpty } from 'lodash';
 
 export class PydtSettings {
   launchCiv = true;
@@ -15,8 +15,8 @@ export class PydtSettings {
 
         const result = new PydtSettings();
 
-        if (!_.isEmpty(settings)) {
-          _.assign(result, settings);
+        if (!isEmpty(settings)) {
+          Object.assign(result, settings);
         }
 
         // Make sure numSaves is an int

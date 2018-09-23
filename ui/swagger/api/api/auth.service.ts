@@ -12,13 +12,11 @@
 /* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional }                      from '@angular/core';
-import { Http, Headers, URLSearchParams }                    from '@angular/http';
-import { RequestMethod, RequestOptions, RequestOptionsArgs } from '@angular/http';
-import { Response, ResponseContentType }                     from '@angular/http';
-import { CustomQueryEncoderHelper }                          from '../encoder';
+import { HttpClient, HttpHeaders, HttpParams,
+         HttpResponse, HttpEvent }                           from '@angular/common/http';
+import { CustomHttpUrlEncodingCodec }                        from '../encoder';
 
 import { Observable }                                        from 'rxjs/Observable';
-import '../rxjs-operators';
 
 import { AuthenticateResponse } from '../model/authenticateResponse';
 import { ValidateResponse } from '../model/validateResponse';
@@ -31,10 +29,10 @@ import { Configuration }                                     from '../configurat
 export class AuthService {
 
     protected basePath = 'https://localhost:3000';
-    public defaultHeaders = new Headers();
+    public defaultHeaders = new HttpHeaders();
     public configuration = new Configuration();
 
-    constructor(protected http: Http, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
+    constructor(protected httpClient: HttpClient, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
         if (basePath) {
             this.basePath = basePath;
         }
@@ -58,43 +56,19 @@ export class AuthService {
         return false;
     }
 
-    /**
-     * 
-     */
-    public authenticate(extraHttpRequestParams?: RequestOptionsArgs): Observable<AuthenticateResponse> {
-        return this.authenticateWithHttpInfo(extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
-    /**
-     * 
-     */
-    public validate(extraHttpRequestParams?: RequestOptionsArgs): Observable<ValidateResponse> {
-        return this.validateWithHttpInfo(extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json() || {};
-                }
-            });
-    }
-
 
     /**
      * 
      * 
-     
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public authenticateWithHttpInfo(extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
+    public authenticate(observe?: 'body', reportProgress?: boolean): Observable<AuthenticateResponse>;
+    public authenticate(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<AuthenticateResponse>>;
+    public authenticate(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<AuthenticateResponse>>;
+    public authenticate(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+        let headers = this.defaultHeaders;
 
         // to determine the Accept header
         let httpHeaderAccepts: string[] = [
@@ -102,7 +76,7 @@ export class AuthService {
         ];
         let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
         if (httpHeaderAcceptSelected != undefined) {
-            headers.set("Accept", httpHeaderAcceptSelected);
+            headers = headers.set("Accept", httpHeaderAcceptSelected);
         }
 
         // to determine the Content-Type header
@@ -110,27 +84,28 @@ export class AuthService {
             'application/json'
         ];
 
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
-        }
-
-        return this.http.request(`${this.basePath}/auth/steam`, requestOptions);
+        return this.httpClient.get<AuthenticateResponse>(`${this.basePath}/auth/steam`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
     /**
      * 
      * 
-     
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
      */
-    public validateWithHttpInfo(extraHttpRequestParams?: RequestOptionsArgs): Observable<Response> {
+    public validate(observe?: 'body', reportProgress?: boolean): Observable<ValidateResponse>;
+    public validate(observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<ValidateResponse>>;
+    public validate(observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<ValidateResponse>>;
+    public validate(observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+        let headers = this.defaultHeaders;
 
         // to determine the Accept header
         let httpHeaderAccepts: string[] = [
@@ -138,7 +113,7 @@ export class AuthService {
         ];
         let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
         if (httpHeaderAcceptSelected != undefined) {
-            headers.set("Accept", httpHeaderAcceptSelected);
+            headers = headers.set("Accept", httpHeaderAcceptSelected);
         }
 
         // to determine the Content-Type header
@@ -146,17 +121,14 @@ export class AuthService {
             'application/json'
         ];
 
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            withCredentials:this.configuration.withCredentials
-        });
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
-        }
-
-        return this.http.request(`${this.basePath}/auth/steam/validate`, requestOptions);
+        return this.httpClient.get<ValidateResponse>(`${this.basePath}/auth/steam/validate`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
     }
 
 }

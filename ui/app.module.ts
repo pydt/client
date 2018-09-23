@@ -1,39 +1,44 @@
-import { NgModule, ErrorHandler } from '@angular/core';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { ErrorHandler, NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpModule, XHRBackend, RequestOptions, Http } from '@angular/http';
-import { FormsModule } from '@angular/forms';
-import { routing } from './app.routing';
+import { CustomFormsModule } from 'ng2-validation';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { ProgressbarModule } from 'ngx-bootstrap/progressbar';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
-import { CustomFormsModule } from 'ng2-validation';
-
+import { ProfileCacheService, PydtSharedModule } from 'pydt-shared';
 import { AppComponent } from './app.component';
+import { routing } from './app.routing';
 import { AuthComponent } from './auth/auth.component';
-import { HomeComponent } from './home/home.component';
 import { GameComponent } from './home/game.component';
+import { HomeComponent } from './home/home.component';
 import { GamePlayerComponent } from './home/player.component';
 import { PlayTurnComponent } from './playTurn/playTurn.component';
 import { PlayTurnState } from './playTurn/playTurnState.service';
-
-import { BusyService, BusyComponent, ProfileCacheService } from 'pydt-shared';
-import { ApiModule, Configuration, UserService } from './swagger/api';
-import { PydtHttp } from './shared/pydtHttp';
+import { RollbarErrorHandler, rollbarFactory, RollbarService } from './rollbarErrorHandler';
 import { AuthService } from './shared/authService';
-import { RollbarErrorHandler, RollbarService, rollbarFactory } from './rollbarErrorHandler';
+import { PydtHttpInterceptor } from './shared/pydtHttpInterceptor';
+import { ApiModule, Configuration, UserService } from './swagger/api';
+
+export function configFactory() {
+  return new Configuration({
+    apiKeys: {},
+    basePath: PYDT_CONFIG.API_URL
+  });
+}
 
 @NgModule({
   imports: [
-    ApiModule,
     BrowserModule,
     BrowserAnimationsModule,
     CustomFormsModule,
-    HttpModule,
+    ApiModule.forRoot(configFactory),
     FormsModule,
     ModalModule.forRoot(),
     ProgressbarModule.forRoot(),
     TooltipModule.forRoot(),
+    PydtSharedModule,
     routing
   ],
   declarations: [
@@ -42,19 +47,13 @@ import { RollbarErrorHandler, RollbarService, rollbarFactory } from './rollbarEr
     HomeComponent,
     GameComponent,
     GamePlayerComponent,
-    PlayTurnComponent,
-    BusyComponent
+    PlayTurnComponent
   ],
   providers: [
     { provide: ErrorHandler, useClass: RollbarErrorHandler },
     { provide: RollbarService, useFactory: rollbarFactory },
     AuthService,
-    {
-      provide: Configuration,
-      useValue: new Configuration({
-        basePath: PYDT_CONFIG.API_URL
-      })
-    },
+    { provide: HTTP_INTERCEPTORS, useClass: PydtHttpInterceptor, multi: true },
     {
       provide: ProfileCacheService,
       useFactory: (userService: UserService) => {
@@ -66,15 +65,7 @@ import { RollbarErrorHandler, RollbarService, rollbarFactory } from './rollbarEr
       },
       deps: [UserService]
     },
-    PlayTurnState,
-    BusyService,
-    {
-      provide: Http,
-      useFactory: (backend: XHRBackend, options: RequestOptions, busy: BusyService) => {
-        return new PydtHttp(backend, options, busy);
-      },
-      deps: [XHRBackend, RequestOptions, BusyService]
-    }
+    PlayTurnState
   ],
   bootstrap: [AppComponent]
 })

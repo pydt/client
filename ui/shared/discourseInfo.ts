@@ -1,5 +1,5 @@
 import * as storage from 'electron-json-storage';
-import * as _ from 'lodash';
+import { isEmpty } from 'lodash';
 
 export class DiscourseInfo {
   [gameId: string]: number;
@@ -13,8 +13,8 @@ export class DiscourseInfo {
 
         const result = new DiscourseInfo();
 
-        if (!_.isEmpty(di)) {
-          _.assign(result, di);
+        if (!isEmpty(di)) {
+          Object.assign(result, di);
         }
 
         resolve(result);

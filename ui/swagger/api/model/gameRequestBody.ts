@@ -11,7 +11,7 @@
  */
 
 
-export interface CreateGameRequestBody {
+export interface GameRequestBody {
     displayName: string;
     description?: string;
     dlc: Array<string>;
@@ -20,7 +20,7 @@ export interface CreateGameRequestBody {
     gameSpeed: string;
     mapFile?: string;
     mapSize: string;
+    randomOnly?: boolean;
     allowJoinAfterStart?: boolean;
     password?: string;
-    player1Civ: string;
 }
