@@ -13,6 +13,7 @@ export class GamePlayerComponent implements OnDestroy {
   @Input() gamePlayerProfiles: PcsProfileMap;
   @Input() civDef: CivDef;
   @ViewChild('tooltip') tooltip: any;
+  isMouseOver = false;
 
   getTooltip() {
     if (this.player) {
@@ -35,12 +36,27 @@ export class GamePlayerComponent implements OnDestroy {
     }
   }
 
-  getProfileImg() {
+  get imgSrc() {
+    if (this.isMouseOver) {
+      const image = this.civDef ? this.civDef.getImageFileName() : 'RANDOM_RANDOM.png';
+      return `https://playyourdamnturn.com/img/civs/${image}`;
+    }
+
     if (this.player && this.player.steamId && !this.player.hasSurrendered) {
       return (this.gamePlayerProfiles[this.player.steamId] || {} as PcsSteamProfile).avatarmedium;
     }
 
     return 'https://playyourdamnturn.com/img/android.png';
+  }
+
+  iconMouseOver() {
+    console.log('over');
+    this.isMouseOver = true;
+  }
+
+  iconMouseOut() {
+    console.log('out');
+    this.isMouseOver = false;
   }
 
   ngOnDestroy() {

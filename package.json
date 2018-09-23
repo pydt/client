@@ -11,7 +11,7 @@
     "dist-mac": "bash -c \"npm run build-prod; electron-builder --mac --publish always\"",
     "dist-linux": "bash -c \"npm run build-prod; electron-builder --linux --publish always\"",
     "postinstall": "install-app-deps",
-    "lint": "tslint --type-check --project tsconfig.json --exclude ./ui/swagger/**/*.ts ./ui/**/*.ts",
+    "lint": "tslint --project tsconfig.json --exclude ./ui/swagger/**/*.ts ./ui/**/*.ts",
     "swagger-codegen": "bash -c \"mkdir -p .tmp && cp ../api/api/_gen/swagger/swagger.json .tmp/swagger.json && MSYS_NO_PATHCONV=1 docker run --rm -v ${PWD}:/local jimschubert/swagger-codegen-cli:2.3.1 generate -i /local/.tmp/swagger.json -l typescript-angular --additional-properties ngVersion=6.1.7 -o /local/ui/swagger/api -DmodelPropertyNaming=original\""
   },
   "build": {
@@ -70,6 +70,7 @@
     "resolve-url-loader": "^3.0.0",
     "rxjs": "^6.3.2",
     "rxjs-compat": "^6.3.2",
+    "rxjs-tslint": "^0.1.5",
     "sass-loader": "^7.1.0",
     "shebang-loader": "0.0.1",
     "style-loader": "^0.23.0",

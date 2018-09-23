@@ -29,6 +29,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private refreshDisabled = false;
   private iotDevice;
   private pollUrl;
+  private sortedTurns: GameWithYourTurn[];
 
   constructor(
     private userService: UserService,
@@ -106,6 +107,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     try {
       this.games = await req.toPromise();
+      this.setSortedTurns();
 
       this.profileCache.getProfilesForGames(this.games).then(profiles => {
         this.gamePlayerProfiles = profiles;
@@ -194,19 +196,19 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
-  get sortedTurns(): GameWithYourTurn[] {
+  setSortedTurns() {
     const yourTurnGames = this.games.filter((game: Game) => {
       return game.inProgress && game.currentPlayerSteamId === this.profile.steamid;
     });
-    
-    const result = yourTurnGames.map((game: Game) => {
+
+    this.sortedTurns = yourTurnGames.map((game: Game) => {
       return {
         ...game,
         yourTurn: true
       };
     });
 
-    return result.concat(difference(this.games, yourTurnGames).map((game: Game) => {
+    this.sortedTurns = this.sortedTurns.concat(difference(this.games, yourTurnGames).map((game: Game) => {
       return {
         ...game,
         yourTurn: false
