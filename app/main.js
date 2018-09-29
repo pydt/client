@@ -24,15 +24,16 @@ const Tray = electron.Tray;
 let win;
 let appIcon;
 
-var shouldQuit = app.makeSingleInstance(function(commandLine, workingDirectory) {
-  // Someone tried to run a second instance, we should focus our window.
-  forceShowWindow();
-});
 
-if (shouldQuit) {
+if (!app.requestSingleInstanceLock()) {
   app.quit();
   return;
 }
+
+app.on('second-instance', function (argv, cwd) {
+  // Someone tried to run a second instance, we should focus our window.
+  forceShowWindow();
+})
 
 function forceShowWindow() {
   if (win) {
