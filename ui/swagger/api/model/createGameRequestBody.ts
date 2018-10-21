@@ -12,14 +12,15 @@
 
 
 export interface CreateGameRequestBody {
+    gameSpeed: string;
+    mapFile?: string;
+    mapSize: string;
+    gameType: string;
     displayName: string;
     description?: string;
     dlc: Array<string>;
     slots: number;
     humans: number;
-    gameSpeed: string;
-    mapFile?: string;
-    mapSize: string;
     randomOnly?: boolean;
     allowJoinAfterStart?: boolean;
     password?: string;

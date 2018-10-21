@@ -25,4 +25,5 @@ export interface User {
     timeTaken: number;
     fastTurns: number;
     slowTurns: number;
+    turnsByGameType: any;
 }

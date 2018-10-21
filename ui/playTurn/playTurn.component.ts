@@ -9,6 +9,7 @@ import * as path from 'path';
 import { PydtSettings } from '../shared/pydtSettings';
 import { GameService } from '../swagger/api';
 import { PlayTurnState } from './playTurnState.service';
+import { GAMES } from 'pydt-shared';
 
 @Component({
   selector: 'pydt-home',
@@ -34,11 +35,16 @@ export class PlayTurnComponent implements OnInit {
   ) {
   }
 
+  get civGame() {
+    return GAMES.find(x => x.id === this.playTurnState.game.gameType);
+  }
+
   async ngOnInit() {
     this.abort = false;
 
     try {
-      const SUFFIX = '/Sid Meier\'s Civilization VI/Saves/Hotseat/';
+      this.playTurnState.game.gameType
+      const SUFFIX = this.civGame.saveDirectory;
 
       if (process.platform === 'darwin') {
         this.saveDir = app.remote.app.getPath('appData') + SUFFIX;
@@ -58,7 +64,7 @@ export class PlayTurnComponent implements OnInit {
         fs.mkdirSync(this.archiveDir);
       }
 
-      this.saveFileToPlay = this.saveDir + '(PYDT) Play This One!.Civ6Save';
+      this.saveFileToPlay = this.saveDir + '(PYDT) Play This One!.' + this.civGame.saveExtension;
     } catch (err) {
       console.log(err);
       this.abort = true;
@@ -119,7 +125,7 @@ export class PlayTurnComponent implements OnInit {
 
               PydtSettings.getSettings().then(settings => {
                 if (settings.launchCiv) {
-                  app.ipcRenderer.send('opn-url', 'steam://run/289070');
+                  app.ipcRenderer.send('opn-url', this.civGame.steamRunUrl);
                 }
               });
 
@@ -140,20 +146,17 @@ export class PlayTurnComponent implements OnInit {
     this.abort = false;
     this.downloaded = true;
 
-    const ptThis = this;
-    app.ipcRenderer.send('start-chokidar', this.saveDir);
-    app.ipcRenderer.on('new-save-detected', newSaveDetected);
-
-    //////
-
-    function newSaveDetected(event, arg) {
-      ptThis.ngZone.run(() => {
-        ptThis.status = `Detected new save: ${path.basename(arg).replace('.Civ6Save', '')}.  Submit turn?`;
-        ptThis.downloaded = false;
-        ptThis.saveFileToUpload = arg;
+    const newSaveDetected = (event, arg) => {
+      this.ngZone.run(() => {
+        this.status = `Detected new save: ${path.basename(arg).replace(`.${this.civGame.saveExtension}`, '')}.  Submit turn?`;
+        this.downloaded = false;
+        this.saveFileToUpload = arg;
         app.ipcRenderer.removeListener('new-save-detected', newSaveDetected);
       });
     }
+
+    app.ipcRenderer.send('start-chokidar', this.saveDir);
+    app.ipcRenderer.on('new-save-detected', newSaveDetected);
   }
 
   async submitFile() {

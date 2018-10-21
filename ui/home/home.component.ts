@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import * as awsIot from 'aws-iot-device-sdk';
 import * as app from 'electron';
 import { difference } from 'lodash';
-import { ProfileCacheService } from 'pydt-shared';
+import { ProfileCacheService, CIV6_GAME } from 'pydt-shared';
 import { Observable, Subscription, timer } from 'rxjs';
 import { AuthService } from '../shared/authService';
 import { DiscourseInfo } from '../shared/discourseInfo';
@@ -107,6 +107,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     try {
       this.games = await req.toPromise();
+      this.games.forEach(x => x.gameType = x.gameType || CIV6_GAME.id);
       this.setSortedTurns();
 
       this.profileCache.getProfilesForGames(this.games).then(profiles => {

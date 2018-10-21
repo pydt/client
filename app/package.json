@@ -1,7 +1,7 @@
 {
   "name": "playyourdamnturn",
   "productName": "Play Your Damn Turn Client",
-  "version": "1.2.6",
+  "version": "1.3.0-beta20181022-1",
   "description": "Desktop Client to assist with playing your damn turns.",
   "author": "playyourdamnturn.com",
   "main": "main.js",

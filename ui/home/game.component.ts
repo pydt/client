@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import * as countdown from 'countdown';
 import * as app from 'electron';
-import { CIV6_LEADERS, CivDef, PcsProfileMap } from 'pydt-shared';
+import { CivDef, GAMES, PcsProfileMap } from 'pydt-shared';
 
 import { PlayTurnState } from '../playTurn/playTurnState.service';
 import { Game, GamePlayer } from '../swagger/api';
@@ -31,7 +31,7 @@ export class GameComponent implements OnInit {
     for (let i = 0; i < this.game.slots; i++) {
       if (this.game.players.length > i) {
         this.gamePlayers.push(this.game.players[i]);
-        this.civDefs.push(CIV6_LEADERS.find(leader => {
+        this.civDefs.push(this.civGame.leaders.find(leader => {
           return leader.leaderKey === this.game.players[i].civType;
         }));
       } else {
@@ -39,6 +39,10 @@ export class GameComponent implements OnInit {
         this.civDefs.push(null);
       }
     }
+  }
+
+  get civGame() {
+    return GAMES.find(x => x.id === this.game.gameType);
   }
 
   playTurn() {

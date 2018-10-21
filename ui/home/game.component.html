@@ -1,5 +1,9 @@
 <div class="panel" [ngClass]="{'panel-default': !yourTurn, 'panel-primary': yourTurn}">
-  <div class="panel-heading" style="height:32px;overflow:hidden;"><a href="javascript:void(0)" (click)="openGameOnWeb()">{{game.displayName}}</a><small *ngIf="game.gameTurnRangeKey > 1" class="pull-right">Last turn {{lastTurn}} ago</small></div>
+  <div class="panel-heading" style="height:32px;overflow:hidden;">
+    <img src="https://playyourdamnturn.com/img/game_{{civGame.id}}.png" style="height:15px;padding-right:8px;position:relative;top:-2px;" />
+    <a href="javascript:void(0)" (click)="openGameOnWeb()">{{game.displayName}}</a>
+    <small *ngIf="game.gameTurnRangeKey > 1" class="pull-right">Last turn {{lastTurn}} ago</small>
+  </div>
   <div class="panel-body">
     <div class="row" style="padding-left:13px;padding-right:13px;">
       <div *ngFor="let player of gamePlayers; let i = index;" class="col-{{game.slots}}-slots" style="padding-left:2px; padding-right:2px;">
