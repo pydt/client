@@ -2,7 +2,10 @@
   <div class="panel-heading" style="height:32px;overflow:hidden;">
     <img src="https://playyourdamnturn.com/img/game_{{civGame.id}}.png" style="height:15px;padding-right:8px;position:relative;top:-2px;" />
     <a href="javascript:void(0)" (click)="openGameOnWeb()">{{game.displayName}}</a>
-    <small *ngIf="game.gameTurnRangeKey > 1" class="pull-right">Last turn {{lastTurn}} ago</small>
+    <ng-container *ngIf="game.gameTurnRangeKey > 1">
+      <small *ngIf="game.turnTimerMinutes" class="pull-right">Timer expires {{timerExpires}}</small>
+      <small *ngIf="!game.turnTimerMinutes" class="pull-right">Last turn {{lastTurn}} ago</small>
+    </ng-container>
   </div>
   <div class="panel-body">
     <div class="row" style="padding-left:13px;padding-right:13px;">

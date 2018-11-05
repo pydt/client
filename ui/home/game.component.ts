@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import * as countdown from 'countdown';
 import * as app from 'electron';
@@ -12,7 +12,7 @@ import { Game, GamePlayer } from '../swagger/api';
   templateUrl: './game.component.html',
   styleUrls: ['./game.component.css']
 })
-export class GameComponent implements OnInit {
+export class GameComponent implements OnInit, OnDestroy {
   @Input() game: Game;
   @Input() gamePlayerProfiles: PcsProfileMap;
   @Input() yourTurn: boolean;
@@ -21,6 +21,7 @@ export class GameComponent implements OnInit {
   gamePlayers: GamePlayer[] = [];
   civDefs: CivDef[] = [];
   private now: Date;
+  updateDateHandle: any;
 
   constructor(private router: Router, private playTurnState: PlayTurnState) {}
 
@@ -39,6 +40,12 @@ export class GameComponent implements OnInit {
         this.civDefs.push(null);
       }
     }
+    
+    this.updateDateHandle = setInterval(() => this.now = new Date(), 30 * 1000);
+  }
+
+  ngOnDestroy() {
+    clearInterval(this.updateDateHandle);
   }
 
   get civGame() {
@@ -67,5 +74,17 @@ export class GameComponent implements OnInit {
     const lastTurnDate: any = this.game.lastTurnEndDate || this.game.updatedAt;
     // tslint:disable-next-line:no-bitwise
     return countdown(Date.parse(lastTurnDate), this.now, countdown.HOURS | countdown.MINUTES);
+  }
+
+  get timerExpires() {
+    const lastTurnDate: any = this.game.lastTurnEndDate || this.game.updatedAt;
+    const expirationDate = new Date(Date.parse(lastTurnDate) + this.game.turnTimerMinutes * 60 * 1000);
+
+    if (expirationDate.getTime() - this.now.getTime() < 0) {
+      return 'soon...';
+    }
+
+    // tslint:disable-next-line:no-bitwise
+    return 'in ' + countdown(this.now, expirationDate, countdown.HOURS | countdown.MINUTES);
   }
 }

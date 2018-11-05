@@ -23,5 +23,6 @@ export interface GameRequestBody {
     humans: number;
     randomOnly?: boolean;
     allowJoinAfterStart?: boolean;
+    turnTimerMinutes?: number;
     password?: string;
 }

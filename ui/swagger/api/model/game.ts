@@ -27,6 +27,7 @@ export interface Game {
     humans: number;
     randomOnly?: boolean;
     allowJoinAfterStart?: boolean;
+    turnTimerMinutes?: number;
     gameId: string;
     createdBySteamId: string;
     inProgress?: boolean;
@@ -34,7 +35,6 @@ export interface Game {
     players: Array<GamePlayer>;
     discourseTopicId?: number;
     currentPlayerSteamId: string;
-    turnTimerMinutes?: number;
     round?: number;
     gameTurnRangeKey?: number;
     completed?: boolean;

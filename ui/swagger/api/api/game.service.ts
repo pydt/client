@@ -23,6 +23,7 @@ import { CreateGameRequestBody } from '../model/createGameRequestBody';
 import { ErrorResponse } from '../model/errorResponse';
 import { Game } from '../model/game';
 import { GameRequestBody } from '../model/gameRequestBody';
+import { GameTurn } from '../model/gameTurn';
 import { GameTurnResponse } from '../model/gameTurnResponse';
 import { JoinGameRequestBody } from '../model/joinGameRequestBody';
 import { OpenGamesResponse } from '../model/openGamesResponse';
@@ -407,6 +408,55 @@ export class GameService {
         return this.httpClient.get<GameTurnResponse>(`${this.basePath}/game/${encodeURIComponent(String(gameId))}/turn`,
             {
                 params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * 
+     * 
+     * @param gameId 
+     * @param startTurn 
+     * @param endTurn 
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public getTurns(gameId: string, startTurn: number, endTurn: number, observe?: 'body', reportProgress?: boolean): Observable<Array<GameTurn>>;
+    public getTurns(gameId: string, startTurn: number, endTurn: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<Array<GameTurn>>>;
+    public getTurns(gameId: string, startTurn: number, endTurn: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<Array<GameTurn>>>;
+    public getTurns(gameId: string, startTurn: number, endTurn: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+        if (gameId === null || gameId === undefined) {
+            throw new Error('Required parameter gameId was null or undefined when calling getTurns.');
+        }
+        if (startTurn === null || startTurn === undefined) {
+            throw new Error('Required parameter startTurn was null or undefined when calling getTurns.');
+        }
+        if (endTurn === null || endTurn === undefined) {
+            throw new Error('Required parameter endTurn was null or undefined when calling getTurns.');
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        let httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set("Accept", httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        let consumes: string[] = [
+            'application/json'
+        ];
+
+        return this.httpClient.get<Array<GameTurn>>(`${this.basePath}/game/${encodeURIComponent(String(gameId))}/turns/${encodeURIComponent(String(startTurn))}/${encodeURIComponent(String(endTurn))}`,
+            {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,

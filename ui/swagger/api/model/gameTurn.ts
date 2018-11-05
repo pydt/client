@@ -11,14 +11,12 @@
  */
 
 
-export interface GamePlayer {
-    steamId: string;
-    civType: string;
-    hasSurrendered?: boolean;
-    surrenderDate?: Date;
-    turnsPlayed?: number;
-    turnsSkipped?: number;
-    timeTaken?: number;
-    fastTurns?: number;
-    slowTurns?: number;
+export interface GameTurn {
+    gameId: string;
+    turn: number;
+    round: number;
+    playerSteamId: string;
+    startDate?: Date;
+    endDate?: Date;
+    skipped?: boolean;
 }

@@ -5,6 +5,7 @@ export * from './errorResponse';
 export * from './game';
 export * from './gamePlayer';
 export * from './gameRequestBody';
+export * from './gameTurn';
 export * from './gameTurnResponse';
 export * from './gamesByUserResponse';
 export * from './joinGameRequestBody';

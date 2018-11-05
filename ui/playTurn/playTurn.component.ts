@@ -10,6 +10,7 @@ import { PydtSettings } from '../shared/pydtSettings';
 import { GameService } from '../swagger/api';
 import { PlayTurnState } from './playTurnState.service';
 import { GAMES } from 'pydt-shared';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'pydt-home',
@@ -205,13 +206,14 @@ export class PlayTurnComponent implements OnInit {
     } catch (err) {
       this.status = 'There was an error submitting your turn.  Please try again.';
 
-      if (err.json && err.json().errorMessage) {
-        this.status = err.json().errorMessage;
+      if (err instanceof HttpErrorResponse) {
+        this.status = err.error.errorMessage;
       }
 
       this.curBytes = this.maxBytes = null;
       this.saveFileToUpload = fileBeingUploaded;
       this.abort = true;
+      return;
     }
 
     // If we've got too many archived files, delete some...

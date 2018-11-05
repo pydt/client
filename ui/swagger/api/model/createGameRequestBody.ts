@@ -23,6 +23,7 @@ export interface CreateGameRequestBody {
     humans: number;
     randomOnly?: boolean;
     allowJoinAfterStart?: boolean;
+    turnTimerMinutes?: number;
     password?: string;
     player1Civ: string;
 }

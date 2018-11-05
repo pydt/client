@@ -50,12 +50,10 @@ export class GamePlayerComponent implements OnDestroy {
   }
 
   iconMouseOver() {
-    console.log('over');
     this.isMouseOver = true;
   }
 
   iconMouseOut() {
-    console.log('out');
     this.isMouseOver = false;
   }
 
