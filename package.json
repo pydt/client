@@ -65,7 +65,7 @@
     "ngx-bootstrap": "^3.0.1",
     "node-sass": "^4.9.3",
     "pako": "^1.0.6",
-    "pydt-shared": "^1.2.0",
+    "pydt-shared": "^1.2.1",
     "raw-loader": "0.5.1",
     "resolve-url-loader": "^3.0.0",
     "rxjs": "^6.3.3",
