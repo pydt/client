@@ -9,7 +9,7 @@ import * as path from 'path';
 import { PydtSettings } from '../shared/pydtSettings';
 import { GameService } from '../swagger/api';
 import { PlayTurnState } from './playTurnState.service';
-import { GAMES } from 'pydt-shared';
+import { GAMES, PlatformSaveLocation } from 'pydt-shared';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
@@ -44,16 +44,8 @@ export class PlayTurnComponent implements OnInit {
     this.abort = false;
 
     try {
-      this.playTurnState.game.gameType
-      const SUFFIX = this.civGame.saveDirectory;
-
-      if (process.platform === 'darwin') {
-        this.saveDir = app.remote.app.getPath('appData') + SUFFIX;
-      } else if (process.platform === 'linux') {
-        this.saveDir = app.remote.app.getPath('home') + '/.local/share/aspyr-media/' + SUFFIX;
-      } else {
-        this.saveDir = app.remote.app.getPath('documents') + '/My Games' + SUFFIX;
-      }
+      const location: PlatformSaveLocation = this.civGame.saveLocations[process.platform];
+      this.saveDir = app.remote.app.getPath(location.basePath) + location.prefix + this.civGame.saveDirectory;
 
       if (!fs.existsSync(this.saveDir)) {
         mkdirp.sync(this.saveDir);
