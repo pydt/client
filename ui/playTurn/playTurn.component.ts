@@ -97,13 +97,15 @@ export class PlayTurnComponent implements OnInit {
         reject(xhr.status);
       };
 
-      xhr.onload = e => {
-        this.ngZone.run(async () => {
-          this.curBytes = this.maxBytes;
+      xhr.onload = async () => {
+        try {
+          await this.ngZone.run(async () => {
+            this.curBytes = this.maxBytes;
+          });
 
-          try {
+          await this.ngZone.run(async () => {
             let data = new Uint8Array(xhr.response);
-
+  
             try {
               data = pako.ungzip(new Uint8Array(xhr.response));
             } catch (e) {
@@ -111,29 +113,32 @@ export class PlayTurnComponent implements OnInit {
             }
 
             await fs.writeFile(this.saveFileToPlay, new Buffer(data));
+          });
 
-            setTimeout(() => {
-              this.curBytes = this.maxBytes = null;
-              this.watchForSave();
+          await new Promise(resolve => setTimeout(resolve, 500));
 
-              PydtSettings.getSettings().then(settings => {
-                if (settings.launchCiv) {
-                  app.ipcRenderer.send('opn-url', this.civGame.steamRunUrl);
-                }
-              });
+          await this.ngZone.run(async () => {
+            const settings = await PydtSettings.getSettings();
+            
+            if (settings.launchCiv) {
+              app.ipcRenderer.send('opn-url', this.civGame.steamRunUrl);
+            }
 
-              resolve();
-            }, 500);
-          } catch (err) {
-            reject(err);
-          }
-        });
+            this.watchForSave();
+          });
+
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
       };
+
       xhr.send();
     });
   }
 
   public watchForSave() {
+    this.curBytes = this.maxBytes = null;
     this.status = 'Downloaded file!  Play Your Damn Turn!';
     this.saveFileToUpload = null;
     this.abort = false;
@@ -148,8 +153,10 @@ export class PlayTurnComponent implements OnInit {
       });
     }
 
-    app.ipcRenderer.send('start-chokidar', this.saveDir);
-    app.ipcRenderer.on('new-save-detected', newSaveDetected);
+    setTimeout(() => {
+      app.ipcRenderer.send('start-chokidar', this.saveDir);
+      app.ipcRenderer.on('new-save-detected', newSaveDetected);
+    }, 5000);
   }
 
   async submitFile() {
