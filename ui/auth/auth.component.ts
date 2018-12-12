@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-
+import { UserService } from 'pydt-shared';
 import { AuthService } from '../shared/authService';
-import { UserService } from '../swagger/api';
 
 @Component({
   selector: 'pydt-auth',

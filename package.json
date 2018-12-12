@@ -3,7 +3,7 @@
   "scripts": {
     "clean": "rm -rf dist app/ui_compiled",
     "build": "webpack --progress --profile --colors --display-error-details --display-cached",
-    "build-prod": "bash -c \"npm run clean; webpack --colors\"",
+    "build-prod": "npm run lint && bash -c \"npm run clean; webpack --colors\"",
     "watch": "webpack --watch --progress --profile --colors --display-error-details --display-cached",
     "electron": "electron app",
     "pack": "bash -c \"npm run build-prod; build --dir\"",
@@ -65,7 +65,7 @@
     "ngx-bootstrap": "^3.0.1",
     "node-sass": "^4.9.3",
     "pako": "^1.0.6",
-    "pydt-shared": "^1.2.2",
+    "pydt-shared": "^1.2.3",
     "raw-loader": "0.5.1",
     "resolve-url-loader": "^3.0.0",
     "rxjs": "^6.3.3",

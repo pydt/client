@@ -1,11 +1,10 @@
-import { Component, EventEmitter, Input, OnInit, Output, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import * as countdown from 'countdown';
 import * as app from 'electron';
-import { CivDef, GAMES, PcsProfileMap } from 'pydt-shared';
-
+import { CivDef, Game, GamePlayer, GAMES, SteamProfileMap } from 'pydt-shared';
 import { PlayTurnState } from '../playTurn/playTurnState.service';
-import { Game, GamePlayer } from '../swagger/api';
+
 
 @Component({
   selector: 'pydt-game',
@@ -14,7 +13,7 @@ import { Game, GamePlayer } from '../swagger/api';
 })
 export class GameComponent implements OnInit, OnDestroy {
   @Input() game: Game;
-  @Input() gamePlayerProfiles: PcsProfileMap;
+  @Input() gamePlayerProfiles: SteamProfileMap;
   @Input() yourTurn: boolean;
   @Input() discoursePostNumber: number;
   @Output() smackRead = new EventEmitter<number>();
@@ -40,7 +39,7 @@ export class GameComponent implements OnInit, OnDestroy {
         this.civDefs.push(null);
       }
     }
-    
+
     this.updateDateHandle = setInterval(() => this.now = new Date(), 30 * 1000);
   }
 

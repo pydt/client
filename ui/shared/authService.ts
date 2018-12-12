@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Configuration } from '../swagger/api';
 import * as storage from 'electron-json-storage';
+import { Configuration } from 'pydt-shared';
 
 @Injectable()
 export class AuthService {

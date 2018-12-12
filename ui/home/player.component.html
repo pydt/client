@@ -1,9 +1,0 @@
-<ng-template #tooltipTemplate><span [innerHtml]="getTooltip()"></span></ng-template>
-<div container="body" [tooltip]="tooltipTemplate" #tooltip="bs-tooltip">
-  <a href="javascript:void(0)" *ngIf="player" class="thumbnail" [class.currentTurn]="game.currentPlayerSteamId === player.steamId">
-    <img [src]="imgSrc" style="height:32px;" (mouseover)="iconMouseOver()" (mouseout)="iconMouseOut()">
-  </a>
-  <a href="javascript:void(0)" *ngIf="!player" class="thumbnail">
-    <img [src]="imgSrc" style="height: 32px;">
-  </a>
-</div>

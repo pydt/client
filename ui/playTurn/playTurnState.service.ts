@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Game } from '../swagger/api';
+import { Game } from 'pydt-shared';
 
 @Injectable()
 export class PlayTurnState {

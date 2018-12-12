@@ -4,12 +4,11 @@ import { Router } from '@angular/router';
 import * as awsIot from 'aws-iot-device-sdk';
 import * as app from 'electron';
 import { difference } from 'lodash';
-import { ProfileCacheService, CIV6_GAME } from 'pydt-shared';
+import { CIV6_GAME, Game, ProfileCacheService, SteamProfile, UserService } from 'pydt-shared';
 import { Observable, Subscription, timer } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { AuthService } from '../shared/authService';
 import { DiscourseInfo } from '../shared/discourseInfo';
-import { Game, SteamProfile, UserService } from '../swagger/api';
-import { map } from 'rxjs/operators';
 
 const POLL_INTERVAL: number = 600 * 1000;
 const TOAST_INTERVAL: number = 14.5 * 60 * 1000;
@@ -103,9 +102,9 @@ export class HomeComponent implements OnInit, OnDestroy {
       }));
     }
 
-    this.discourseInfo = await DiscourseInfo.getDiscourseInfo();
-
     try {
+      this.discourseInfo = await DiscourseInfo.getDiscourseInfo();
+
       this.games = await req.toPromise();
       this.games.forEach(x => x.gameType = x.gameType || CIV6_GAME.id);
       this.setSortedTurns();

@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, NgZone, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import * as app from 'electron';
@@ -5,12 +6,10 @@ import * as fs from 'fs-extra';
 import * as mkdirp from 'mkdirp';
 import * as pako from 'pako';
 import * as path from 'path';
-
+import { GAMES, GameService, PlatformSaveLocation } from 'pydt-shared';
 import { PydtSettings } from '../shared/pydtSettings';
-import { GameService } from '../swagger/api';
 import { PlayTurnState } from './playTurnState.service';
-import { GAMES, PlatformSaveLocation } from 'pydt-shared';
-import { HttpErrorResponse } from '@angular/common/http';
+
 
 @Component({
   selector: 'pydt-home',
@@ -105,7 +104,7 @@ export class PlayTurnComponent implements OnInit {
 
           await this.ngZone.run(async () => {
             let data = new Uint8Array(xhr.response);
-  
+
             try {
               data = pako.ungzip(new Uint8Array(xhr.response));
             } catch (e) {
@@ -115,11 +114,11 @@ export class PlayTurnComponent implements OnInit {
             await fs.writeFile(this.saveFileToPlay, new Buffer(data));
           });
 
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise(sleepResolve => setTimeout(sleepResolve, 500));
 
           await this.ngZone.run(async () => {
             const settings = await PydtSettings.getSettings();
-            
+
             if (settings.launchCiv) {
               app.ipcRenderer.send('opn-url', this.civGame.steamRunUrl);
             }
@@ -151,7 +150,7 @@ export class PlayTurnComponent implements OnInit {
         this.saveFileToUpload = arg;
         app.ipcRenderer.removeListener('new-save-detected', newSaveDetected);
       });
-    }
+    };
 
     setTimeout(() => {
       app.ipcRenderer.send('start-chokidar', this.saveDir);
