@@ -1,12 +1,12 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, NgZone, OnInit } from '@angular/core';
+import { Component, Input, NgZone, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import * as app from 'electron';
 import * as fs from 'fs-extra';
 import * as mkdirp from 'mkdirp';
 import * as pako from 'pako';
 import * as path from 'path';
-import { GAMES, GameService, PlatformSaveLocation } from 'pydt-shared';
+import { GAMES, Game, GameService, PlatformSaveLocation, ProfileCacheService, SteamProfileMap } from 'pydt-shared';
 import { PydtSettings } from '../shared/pydtSettings';
 import { PlayTurnState } from './playTurnState.service';
 
@@ -17,6 +17,8 @@ import { PlayTurnState } from './playTurnState.service';
   styleUrls: ['./playTurn.component.css']
 })
 export class PlayTurnComponent implements OnInit {
+  @Input() game: Game;
+  @Input() gamePlayerProfiles: SteamProfileMap;
   status = 'Downloading Save File...';
   saveFileToUpload: string;
   abort: boolean;
@@ -26,6 +28,8 @@ export class PlayTurnComponent implements OnInit {
   private saveDir: string;
   private archiveDir: string;
   private saveFileToPlay: string;
+  private profileCache: ProfileCacheService
+
 
   constructor(
     public playTurnState: PlayTurnState,
@@ -33,6 +37,7 @@ export class PlayTurnComponent implements OnInit {
     private router: Router,
     private ngZone: NgZone
   ) {
+
   }
 
   get civGame() {
@@ -237,5 +242,9 @@ export class PlayTurnComponent implements OnInit {
 
   goHome() {
     this.router.navigate(['/']);
+  }
+
+  openGameOnWeb() {
+    app.ipcRenderer.send('opn-url', 'https://playyourdamnturn.com/game/' + this.playTurnState.game.gameId);
   }
 }

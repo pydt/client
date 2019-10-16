@@ -5,3 +5,8 @@
 h3 {
   margin-top: 0;
 }
+
+.panel-default a, .panel-default a:hover {
+  color: black;
+  text-decoration: underline;
+}
