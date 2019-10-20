@@ -12,12 +12,14 @@ import { AppComponent } from './app.component';
 import { routing } from './app.routing';
 import { AuthComponent } from './auth/auth.component';
 import { GameComponent } from './home/game.component';
+import { GamePlayersComponent } from './home/gamePlayers.component';
 import { HomeComponent } from './home/home.component';
 import { PlayTurnComponent } from './playTurn/playTurn.component';
 import { PlayTurnState } from './playTurn/playTurnState.service';
 import { RollbarErrorHandler, rollbarFactory, RollbarService } from './rollbarErrorHandler';
 import { AuthService } from './shared/authService';
 import { PydtHttpInterceptor } from './shared/pydtHttpInterceptor';
+import { MarkdownModule } from 'ngx-markdown';
 
 export function configFactory() {
   return new Configuration({
@@ -37,14 +39,16 @@ export function configFactory() {
     ProgressbarModule.forRoot(),
     TooltipModule.forRoot(),
     PydtSharedModule,
-    routing
+    routing,
+    MarkdownModule.forRoot()
   ],
   declarations: [
     AppComponent,
     AuthComponent,
     HomeComponent,
     GameComponent,
-    PlayTurnComponent
+    PlayTurnComponent,
+    GamePlayersComponent
   ],
   providers: [
     ProfileCacheService,

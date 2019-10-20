@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { Router } from '@angular/router';
 import * as countdown from 'countdown';
 import * as app from 'electron';
-import { CivDef, Game, GamePlayer, GAMES, SteamProfileMap } from 'pydt-shared';
+import { Game, GAMES, SteamProfileMap } from 'pydt-shared';
 import { PlayTurnState } from '../playTurn/playTurnState.service';
 
 
@@ -17,29 +17,14 @@ export class GameComponent implements OnInit, OnDestroy {
   @Input() yourTurn: boolean;
   @Input() discoursePostNumber: number;
   @Output() smackRead = new EventEmitter<number>();
-  gamePlayers: GamePlayer[] = [];
-  civDefs: CivDef[] = [];
   private now: Date;
   updateDateHandle: any;
 
-  constructor(private router: Router, private playTurnState: PlayTurnState) {}
+  constructor(private router: Router, private playTurnState: PlayTurnState) { }
 
   ngOnInit() {
     // Save current date to prevent "changed after it was checked" bugs
     this.now = new Date();
-
-    for (let i = 0; i < this.game.slots; i++) {
-      if (this.game.players.length > i) {
-        this.gamePlayers.push(this.game.players[i]);
-        this.civDefs.push(this.civGame.leaders.find(leader => {
-          return leader.leaderKey === this.game.players[i].civType;
-        }));
-      } else {
-        this.gamePlayers.push(null);
-        this.civDefs.push(null);
-      }
-    }
-
     this.updateDateHandle = setInterval(() => this.now = new Date(), 30 * 1000);
   }
 
@@ -53,6 +38,7 @@ export class GameComponent implements OnInit, OnDestroy {
 
   playTurn() {
     this.playTurnState.game = this.game;
+    this.playTurnState.gamePlayerProfiles = this.gamePlayerProfiles;
     this.router.navigate(['/playTurn']);
   }
 

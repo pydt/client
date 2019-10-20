@@ -9,9 +9,7 @@
   </div>
   <div class="panel-body">
     <div class="row" style="padding-left:13px;padding-right:13px;">
-      <div *ngFor="let player of gamePlayers; let i = index;" class="col-{{game.slots}}-slots" style="padding-left:2px; padding-right:2px;">
-        <pydt-player-avatar [game]="game" [player]="player" [gamePlayerProfiles]="gamePlayerProfiles" [civDef]="civDefs[i]"></pydt-player-avatar>
-      </div>
+      <pydt-game-players [game]="game" [gamePlayerProfiles]="gamePlayerProfiles"></pydt-game-players>
     </div>
     <div *ngIf="newDiscoursePost">
       <button type="submit" class="btn btn-primary btn-xs btn-block" (click)="readSmack()">Read New Smack Talk Post!</button>

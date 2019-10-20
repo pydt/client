@@ -89,6 +89,7 @@
   "dependencies": {
     "fs-extra": "^7.0.0",
     "ng2-validation": "^4.2.0",
+    "ngx-markdown": "^8.2.1",
     "rollbar": "^2.4.7"
   }
 }

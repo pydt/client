@@ -10,11 +10,11 @@ const notifier = require('node-notifier');
 const opn = require('opn');
 
 // Module to control application life.
-const {app} = electron;
+const { app } = electron;
 app.disableHardwareAcceleration();
 
 // Module to create native browser window.
-const {BrowserWindow} = electron;
+const { BrowserWindow } = electron;
 
 const Menu = electron.Menu;
 const Tray = electron.Tray;
@@ -47,7 +47,7 @@ function forceShowWindow() {
 
 function createWindow() {
   // Create the browser window.
-  win = new BrowserWindow({width: 500, height: 350});
+  win = new BrowserWindow({ width: 500, height: 350 });
 
   // and load the index.html of the app.
   win.loadURL(`file://${__dirname}/index.html`);
@@ -105,32 +105,32 @@ function createWindow() {
   };
 
   const menuTemplate = [{
-      label: 'Options', 
-      submenu: [{
-        label: 'About',
-        click: aboutClick
-      },{
-        label: 'Settings',
-        click: settingsClick
-      }]
-    },{
-      label: 'Debug',
-      submenu: [
-        {
-          label: 'Toggle Developer Tools',
-          accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
-          click: (item, focusedWindow) => {
-            if (focusedWindow) focusedWindow.webContents.toggleDevTools();
-          }
-        }, {
-          label: 'Clear Storage',
-          click: () => {
-            storage.clear(() => {
-              win.reload();
-            });
-          }
+    label: 'Options',
+    submenu: [{
+      label: 'About',
+      click: aboutClick
+    }, {
+      label: 'Settings',
+      click: settingsClick
+    }]
+  }, {
+    label: 'Debug',
+    submenu: [
+      {
+        label: 'Toggle Developer Tools',
+        accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
+        click: (item, focusedWindow) => {
+          if (focusedWindow) focusedWindow.webContents.toggleDevTools();
         }
-      ]
+      }, {
+        label: 'Clear Storage',
+        click: () => {
+          storage.clear(() => {
+            win.reload();
+          });
+        }
+      }
+    ]
   }, {
     label: 'Donate!',
     click: () => {
@@ -160,7 +160,7 @@ function createWindow() {
   Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate));
 
   const appUpdater = require('./appUpdater');
-  
+
   appUpdater.checkForUpdates(win);
 
   electron.ipcMain.on('apply-update', () => {
@@ -193,7 +193,7 @@ function createWindow() {
     if (__dirname.indexOf('app.asar') > 0) {
       const splitDirname = __dirname.split(path.sep);
       const rootPath = path.join.apply(this, splitDirname.slice(0, splitDirname.length - 2));
-      
+
       arg.icon = path.join(rootPath, 'Contents/app/icon.png');
 
       if (!fs.existsSync(arg.icon)) arg.icon = path.join(rootPath, 'app/icon.png');
@@ -232,7 +232,7 @@ function createWindow() {
     log.info('set-autostart');
 
     const AutoLaunch = require('auto-launch');
- 
+
     const launcher = new AutoLaunch({
       name: 'Play Your Damn Turn Client',
       isHidden: true
