@@ -10,6 +10,8 @@ import { GAMES, Game, GameService, PlatformSaveLocation, ProfileCacheService, St
 import { PydtSettings } from '../shared/pydtSettings';
 import { PlayTurnState } from './playTurnState.service';
 
+import { DomSanitizer } from '@angular/platform-browser';
+
 
 @Component({
   selector: 'pydt-home',
@@ -29,15 +31,18 @@ export class PlayTurnComponent implements OnInit {
   private archiveDir: string;
   private saveFileToPlay: string;
   private profileCache: ProfileCacheService;
+  displayDescription: any;
 
 
   constructor(
     public playTurnState: PlayTurnState,
     private gameService: GameService,
     private router: Router,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private sanitizer: DomSanitizer
   ) {
-
+    //this.displayDescription = this.playTurnState.game.description;
+    this.displayDescription = this.sanitizer.bypassSecurityTrustHtml(this.playTurnState.game.description);
   }
 
   get civGame() {
@@ -248,18 +253,9 @@ export class PlayTurnComponent implements OnInit {
     app.ipcRenderer.send('opn-url', 'https://playyourdamnturn.com/game/' + this.playTurnState.game.gameId);
   }
 
-  openLink() {
-    alert('hi');
-    console.log('hey yo! did we even get here!?');
-    // var clickedElement = event.target;
-    // var url = clickedElement.getAttribute("hrefx");
-    // app.ipcRenderer.send('opn-url', url);
+  openMarkdownLink() {
+    // for now, just navigating to website.
     app.ipcRenderer.send('opn-url', 'https://playyourdamnturn.com');
     return false;
-  }
-
-  displayDescription() {
-    // $compile('<a ng-click="openLink" href="javascript:void(0)"
-    // data = "https://www.playyourdamnturn.com/game/listOpen?TEST=1" > Testing < /a>')($scope);
   }
 }

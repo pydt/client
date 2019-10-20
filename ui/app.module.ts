@@ -19,13 +19,34 @@ import { PlayTurnState } from './playTurn/playTurnState.service';
 import { RollbarErrorHandler, rollbarFactory, RollbarService } from './rollbarErrorHandler';
 import { AuthService } from './shared/authService';
 import { PydtHttpInterceptor } from './shared/pydtHttpInterceptor';
-import { MarkdownModule } from 'ngx-markdown';
+import { MarkdownModule, MarkedOptions, MarkedRenderer } from 'ngx-markdown';
 
 export function configFactory() {
   return new Configuration({
     apiKeys: {},
     basePath: PYDT_CONFIG.API_URL
   });
+}
+
+export function markedOptionsFactory(): MarkedOptions {
+  const renderer = new MarkedRenderer();
+  const linkRenderer = renderer.link;
+
+  renderer.link = (href, title, text) => {
+    const html = linkRenderer.call(renderer, href, title, text);
+    return html.replace('href=', 'href="javascript:void(0);" (click)="openMarkdownLink()" hrefx=');
+  };
+
+  return {
+    renderer,
+    gfm: true,
+    tables: true,
+    breaks: false,
+    pedantic: false,
+    sanitize: false,
+    smartLists: true,
+    smartypants: false,
+  };
 }
 
 @NgModule({
@@ -40,7 +61,13 @@ export function configFactory() {
     TooltipModule.forRoot(),
     PydtSharedModule,
     routing,
-    MarkdownModule.forRoot()
+    MarkdownModule.forRoot({
+      markedOptions: {
+        provide: MarkedOptions,
+        useFactory: markedOptionsFactory,
+      },
+    }),
+
   ],
   declarations: [
     AppComponent,
