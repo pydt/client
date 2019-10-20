@@ -12,7 +12,7 @@ import { AppComponent } from './app.component';
 import { routing } from './app.routing';
 import { AuthComponent } from './auth/auth.component';
 import { GameComponent } from './home/game.component';
-import { GamePlayers } from './home/game.players';
+import { GamePlayersComponent } from './home/gamePlayers.component';
 import { HomeComponent } from './home/home.component';
 import { PlayTurnComponent } from './playTurn/playTurn.component';
 import { PlayTurnState } from './playTurn/playTurnState.service';
@@ -48,7 +48,7 @@ export function configFactory() {
     HomeComponent,
     GameComponent,
     PlayTurnComponent,
-    GamePlayers
+    GamePlayersComponent
   ],
   providers: [
     ProfileCacheService,

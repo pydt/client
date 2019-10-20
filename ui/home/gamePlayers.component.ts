@@ -4,11 +4,11 @@ import { CivDef, GAMES, Game, GamePlayer, SteamProfileMap } from 'pydt-shared';
 
 @Component({
     selector: 'pydt-game-players',
-    templateUrl: './game.players.html',
-    styleUrls: ['./game.players.css']
+    templateUrl: './gamePlayers.component.html',
+    styleUrls: ['./gamePlayers.component.css']
 })
 
-export class GamePlayers implements OnInit {
+export class GamePlayersComponent implements OnInit {
     @Input() game: Game;
     @Input() gamePlayerProfiles: SteamProfileMap;
     gamePlayers: GamePlayer[] = [];
