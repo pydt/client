@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, Input, NgZone, OnInit } from '@angular/core';
+import { Component, Input, NgZone, OnInit, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import * as app from 'electron';
 import * as fs from 'fs-extra';
@@ -38,6 +38,17 @@ export class PlayTurnComponent implements OnInit {
     private ngZone: NgZone
   ) {
 
+  }
+
+  @HostListener('click', ['$event'])
+  onMouseEnter(event: MouseEvent) {
+    const href = (event.srcElement as any).href;
+    if (href) {
+      app.ipcRenderer.send('opn-url', href);
+    }
+
+    event.preventDefault();
+    return false;
   }
 
   get civGame() {
