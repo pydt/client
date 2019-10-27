@@ -258,19 +258,4 @@ export class PlayTurnComponent implements OnInit {
   openGameOnWeb() {
     app.ipcRenderer.send('opn-url', 'https://playyourdamnturn.com/game/' + this.playTurnState.game.gameId);
   }
-
-  openLink() {
-    alert('hi');
-    console.log('hey yo! did we even get here!?');
-    // var clickedElement = event.target;
-    // var url = clickedElement.getAttribute("hrefx");
-    // app.ipcRenderer.send('opn-url', url);
-    app.ipcRenderer.send('opn-url', 'https://playyourdamnturn.com');
-    return false;
-  }
-
-  displayDescription() {
-    // $compile('<a ng-click="openLink" href="javascript:void(0)"
-    // data = "https://www.playyourdamnturn.com/game/listOpen?TEST=1" > Testing < /a>')($scope);
-  }
 }
