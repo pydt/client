@@ -13,10 +13,10 @@ export class AppComponent implements OnInit {
   newVersion: string;
   settings = new PydtSettings();
 
-  @ViewChild('aboutModal') aboutModal: ModalDirective;
-  @ViewChild('updateModal') updateModal: ModalDirective;
-  @ViewChild('manualUpdateModal') manualUpdateModal: ModalDirective;
-  @ViewChild('settingsModal') settingsModal: ModalDirective;
+  @ViewChild('aboutModal', { static: true }) aboutModal: ModalDirective;
+  @ViewChild('updateModal', { static: true }) updateModal: ModalDirective;
+  @ViewChild('manualUpdateModal', { static: true }) manualUpdateModal: ModalDirective;
+  @ViewChild('settingsModal', { static: true }) settingsModal: ModalDirective;
 
   constructor(private zone: NgZone) {}
 

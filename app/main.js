@@ -47,7 +47,13 @@ function forceShowWindow() {
 
 function createWindow() {
   // Create the browser window.
-  win = new BrowserWindow({ width: 500, height: 350 });
+  win = new BrowserWindow({
+    width: 500,
+    height: 350,
+    webPreferences: {
+      nodeIntegration: true
+    }
+  });
 
   // and load the index.html of the app.
   win.loadURL(`file://${__dirname}/index.html`);

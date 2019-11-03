@@ -1,4 +1,4 @@
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ErrorHandler, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
@@ -7,7 +7,8 @@ import { CustomFormsModule } from 'ng2-validation';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { ProgressbarModule } from 'ngx-bootstrap/progressbar';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
-import { ApiModule, Configuration, PydtSharedModule, ProfileCacheService } from 'pydt-shared';
+import { MarkdownModule } from 'ngx-markdown';
+import { ApiModule, Configuration, ProfileCacheService, PydtSharedModule } from 'pydt-shared';
 import { AppComponent } from './app.component';
 import { routing } from './app.routing';
 import { AuthComponent } from './auth/auth.component';
@@ -19,7 +20,6 @@ import { PlayTurnState } from './playTurn/playTurnState.service';
 import { RollbarErrorHandler, rollbarFactory, RollbarService } from './rollbarErrorHandler';
 import { AuthService } from './shared/authService';
 import { PydtHttpInterceptor } from './shared/pydtHttpInterceptor';
-import { MarkdownModule } from 'ngx-markdown';
 
 export function configFactory() {
   return new Configuration({
@@ -32,6 +32,7 @@ export function configFactory() {
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    HttpClientModule,
     CustomFormsModule,
     ApiModule.forRoot(configFactory),
     FormsModule,
