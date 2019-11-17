@@ -183,7 +183,11 @@ function createWindow() {
   });
 
   electron.ipcMain.on('start-chokidar', (event, arg) => {
-    const watcher = chokidar.watch(arg, { depth: 0, ignoreInitial: true });
+    const watcher = chokidar.watch(arg, {
+      depth: 0,
+      ignoreInitial: true,
+      awaitWriteFinish: true
+    });
 
     const changeDetected = (path) => {
       forceShowWindow();
