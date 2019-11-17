@@ -28,8 +28,7 @@ export class PlayTurnComponent implements OnInit {
   private saveDir: string;
   private archiveDir: string;
   private saveFileToPlay: string;
-  private profileCache: ProfileCacheService;
-
+  private showGameInfo = false;
 
   constructor(
     public playTurnState: PlayTurnState,
@@ -75,6 +74,7 @@ export class PlayTurnComponent implements OnInit {
       this.saveFileToPlay = this.saveDir + '(PYDT) Play This One!.' + this.civGame.saveExtension;
     } catch (err) {
       console.log(err);
+      this.showGameInfo = false;
       this.abort = true;
       this.status = 'Unable to locate/create save file directory.  ' +
         'Are you using OneDrive and have the "Files On-Demand" option enabled?  ' +
@@ -88,6 +88,7 @@ export class PlayTurnComponent implements OnInit {
     } catch (err) {
       this.ngZone.run(() => {
         this.status = err;
+        this.showGameInfo = false;
         this.abort = true;
       });
     }
@@ -163,6 +164,7 @@ export class PlayTurnComponent implements OnInit {
       this.ngZone.run(() => {
         this.status = `Detected new save: ${path.basename(arg).replace(`.${this.civGame.saveExtension}`, '')}.  Submit turn?`;
         this.downloaded = false;
+        this.showGameInfo = false;
         this.saveFileToUpload = arg;
         app.ipcRenderer.removeListener('new-save-detected', newSaveDetected);
       });
@@ -227,6 +229,7 @@ export class PlayTurnComponent implements OnInit {
       this.curBytes = this.maxBytes = null;
       this.saveFileToUpload = fileBeingUploaded;
       this.abort = true;
+      this.showGameInfo = false;
       return;
     }
 
