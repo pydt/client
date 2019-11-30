@@ -17,10 +17,13 @@
   "build": {
     "appId": "play.your.damn.turn.client",
     "mac": {
-      "category": "public.app-category.strategy-games"
+      "category": "public.app-category.strategy-games",
+      "artifactName": "playyourdamnturn-${version}.${ext}"
     },
     "linux": {
-      "category": "StrategyGame"
+      "category": "StrategyGame",
+      "artifactName": "playyourdamnturn-${version}-${arch}.${ext}",
+      "target": "AppImage"
     },
     "extraFiles": [
       "app/icon.png"

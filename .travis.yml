@@ -2,7 +2,7 @@ os:
   - linux
   - osx
 
-osx_image: xcode8.3
+osx_image: xcode10.3
 sudo: true
 dist: trusty
 language: node_js
