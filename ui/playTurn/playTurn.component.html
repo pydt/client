@@ -6,12 +6,12 @@
     </div>
     <div class="panel-body">
       <ng-container *ngIf="!showGameInfo">
-        <h3>{{status}}</h3>
+        <h3 [innerHTML]="status"></h3>
         <div>
           <progressbar *ngIf="curBytes" [animate]="false" [max]="maxBytes" [value]="curBytes"><span style="color:white;white-space:nowrap;">{{curBytes}} K / {{maxBytes}} K</span></progressbar>
           <button *ngIf="saveFileToUpload" type="submit" class="btn btn-primary btn-sm btn-block" (click)="submitFile(game)">{{ abort ? "Re-" : "" }}Submit File</button>
           <button *ngIf="saveFileToUpload" type="submit" class="btn btn-default btn-sm btn-block" (click)="watchForSave()">{{ abort ? "Watch for New Save" : "Ignore" }}</button>
-          <button *ngIf="abort || downloaded" type="submit" class="btn btn-default btn-sm btn-block" (click)="goHome()">Return to Game List</button>
+          <button *ngIf="abort || downloaded" type="submit" class="btn btn-default btn-sm btn-block" (click)="goHome()">Cancel Turn and Return to Game List</button>
         </div>
       </ng-container>
       <ng-container *ngIf="showGameInfo">

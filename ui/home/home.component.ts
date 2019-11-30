@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import * as awsIot from 'aws-iot-device-sdk';
 import * as app from 'electron';
 import { difference } from 'lodash';
-import { CIV6_GAME, Game, ProfileCacheService, SteamProfile, UserService } from 'pydt-shared';
+import { CIV6_GAME, Game, ProfileCacheService, SteamProfile, UserService, User } from 'pydt-shared';
 import { Observable, Subscription, timer } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AuthService } from '../shared/authService';
@@ -21,7 +21,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   games: Game[];
   gamePlayerProfiles: any = {};
   discourseInfo: DiscourseInfo;
-  private profile: SteamProfile;
+  private user: User;
   private timerSub: Subscription;
   private destroyed = false;
   private lastNotification: Date;
@@ -44,7 +44,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.profile = await this.userService.steamProfile().toPromise();
+    this.user = await this.userService.getCurrent().toPromise();
 
     const $timer = timer(10, POLL_INTERVAL);
     this.configureIot();
@@ -116,7 +116,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       // Notify about turns available
       const yourTurns = this.games
         .filter(game => {
-          return game.currentPlayerSteamId === this.profile.steamid && game.gameTurnRangeKey > 1;
+          return game.currentPlayerSteamId === this.user.steamId && game.gameTurnRangeKey > 1;
         })
         .map(game => {
           return game.displayName;
@@ -138,7 +138,16 @@ export class HomeComponent implements OnInit, OnDestroy {
         // Notify about smack talk
         const smackTalk = this.games.filter(x =>  {
           const readPostNumber = this.discourseInfo[x.gameId] || 0;
-          return x.latestDiscoursePostNumber && x.latestDiscoursePostNumber > readPostNumber;
+
+          if (!x.latestDiscoursePostNumber || x.latestDiscoursePostNumber <= readPostNumber) {
+            return false;
+          }
+
+          if (x.latestDiscoursePostUser === 'system' || x.latestDiscoursePostUser === (this.user.forumUsername || this.user.displayName)) {
+            return false;
+          }
+
+          return true;
         }).map(x => x.displayName);
 
         if (smackTalk.length) {
@@ -163,12 +172,12 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   configureIot() {
-    if (!this.profile) {
+    if (!this.user) {
       return;
     }
 
     const env = PYDT_CONFIG.PROD ? 'prod' : 'dev';
-    const topic = `/pydt/${env}/user/${this.profile.steamid}/gameupdate`;
+    const topic = `/pydt/${env}/user/${this.user.steamId}/gameupdate`;
 
     this.iotDevice = awsIot.device({
       region: 'us-east-1',
@@ -198,7 +207,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   setSortedTurns() {
     const yourTurnGames = this.games.filter((game: Game) => {
-      return game.inProgress && game.currentPlayerSteamId === this.profile.steamid;
+      return game.inProgress && game.currentPlayerSteamId === this.user.steamId;
     });
 
     this.sortedTurns = yourTurnGames.map((game: Game) => {

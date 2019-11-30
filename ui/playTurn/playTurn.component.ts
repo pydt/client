@@ -6,7 +6,7 @@ import * as fs from 'fs-extra';
 import * as mkdirp from 'mkdirp';
 import * as pako from 'pako';
 import * as path from 'path';
-import { GAMES, Game, GameService, PlatformSaveLocation, ProfileCacheService, SteamProfileMap } from 'pydt-shared';
+import { GAMES, CIV6_GAME, Game, GameService, PlatformSaveLocation, SteamProfileMap } from 'pydt-shared';
 import { PydtSettings } from '../shared/pydtSettings';
 import { PlayTurnState } from './playTurnState.service';
 
@@ -155,7 +155,7 @@ export class PlayTurnComponent implements OnInit {
 
   public watchForSave() {
     this.curBytes = this.maxBytes = null;
-    this.status = 'Downloaded file!  Play Your Damn Turn!';
+    this.status = 'Downloaded file!<br />Play Your Damn Turn!';
     this.saveFileToUpload = null;
     this.abort = false;
     this.downloaded = true;
@@ -171,7 +171,10 @@ export class PlayTurnComponent implements OnInit {
     };
 
     setTimeout(() => {
-      app.ipcRenderer.send('start-chokidar', this.saveDir);
+      app.ipcRenderer.send('start-chokidar', {
+        path: this.saveDir,
+        awaitWriteFinish: this.playTurnState.game.gameType !== CIV6_GAME.id
+      });
       app.ipcRenderer.on('new-save-detected', newSaveDetected);
     }, 5000);
   }

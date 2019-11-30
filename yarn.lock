@@ -2468,6 +2468,14 @@ electron-publish@22.1.0:
     lazy-val "^1.0.4"
     mime "^2.4.4"
 
+electron-window-state@^5.0.3:
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/electron-window-state/-/electron-window-state-5.0.3.tgz#4f36d09e3f953d87aff103bf010f460056050aa8"
+  integrity sha512-1mNTwCfkolXl3kMf50yW3vE2lZj0y92P/HYWFBrb+v2S/pCka5mdwN3cagKm458A7NjndSwijynXgcLWRodsVg==
+  dependencies:
+    jsonfile "^4.0.0"
+    mkdirp "^0.5.1"
+
 electron@^7.0.1:
   version "7.0.1"
   resolved "https://registry.yarnpkg.com/electron/-/electron-7.0.1.tgz#6da2c07aa0513d3d156b5b027f317e0959261d43"
@@ -5765,10 +5773,10 @@ punycode@^2.1.0:
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
   integrity sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==
 
-pydt-shared@^1.2.8:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/pydt-shared/-/pydt-shared-1.3.1.tgz#35059bd684a051cabbd431d6200bb1f8cc1731a5"
-  integrity sha512-yglFFVYHKmDBC6ZStvX0AU4wDbg7tmfxacNHkRxqpLTgzhAru2UAX7k807noGgqrl1YFnPUTALlrCyAT4kMOCw==
+pydt-shared@^1.3.2:
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/pydt-shared/-/pydt-shared-1.3.2.tgz#8a128418d6a1944bd23ba7406f9db2307b277cef"
+  integrity sha512-dsHkFdZstWm6Ipebd37y1cAUDn/E6V4/RJT6jKu2lNudtsVHlLWlhFXgue6MXzEq4KpBlmax1K9GnssXn4HwWg==
   dependencies:
     tslib "^1.9.0"
 

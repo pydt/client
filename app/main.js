@@ -8,6 +8,7 @@ const storage = require('electron-json-storage');
 const chokidar = require('chokidar');
 const notifier = require('node-notifier');
 const opn = require('opn');
+const windowStateKeeper = require('electron-window-state');
 
 // Module to control application life.
 const { app } = electron;
@@ -47,13 +48,20 @@ function forceShowWindow() {
 
 function createWindow() {
   // Create the browser window.
+  const mainWindowState = windowStateKeeper({
+    defaultWidth: 500,
+    defaultHeight: 350
+  });
+
   win = new BrowserWindow({
-    width: 500,
-    height: 350,
+    width: mainWindowState.width,
+    height: mainWindowState.height,
     webPreferences: {
       nodeIntegration: true
     }
   });
+
+  mainWindowState.manage(win);
 
   // and load the index.html of the app.
   win.loadURL(`file://${__dirname}/index.html`);
@@ -183,10 +191,10 @@ function createWindow() {
   });
 
   electron.ipcMain.on('start-chokidar', (event, arg) => {
-    const watcher = chokidar.watch(arg, {
+    const watcher = chokidar.watch(arg.path, {
       depth: 0,
       ignoreInitial: true,
-      awaitWriteFinish: true
+      awaitWriteFinish: arg.awaitWriteFinish
     });
 
     const changeDetected = (path) => {
