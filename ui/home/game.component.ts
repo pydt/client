@@ -43,11 +43,11 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   openGameOnWeb() {
-    app.ipcRenderer.send('opn-url', 'https://playyourdamnturn.com/game/' + this.game.gameId);
+    app.ipcRenderer.send('open-url', 'https://playyourdamnturn.com/game/' + this.game.gameId);
   }
 
   readSmack() {
-    app.ipcRenderer.send('opn-url', 'https://discourse.playyourdamnturn.com/t/' + this.game.discourseTopicId);
+    app.ipcRenderer.send('open-url', 'https://discourse.playyourdamnturn.com/t/' + this.game.discourseTopicId);
     this.smackRead.emit(this.game.latestDiscoursePostNumber);
   }
 

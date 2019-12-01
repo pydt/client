@@ -43,7 +43,7 @@ export class PlayTurnComponent implements OnInit {
   onMouseEnter(event: MouseEvent) {
     const href = (event.srcElement as any).href;
     if (href) {
-      app.ipcRenderer.send('opn-url', href);
+      app.ipcRenderer.send('open-url', href);
     }
 
     event.preventDefault();
@@ -137,7 +137,7 @@ export class PlayTurnComponent implements OnInit {
             const settings = await PydtSettings.getSettings();
 
             if (settings.launchCiv) {
-              app.ipcRenderer.send('opn-url', this.civGame.steamRunUrl);
+              app.ipcRenderer.send('open-url', this.civGame.steamRunUrl);
             }
 
             this.watchForSave();
@@ -262,6 +262,6 @@ export class PlayTurnComponent implements OnInit {
   }
 
   openGameOnWeb() {
-    app.ipcRenderer.send('opn-url', 'https://playyourdamnturn.com/game/' + this.playTurnState.game.gameId);
+    app.ipcRenderer.send('open-url', 'https://playyourdamnturn.com/game/' + this.playTurnState.game.gameId);
   }
 }

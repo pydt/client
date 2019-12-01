@@ -53,7 +53,7 @@ module.exports = {
     rules: [
       { test: /node_modules.mqtt/, loader: 'shebang-loader' },
       { test: /\.ts$/, use: [ { loader: 'ts-loader' }, { loader: 'angular2-template-loader' }], exclude: [ /node_modules\/(?!(pydt-.+))/, /app\/node_modules/ ] },
-      { test: /\.(html|css)$/, loader: 'raw-loader' },
+      { test: /\.(html|css)$/, use: [ { loader: 'raw-loader', options: { esModule: false }, } ] },
       // Hack for chokidar, doesn't work without this?
       //{ test: /binary-extensions|\.json/, loader: 'json-loader' },
       // Hacks for bootstrap fonts

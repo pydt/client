@@ -7,7 +7,7 @@ const fs = require('fs');
 const storage = require('electron-json-storage');
 const chokidar = require('chokidar');
 const notifier = require('node-notifier');
-const opn = require('opn');
+const open = require('open');
 const windowStateKeeper = require('electron-window-state');
 
 // Module to control application life.
@@ -148,7 +148,7 @@ function createWindow() {
   }, {
     label: 'Donate!',
     click: () => {
-      opn('https://patreon.com/pydt');
+      open('https://patreon.com/pydt');
     }
   }];
 
@@ -219,6 +219,8 @@ function createWindow() {
       arg.icon = path.join(__dirname, 'icon.png');
     }
 
+    arg.appID = 'com.squirrel.play.your.damn.turn.client';
+
     arg.wait = true;
     notifier.notify(arg);
   });
@@ -240,8 +242,8 @@ function createWindow() {
     });
   });
 
-  electron.ipcMain.on('opn-url', (event, arg) => {
-    opn(arg).catch(err => {
+  electron.ipcMain.on('open-url', (event, arg) => {
+    open(arg).catch(err => {
       log.error(`Could not open URL ${arg}: ${err.message}`);
     });
   });
