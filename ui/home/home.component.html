@@ -3,7 +3,7 @@
   <div *ngIf="games" style="margin-top:30px;">
     <button type="button" class="btn btn-xs btn-default" [disabled]="refreshDisabled" style="position:fixed;top:0;right:20px;z-index:1000;" (click)="refresh()">Refresh</button>
     <div *ngFor="let game of sortedTurns">
-      <pydt-game [game]="game" (smackRead)="smackRead(game.gameId, $event)" [discoursePostNumber]="discourseInfo[game.gameId]" [gamePlayerProfiles]="gamePlayerProfiles" [yourTurn]="game.yourTurn"></pydt-game>
+      <pydt-game [game]="game" [user]="user" (smackRead)="smackRead(game.gameId, $event)" [discoursePostNumber]="discourseInfo[game.gameId]" [gamePlayerProfiles]="gamePlayerProfiles" [yourTurn]="game.yourTurn"></pydt-game>
     </div>
   </div>
 </div>

@@ -2,8 +2,9 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { Router } from '@angular/router';
 import * as countdown from 'countdown';
 import * as app from 'electron';
-import { Game, GAMES, SteamProfileMap } from 'pydt-shared';
+import { Game, GAMES, SteamProfileMap, User } from 'pydt-shared';
 import { PlayTurnState } from '../playTurn/playTurnState.service';
+import { DiscourseInfo } from '../shared/discourseInfo';
 
 
 @Component({
@@ -13,6 +14,7 @@ import { PlayTurnState } from '../playTurn/playTurnState.service';
 })
 export class GameComponent implements OnInit, OnDestroy {
   @Input() game: Game;
+  @Input() user: User;
   @Input() gamePlayerProfiles: SteamProfileMap;
   @Input() yourTurn: boolean;
   @Input() discoursePostNumber: number;
@@ -52,7 +54,7 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   get newDiscoursePost() {
-    return this.game.latestDiscoursePostNumber && this.game.latestDiscoursePostNumber > (this.discoursePostNumber || 0);
+    return DiscourseInfo.isNewSmackTalkPost(this.game, this.user, (this.discoursePostNumber || 0));
   }
 
   get lastTurn() {

@@ -138,16 +138,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         // Notify about smack talk
         const smackTalk = this.games.filter(x =>  {
           const readPostNumber = this.discourseInfo[x.gameId] || 0;
-
-          if (!x.latestDiscoursePostNumber || x.latestDiscoursePostNumber <= readPostNumber) {
-            return false;
-          }
-
-          if (x.latestDiscoursePostUser === 'system' || x.latestDiscoursePostUser === (this.user.forumUsername || this.user.displayName)) {
-            return false;
-          }
-
-          return true;
+          return DiscourseInfo.isNewSmackTalkPost(x, this.user, readPostNumber);
         }).map(x => x.displayName);
 
         if (smackTalk.length) {

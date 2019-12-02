@@ -1,5 +1,6 @@
 import * as storage from 'electron-json-storage';
 import { isEmpty } from 'lodash';
+import { User, Game } from 'pydt-shared';
 
 export class DiscourseInfo {
   [gameId: string]: number;
@@ -32,5 +33,17 @@ export class DiscourseInfo {
         resolve();
       });
     });
+  }
+
+  static isNewSmackTalkPost(game: Game, user: User, readPostNumber: number) {
+    if (!game.latestDiscoursePostNumber || game.latestDiscoursePostNumber <= readPostNumber) {
+      return false;
+    }
+
+    if (game.latestDiscoursePostUser === 'system' || game.latestDiscoursePostUser === (user.forumUsername || user.displayName)) {
+      return false;
+    }
+
+    return true;
   }
 }
