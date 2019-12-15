@@ -219,7 +219,7 @@ function createWindow() {
       arg.icon = path.join(__dirname, 'icon.png');
     }
 
-    arg.appID = 'com.squirrel.play.your.damn.turn.client';
+    arg.appID = 'play.your.damn.turn.client';
 
     arg.wait = true;
     notifier.notify(arg);
