@@ -7,7 +7,7 @@
     "watch": "webpack --watch --progress --profile --colors --display-error-details --display-cached",
     "electron": "electron app",
     "pack": "bash -c \"npm run build-prod; build --dir\"",
-    "dist-win": "bash -c \"npm run build-prod; electron-builder --win --publish always\"",
+    "dist-win": "bash -c \"npm run build-prod; electron-builder --win squirrel --publish always\"",
     "dist-mac": "bash -c \"npm run build-prod; electron-builder --mac --publish always\"",
     "dist-linux": "bash -c \"npm run build-prod; electron-builder --linux --publish always\"",
     "postinstall": "install-app-deps",
@@ -24,9 +24,6 @@
       "category": "StrategyGame",
       "artifactName": "playyourdamnturn-${version}-${arch}.${ext}",
       "target": "AppImage"
-    },
-    "win": {
-      "artifactName": "playyourdamnturn-Setup-${version}.${ext}"
     },
     "extraFiles": [
       "app/icon.png"
@@ -58,6 +55,7 @@
     "electron": "^7.1.2",
     "electron-builder": "^21.2.0",
     "electron-builder-lib": "^20.23.1",
+    "electron-builder-squirrel-windows": "^22.2.0",
     "electron-contextmenu-middleware": "^1.0.3",
     "electron-input-menu": "^2.1.0",
     "electron-json-storage": "^4.1.8",

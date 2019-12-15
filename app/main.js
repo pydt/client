@@ -1,3 +1,5 @@
+if (require('electron-squirrel-startup')) return;
+
 const electron = require('electron');
 const log = require('electron-log');
 const path = require('path');
@@ -217,7 +219,7 @@ function createWindow() {
       arg.icon = path.join(__dirname, 'icon.png');
     }
 
-    arg.appID = 'play.your.damn.turn.client';
+    arg.appID = 'com.squirrel.play.your.damn.turn.client';
 
     arg.wait = true;
     notifier.notify(arg);

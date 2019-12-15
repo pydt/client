@@ -1,7 +1,7 @@
 {
   "name": "playyourdamnturn",
   "productName": "Play Your Damn Turn Client",
-  "version": "1.3.6",
+  "version": "1.3.7",
   "description": "Desktop Client to assist with playing your damn turns.",
   "author": "playyourdamnturn.com",
   "main": "main.js",
@@ -10,10 +10,11 @@
     "chokidar": "^3.3.0",
     "electron-json-storage": "^4.1.8",
     "electron-log": "^3.0.9",
-    "electron-updater": "^4.2.0",
+    "electron-squirrel-startup": "^1.0.0",
     "electron-window-state": "^5.0.3",
     "node-notifier": "6.0.0",
     "open": "^7.0.0",
+    "request": "^2.83.0",
     "rollbar": "^2.14.4"
   }
 }
