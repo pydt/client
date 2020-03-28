@@ -21,6 +21,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   games: Game[];
   gamePlayerProfiles: any = {};
   discourseInfo: DiscourseInfo;
+  errorLoading = false;
   private user: User;
   private timerSub: Subscription;
   private destroyed = false;
@@ -50,7 +51,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.configureIot();
 
     this.timerSub = $timer.subscribe(() => {
-      this.loadGames();
+      this.safeLoadGames();
     });
   }
 
@@ -70,7 +71,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   refresh() {
-    this.loadGames();
+    this.safeLoadGames();
     this.refreshDisabled = true;
     setTimeout(() => {
       this.refreshDisabled = false;
@@ -82,11 +83,28 @@ export class HomeComponent implements OnInit, OnDestroy {
     DiscourseInfo.saveDiscourseInfo(this.discourseInfo);
   }
 
-  async loadGames(retry = 0) {
-    if (retry >= 3) {
-      return;
+  async safeLoadGames() {
+    let count = 0;
+
+    while (count < 3) {
+      try {
+        await this.loadGames();
+        this.errorLoading = false;
+        return;
+      } catch (err) {
+        count++;
+        console.error('Error polling user games...', err);
+
+        if (count < 3) {
+          await new Promise(p => setTimeout(p, 5000));
+        }
+      }
     }
 
+    this.errorLoading = true;
+  }
+
+  async loadGames() {
     let req: Observable<Game[]>;
 
     if (this.destroyed) {
@@ -102,63 +120,55 @@ export class HomeComponent implements OnInit, OnDestroy {
       }));
     }
 
-    try {
-      this.discourseInfo = await DiscourseInfo.getDiscourseInfo();
+    this.discourseInfo = await DiscourseInfo.getDiscourseInfo();
 
-      this.games = await req.toPromise();
-      this.games.forEach(x => x.gameType = x.gameType || CIV6_GAME.id);
-      this.setSortedTurns();
+    this.games = await req.toPromise();
+    this.games.forEach(x => x.gameType = x.gameType || CIV6_GAME.id);
+    this.setSortedTurns();
 
-      this.profileCache.getProfilesForGames(this.games).then(profiles => {
-        this.gamePlayerProfiles = profiles;
+    this.profileCache.getProfilesForGames(this.games).then(profiles => {
+      this.gamePlayerProfiles = profiles;
+    });
+
+    // Notify about turns available
+    const yourTurns = this.games
+      .filter(game => {
+        return game.currentPlayerSteamId === this.user.steamId && game.gameTurnRangeKey > 1;
+      })
+      .map(game => {
+        return game.displayName;
       });
 
-      // Notify about turns available
-      const yourTurns = this.games
-        .filter(game => {
-          return game.currentPlayerSteamId === this.user.steamId && game.gameTurnRangeKey > 1;
-        })
-        .map(game => {
-          return game.displayName;
+    app.ipcRenderer.send('turns-available', !!yourTurns.length);
+
+    let notificationShown = false;
+
+    if ((!this.lastNotification || new Date().getTime() - this.lastNotification.getTime() > TOAST_INTERVAL)) {
+      if (yourTurns.length) {
+        app.ipcRenderer.send('show-toast', {
+          title: 'Play Your Damn Turn!',
+          message: yourTurns.join(', ')
         });
-
-      app.ipcRenderer.send('turns-available', !!yourTurns.length);
-
-      let notificationShown = false;
-
-      if ((!this.lastNotification || new Date().getTime() - this.lastNotification.getTime() > TOAST_INTERVAL)) {
-        if (yourTurns.length) {
-          app.ipcRenderer.send('show-toast', {
-            title: 'Play Your Damn Turn!',
-            message: yourTurns.join(', ')
-          });
-          notificationShown = true;
-        }
-
-        // Notify about smack talk
-        const smackTalk = this.games.filter(x =>  {
-          const readPostNumber = this.discourseInfo[x.gameId] || 0;
-          return DiscourseInfo.isNewSmackTalkPost(x, this.user, readPostNumber);
-        }).map(x => x.displayName);
-
-        if (smackTalk.length) {
-          app.ipcRenderer.send('show-toast', {
-            title: 'New Smack Talk Message!',
-            message: smackTalk.join(', ')
-          });
-          notificationShown = true;
-        }
+        notificationShown = true;
       }
 
-      if (notificationShown) {
-        this.lastNotification = new Date();
-      }
-    } catch (err) {
-      console.error('Error polling user games...', err);
+      // Notify about smack talk
+      const smackTalk = this.games.filter(x =>  {
+        const readPostNumber = this.discourseInfo[x.gameId] || 0;
+        return DiscourseInfo.isNewSmackTalkPost(x, this.user, readPostNumber);
+      }).map(x => x.displayName);
 
-      setTimeout(() => {
-        this.loadGames(retry + 1);
-      }, 5000);
+      if (smackTalk.length) {
+        app.ipcRenderer.send('show-toast', {
+          title: 'New Smack Talk Message!',
+          message: smackTalk.join(', ')
+        });
+        notificationShown = true;
+      }
+    }
+
+    if (notificationShown) {
+      this.lastNotification = new Date();
     }
   }
 
@@ -191,7 +201,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.iotDevice.on('message', (recTopic, message) => {
       console.log('received message from topic ', recTopic);
       if (recTopic === topic) {
-        this.loadGames();
+        this.safeLoadGames();
       }
     });
   }
