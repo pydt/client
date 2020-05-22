@@ -25,10 +25,10 @@ export class PlayTurnComponent implements OnInit {
   downloaded: boolean;
   curBytes: number;
   maxBytes: number;
+  showGameInfo = false;
   private saveDir: string;
   private archiveDir: string;
   private saveFileToPlay: string;
-  private showGameInfo = false;
 
   constructor(
     public playTurnState: PlayTurnState,

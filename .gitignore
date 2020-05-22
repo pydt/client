@@ -6,3 +6,4 @@ npm-debug.log
 /.vscode
 /iot-client-creds.json
 .tmp
+/ui/envVars.js

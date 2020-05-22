@@ -1,15 +1,24 @@
 {
+  "compileOnSave": false,
   "compilerOptions": {
-    "target": "ES6",
-    "module": "commonjs",
-    "removeComments": true,
+    "allowJs": true,
+    "importHelpers": true,
+    "outDir": "./dist/out-tsc",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "sourceMap": true
-  },
-  "filesGlob": [
-    "ui/**"
-  ],
-  "compileOnSave": false,
-  "buildOnSave": false
+    "downlevelIteration": true,
+    "target": "es2015",
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "lib": [
+      "es2017",
+      "dom"
+    ],
+    "module": "esnext",
+    "baseUrl": "./"
+  }
 }

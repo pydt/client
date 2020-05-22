@@ -64,7 +64,7 @@ function createWindow() {
   mainWindowState.manage(win);
 
   // and load the index.html of the app.
-  win.loadURL(`file://${__dirname}/index.html`);
+  win.loadURL(`file://${__dirname}/ui_compiled/index.html`);
 
   let forceQuit = false;
 
