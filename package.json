@@ -16,9 +16,17 @@
   },
   "build": {
     "appId": "play.your.damn.turn.client",
+    "afterSign": "scripts/notarize.js",
     "mac": {
       "category": "public.app-category.strategy-games",
-      "artifactName": "playyourdamnturn-mac-${version}.${ext}"
+      "artifactName": "playyourdamnturn-mac-${version}.${ext}",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist"
+    },
+    "dmg": {
+      "sign": false
     },
     "linux": {
       "category": "StrategyGame",
@@ -54,13 +62,14 @@
     "codelyzer": "^5.2.2",
     "core-js": "^3.6.5",
     "countdown": "2.6.0",
-    "electron": "^9.0.0",
+    "electron": "^8",
     "electron-builder": "^22.6.1",
     "electron-builder-lib": "^20.23.1",
     "electron-builder-squirrel-windows": "^22.6.1",
     "electron-contextmenu-middleware": "^1.0.3",
     "electron-input-menu": "^2.1.0",
     "electron-json-storage": "^4.1.8",
+    "electron-notarize": "^0.3.0",
     "es6-shim": "^0.35.3",
     "font-awesome": "4",
     "fs-extra": "^9.0.0",
