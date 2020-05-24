@@ -37,6 +37,9 @@
       "app/icon.png"
     ]
   },
+  "browserslist": [
+    "last 2 Chrome versions"
+  ],
   "repository": "https://github.com/pydt/client",
   "devDependencies": {
     "@angular-builders/custom-webpack": "^9.1.0",
