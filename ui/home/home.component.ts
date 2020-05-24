@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import * as awsIot from 'aws-iot-device-sdk';
 import * as app from 'electron';
 import { difference } from 'lodash';
 import { CIV6_GAME, Game, ProfileCacheService, User, UserService } from 'pydt-shared';
@@ -27,7 +26,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   private timerSub: Subscription;
   private destroyed = false;
   private lastNotification: Date;
-  private iotDevice;
   private pollUrl;
   private sortedTurns: GameWithYourTurn[];
 
@@ -64,10 +62,9 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     this.destroyed = true;
 
-    if (this.iotDevice) {
-      this.iotDevice.end(true);
-      this.iotDevice = null;
-    }
+    app.ipcRenderer.removeAllListeners('iot-connect');
+    app.ipcRenderer.removeAllListeners('iot-error');
+    app.ipcRenderer.removeAllListeners('iot-message');
   }
 
   refresh() {
@@ -180,29 +177,23 @@ export class HomeComponent implements OnInit, OnDestroy {
     const env = PYDT_CONFIG.PROD ? 'prod' : 'dev';
     const topic = `/pydt/${env}/user/${this.user.steamId}/gameupdate`;
 
-    this.iotDevice = awsIot.device({
-      region: 'us-east-1',
-      protocol: 'wss',
-      keepalive: 600,
-      accessKeyId: PYDT_CONFIG.IOT_CLIENT_ACCESS_KEY,
-      secretKey: PYDT_CONFIG.IOT_CLIENT_SECRET_KEY,
-      host: 'a21s639tnrshxf.iot.us-east-1.amazonaws.com'
-    });
-
-    this.iotDevice.on('connect', () => {
+    app.ipcRenderer.on('iot-connect', (e, data) => {
       console.log('connected to IoT!');
-      this.iotDevice.subscribe(topic);
     });
 
-    this.iotDevice.on('error', err => {
-      console.log('IoT error...', err);
+    app.ipcRenderer.on('iot-error', (e, data) => {
+      console.log('IoT error...', data);
     });
 
-    this.iotDevice.on('message', (recTopic, message) => {
-      console.log('received message from topic ', recTopic);
-      if (recTopic === topic) {
-        this.safeLoadGames();
-      }
+    app.ipcRenderer.on('iot-message', (e, data) => {
+      console.log('received message from topic ', data.topic);
+      this.safeLoadGames();
+    });
+
+    app.ipcRenderer.send('start-iot', {
+      topic,
+      accessKey: PYDT_CONFIG.IOT_CLIENT_ACCESS_KEY,
+      secretKey: PYDT_CONFIG.IOT_CLIENT_SECRET_KEY
     });
   }
 

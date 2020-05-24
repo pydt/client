@@ -272,6 +272,8 @@ function createWindow() {
       log.error('Error toggling auto-start: ', err.message);
     });
   });
+
+  require('./iot').configureIot(electron, win);
 }
 
 // This method will be called when Electron has finished
