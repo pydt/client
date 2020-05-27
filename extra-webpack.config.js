@@ -26,17 +26,22 @@ if (fs.existsSync("iot-client-creds.json")) {
     console.log("Using IoT creds from environment...")
 }
 
-module.exports = {
-    target: 'electron-renderer',
-    plugins: [
-        new webpack.DefinePlugin({
-            // Environment helpers
-            'PYDT_CONFIG': {
-                PROD: JSON.stringify(isProd),
-                API_URL: JSON.stringify(apiUrl),
-                IOT_CLIENT_ACCESS_KEY: JSON.stringify(iotCreds.accessKey),
-                IOT_CLIENT_SECRET_KEY: JSON.stringify(iotCreds.secretKey),
-            }
-        })
-    ]
+module.exports = (config) => {
+  config.target = 'electron-renderer';
+  config.devtool = 'inline-source-map';
+  // Remove SourceMapDevToolPlugin so we can have inline maps
+  config.plugins = config.plugins.filter(x => Object.keys(x).indexOf('sourceMapFilename') < 0);
+  config.plugins.push(
+    new webpack.DefinePlugin({
+      // Environment helpers
+      'PYDT_CONFIG': {
+          PROD: JSON.stringify(isProd),
+          API_URL: JSON.stringify(apiUrl),
+          IOT_CLIENT_ACCESS_KEY: JSON.stringify(iotCreds.accessKey),
+          IOT_CLIENT_SECRET_KEY: JSON.stringify(iotCreds.secretKey),
+      }
+    })
+  );
+  
+  return config;
 };
