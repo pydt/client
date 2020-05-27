@@ -4,7 +4,7 @@
     "clean": "rm -rf dist app/ui_compiled",
     "build": "ng build",
     "serve": "ng serve",
-    "build-prod": "npm run lint && bash -c \"npm run clean; npm run build\"",
+    "build-prod": "npm run lint && bash -c \"npm run clean; ng build --prod\"",
     "electron": "electron app",
     "pack": "bash -c \"npm run build-prod; build --dir\"",
     "dist-win": "bash -c \"npm run build-prod; electron-builder --win squirrel --publish always\"",
