@@ -81,7 +81,7 @@
     "ngx-custom-validators": "^9.1.0",
     "ngx-markdown": "^9.1.1",
     "pako": "^1.0.11",
-    "pydt-shared": "^1.3.6",
+    "pydt-shared": "^1.4.0",
     "rollbar": "^2.16.2",
     "rxjs": "^6.5.3",
     "rxjs-tslint": "^0.1.8",

@@ -6,7 +6,7 @@ import * as fs from 'fs-extra';
 import * as mkdirp from 'mkdirp';
 import * as pako from 'pako';
 import * as path from 'path';
-import { GAMES, CIV6_GAME, Game, GameService, PlatformSaveLocation, SteamProfileMap } from 'pydt-shared';
+import { GAMES, CIV6_GAME, Game, GameService, PlatformSaveLocation, SteamProfileMap, GameStore } from 'pydt-shared';
 import { PydtSettings } from '../shared/pydtSettings';
 import { PlayTurnState } from './playTurnState.service';
 
@@ -59,7 +59,13 @@ export class PlayTurnComponent implements OnInit {
 
     try {
       const location: PlatformSaveLocation = this.civGame.saveLocations[process.platform];
-      this.saveDir = app.remote.app.getPath(location.basePath) + location.prefix + this.civGame.saveDirectory;
+      const gamesLocation = app.remote.app.getPath(location.basePath) + location.prefix;
+
+      const gameDirectory = (fs.existsSync(gamesLocation + this.civGame.gamePaths[GameStore.Epic])) ?
+        gamesLocation + this.civGame.gamePaths[GameStore.Epic] :
+        gamesLocation + this.civGame.gamePaths[GameStore.Steam];
+
+      this.saveDir = gameDirectory + this.civGame.savePath;
 
       if (!fs.existsSync(this.saveDir)) {
         mkdirp.sync(this.saveDir);
