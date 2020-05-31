@@ -433,3 +433,23 @@ a.list-group-item {
 .col-12-slots {
   @include make-slot-column(12);
 }
+
+.nav-tabs {
+  border-bottom-color: $gray-light;
+  li a {
+    color: $brand-primary;
+    border: 1px solid $gray-light;
+    border-bottom: none;
+  }
+
+  > li.active {
+    > a, > a:hover, > a:focus {    
+      background-color: $gray-lighter;
+    }
+  }
+}
+
+.force-horizontal-label {
+  padding-top: 11px;
+  margin-bottom: 0;
+}

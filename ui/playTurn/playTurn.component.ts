@@ -1,12 +1,12 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, Input, NgZone, OnInit, HostListener } from '@angular/core';
+import { Component, HostListener, Input, NgZone, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import * as app from 'electron';
 import * as fs from 'fs-extra';
-import * as mkdirp from 'mkdirp';
 import * as pako from 'pako';
 import * as path from 'path';
-import { GAMES, CIV6_GAME, Game, GameService, PlatformSaveLocation, SteamProfileMap } from 'pydt-shared';
+import * as mkdirp from 'mkdirp';
+import { CIV6_GAME, Game, GAMES, GameService, PlatformSaveLocation, SteamProfileMap } from 'pydt-shared';
 import { PydtSettings } from '../shared/pydtSettings';
 import { PlayTurnState } from './playTurnState.service';
 
@@ -26,6 +26,7 @@ export class PlayTurnComponent implements OnInit {
   curBytes: number;
   maxBytes: number;
   showGameInfo = false;
+  settings: PydtSettings;
   private saveDir: string;
   private archiveDir: string;
   private saveFileToPlay: string;
@@ -56,10 +57,10 @@ export class PlayTurnComponent implements OnInit {
 
   async ngOnInit() {
     this.abort = false;
+    this.settings = await PydtSettings.getSettings();
 
     try {
-      const location: PlatformSaveLocation = this.civGame.saveLocations[process.platform];
-      this.saveDir = app.remote.app.getPath(location.basePath) + location.prefix + this.civGame.saveDirectory;
+      this.saveDir = this.settings.getSavePath(this.civGame);
 
       if (!fs.existsSync(this.saveDir)) {
         mkdirp.sync(this.saveDir);
@@ -133,11 +134,9 @@ export class PlayTurnComponent implements OnInit {
 
           await new Promise(sleepResolve => setTimeout(sleepResolve, 500));
 
-          await this.ngZone.run(async () => {
-            const settings = await PydtSettings.getSettings();
-
-            if (settings.launchCiv) {
-              app.ipcRenderer.send('open-url', this.civGame.steamRunUrl);
+          this.ngZone.run(() => {
+            if (this.settings.launchCiv) {
+              app.ipcRenderer.send('open-url', this.civGame.runUrls[this.settings.getGameStore(this.civGame)]);
             }
 
             this.watchForSave();
@@ -248,9 +247,7 @@ export class PlayTurnComponent implements OnInit {
       .sort((a, b) => a.time - b.time)
       .map(x => x.file);
 
-    const settings = await PydtSettings.getSettings();
-
-    while (files.length > settings.numSaves) {
+    while (files.length > this.settings.numSaves) {
       await fs.unlink(files.shift());
     }
 

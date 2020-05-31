@@ -6,6 +6,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { ProgressbarModule } from 'ngx-bootstrap/progressbar';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
+import { TabsModule } from 'ngx-bootstrap/tabs';
 import { CustomFormsModule } from 'ngx-custom-validators';
 import { MarkdownModule } from 'ngx-markdown';
 import { ApiModule, Configuration, ProfileCacheService, PydtSharedModule } from 'pydt-shared';
@@ -39,6 +40,7 @@ export function configFactory() {
     ModalModule.forRoot(),
     ProgressbarModule.forRoot(),
     TooltipModule.forRoot(),
+    TabsModule.forRoot(),
     PydtSharedModule,
     routing,
     MarkdownModule.forRoot()

@@ -1,8 +1,8 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { ModalDirective } from 'ngx-bootstrap/modal';
-import { PydtSettings } from './shared/pydtSettings';
-import { NgZone } from '@angular/core';
+import { Component, NgZone, OnInit, ViewChild } from '@angular/core';
 import * as app from 'electron';
+import { ModalDirective } from 'ngx-bootstrap/modal';
+import { CivGame, GAMES, GameStore } from 'pydt-shared';
+import { PydtSettings } from './shared/pydtSettings';
 
 @Component({
   selector: 'pydt-app',
@@ -12,6 +12,7 @@ export class AppComponent implements OnInit {
   version: string;
   newVersion: string;
   settings = new PydtSettings();
+  GAMES = GAMES;
 
   @ViewChild('aboutModal', { static: true }) aboutModal: ModalDirective;
   @ViewChild('updateModal', { static: true }) updateModal: ModalDirective;
@@ -56,11 +57,28 @@ export class AppComponent implements OnInit {
     });
   }
 
+  gameStoreOptions(civGame: CivGame) {
+    return Object.keys(GameStore)
+      .filter(x => !!civGame.dataPaths[GameStore[x]])
+      .map(key => ({
+        key,
+        value: GameStore[key]
+      }));
+  }
+
   hideAllModals() {
     this.aboutModal.hide();
     this.settingsModal.hide();
     this.updateModal.hide();
     this.manualUpdateModal.hide();
+  }
+
+  async openDirectoryDialog(civGame: CivGame) {
+    const result = await app.remote.dialog.showOpenDialog({ properties: [ 'openDirectory' ] });
+
+    if (!result.canceled && result.filePaths.length) {
+      this.settings.setSavePath(civGame, result.filePaths[0]);
+    }
   }
 
   saveSettings() {
