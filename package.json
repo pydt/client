@@ -75,7 +75,7 @@
     "es6-shim": "^0.35.3",
     "font-awesome": "4",
     "fs-extra": "^9.0.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.19",
     "mkdirp": "0.5.1",
     "ngx-bootstrap": "^5.6.1",
     "ngx-custom-validators": "^9.1.0",
