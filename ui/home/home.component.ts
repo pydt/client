@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import * as app from 'electron';
 import { difference } from 'lodash';
-import { CIV6_GAME, Game, ProfileCacheService, User, UserService } from 'pydt-shared';
+import { Game, ProfileCacheService, User, UserService } from 'pydt-shared';
 import { Observable, Subscription, timer } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AuthService } from '../shared/authService';
@@ -120,7 +120,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.discourseInfo = await DiscourseInfo.getDiscourseInfo();
 
     this.games = await req.toPromise();
-    this.games.forEach(x => x.gameType = x.gameType || CIV6_GAME.id);
+    this.games.forEach(x => x.gameType = x.gameType || 'CIV6');
     this.setSortedTurns();
 
     this.profileCache.getProfilesForGames(this.games).then(profiles => {

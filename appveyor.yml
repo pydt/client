@@ -19,11 +19,11 @@ init:
 install:
   - ps: Install-Product node 10 x64
   - git reset --hard HEAD
-  - yarn install
 
 build_script:
   - node --version
   - npm --version
+  - npm install
   - npm run dist-win
 
 test: off

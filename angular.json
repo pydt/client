@@ -102,8 +102,7 @@
               "ui/tsconfig.spec.json"
             ],
             "exclude": [
-              "**/node_modules/**",
-              "**/src/app/swagger/**/*"
+              "**/node_modules/**"
             ]
           }
         }
@@ -119,8 +118,5 @@
     "@schematics/angular:directive": {
       "prefix": "app"
     }
-  },
-  "cli": {
-    "packageManager": "yarn"
   }
 }

@@ -5,11 +5,11 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { ProgressbarModule } from 'ngx-bootstrap/progressbar';
-import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { TabsModule } from 'ngx-bootstrap/tabs';
+import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { CustomFormsModule } from 'ngx-custom-validators';
 import { MarkdownModule } from 'ngx-markdown';
-import { ApiModule, Configuration, ProfileCacheService, PydtSharedModule } from 'pydt-shared';
+import { ApiModule, BusyService, Configuration, MetadataCacheService, ProfileCacheService, PydtSharedModule } from 'pydt-shared';
 import { AppComponent } from './app.component';
 import { routing } from './app.routing';
 import { AuthComponent } from './auth/auth.component';
@@ -20,7 +20,6 @@ import { PlayTurnComponent } from './playTurn/playTurn.component';
 import { PlayTurnState } from './playTurn/playTurnState.service';
 import { RollbarErrorHandler, rollbarFactory, RollbarService } from './rollbarErrorHandler';
 import { AuthService } from './shared/authService';
-import { PydtHttpInterceptor } from './shared/pydtHttpInterceptor';
 
 export function configFactory() {
   return new Configuration({
@@ -58,7 +57,8 @@ export function configFactory() {
     { provide: ErrorHandler, useClass: RollbarErrorHandler },
     { provide: RollbarService, useFactory: rollbarFactory },
     AuthService,
-    { provide: HTTP_INTERCEPTORS, useClass: PydtHttpInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useExisting: BusyService, multi: true },
+    { provide: HTTP_INTERCEPTORS, useExisting: MetadataCacheService, multi: true },
     PlayTurnState
   ],
   bootstrap: [AppComponent]

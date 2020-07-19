@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { Router } from '@angular/router';
 import * as countdown from 'countdown';
 import * as app from 'electron';
-import { Game, GAMES, SteamProfileMap, User } from 'pydt-shared';
+import { Game, SteamProfileMap, User, CivGame, MetadataCacheService } from 'pydt-shared';
 import { PlayTurnState } from '../playTurn/playTurnState.service';
 import { DiscourseInfo } from '../shared/discourseInfo';
 
@@ -21,13 +21,16 @@ export class GameComponent implements OnInit, OnDestroy {
   @Output() smackRead = new EventEmitter<number>();
   private now: Date;
   updateDateHandle: any;
+  games: CivGame[] = [];
 
-  constructor(private router: Router, private playTurnState: PlayTurnState) { }
+  constructor(private router: Router, private playTurnState: PlayTurnState, private metadataCache: MetadataCacheService) { }
 
-  ngOnInit() {
+  async ngOnInit() {
     // Save current date to prevent "changed after it was checked" bugs
     this.now = new Date();
     this.updateDateHandle = setInterval(() => this.now = new Date(), 30 * 1000);
+
+    this.games = (await this.metadataCache.getCivGameMetadata()).civGames;
   }
 
   ngOnDestroy() {
@@ -35,7 +38,7 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   get civGame() {
-    return GAMES.find(x => x.id === this.game.gameType);
+    return this.games.find(x => x.id === this.game.gameType);
   }
 
   playTurn() {

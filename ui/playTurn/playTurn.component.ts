@@ -6,7 +6,7 @@ import * as fs from 'fs-extra';
 import * as pako from 'pako';
 import * as path from 'path';
 import * as mkdirp from 'mkdirp';
-import { CIV6_GAME, Game, GAMES, GameService, PlatformSaveLocation, SteamProfileMap } from 'pydt-shared';
+import { Game, GameService, PlatformSaveLocation, SteamProfileMap, MetadataCacheService, CivGame } from 'pydt-shared';
 import { PydtSettings } from '../shared/pydtSettings';
 import { PlayTurnState } from './playTurnState.service';
 
@@ -27,17 +27,18 @@ export class PlayTurnComponent implements OnInit {
   maxBytes: number;
   showGameInfo = false;
   settings: PydtSettings;
+  games: CivGame[] = [];
   private saveDir: string;
   private archiveDir: string;
   private saveFileToPlay: string;
 
   constructor(
     public playTurnState: PlayTurnState,
+    private metadataCache: MetadataCacheService,
     private gameService: GameService,
     private router: Router,
     private ngZone: NgZone
   ) {
-
   }
 
   @HostListener('click', ['$event'])
@@ -52,12 +53,13 @@ export class PlayTurnComponent implements OnInit {
   }
 
   get civGame() {
-    return GAMES.find(x => x.id === this.playTurnState.game.gameType);
+    return this.games.find(x => x.id === this.playTurnState.game.gameType);
   }
 
   async ngOnInit() {
     this.abort = false;
     this.settings = await PydtSettings.getSettings();
+    this.games = (await this.metadataCache.getCivGameMetadata()).civGames;
 
     try {
       this.saveDir = this.settings.getSavePath(this.civGame);
@@ -172,7 +174,7 @@ export class PlayTurnComponent implements OnInit {
     setTimeout(() => {
       app.ipcRenderer.send('start-chokidar', {
         path: this.saveDir,
-        awaitWriteFinish: this.playTurnState.game.gameType !== CIV6_GAME.id
+        awaitWriteFinish: this.playTurnState.game.gameType !== 'CIV6'
       });
       app.ipcRenderer.on('new-save-detected', newSaveDetected);
     }, 5000);

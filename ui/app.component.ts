@@ -1,7 +1,7 @@
-import { Component, NgZone, OnInit, ViewChild } from '@angular/core';
+import { Component, NgZone, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import * as app from 'electron';
-import { ModalDirective } from 'ngx-bootstrap/modal';
-import { CivGame, GAMES, GameStore } from 'pydt-shared';
+import { ModalDirective, BsModalRef, BsModalService, ModalOptions } from 'ngx-bootstrap/modal';
+import { CivGame, GameStore, MetadataCacheService } from 'pydt-shared';
 import { PydtSettings } from './shared/pydtSettings';
 
 @Component({
@@ -12,47 +12,53 @@ export class AppComponent implements OnInit {
   version: string;
   newVersion: string;
   settings = new PydtSettings();
-  GAMES = GAMES;
 
-  @ViewChild('aboutModal', { static: true }) aboutModal: ModalDirective;
-  @ViewChild('updateModal', { static: true }) updateModal: ModalDirective;
-  @ViewChild('manualUpdateModal', { static: true }) manualUpdateModal: ModalDirective;
-  @ViewChild('settingsModal', { static: true }) settingsModal: ModalDirective;
+  @ViewChild('aboutModal', { static: true }) aboutModal: TemplateRef<any>;
+  @ViewChild('updateModal', { static: true }) updateModal: TemplateRef<any>;
+  @ViewChild('manualUpdateModal', { static: true }) manualUpdateModal: TemplateRef<any>;
+  @ViewChild('settingsModal', { static: true }) settingsModal: TemplateRef<any>;
+  openModal: BsModalRef;
+  civGames: CivGame[];
 
-  constructor(private zone: NgZone) {}
+  constructor(private zone: NgZone, public metadataCache: MetadataCacheService, private modalService: BsModalService) {}
 
   ngOnInit() {
+    const modalOptions: ModalOptions = {
+      class: 'modal-lg'
+    };
+
     app.ipcRenderer.on('show-about-modal', (e, data) => {
       this.zone.run(() => {
-        this.hideAllModals();
+        this.hideOpenModal();
         this.version = data;
-        this.aboutModal.show();
+        this.openModal = this.modalService.show(this.aboutModal, modalOptions);
       });
     });
 
     app.ipcRenderer.on('show-settings-modal', (e, data) => {
       PydtSettings.getSettings().then(settings => {
-        this.zone.run(() => {
-          this.hideAllModals();
+        this.zone.run(async () => {
+          this.civGames = (await this.metadataCache.getCivGameMetadata()).civGames;
+          this.hideOpenModal();
           this.settings = settings;
-          this.settingsModal.show();
+          this.openModal = this.modalService.show(this.settingsModal, modalOptions);
         });
       });
     });
 
     app.ipcRenderer.on('show-update-modal', (e, data) => {
       this.zone.run(() => {
-        this.hideAllModals();
+        this.hideOpenModal();
         this.newVersion = data;
-        this.updateModal.show();
+        this.openModal = this.modalService.show(this.updateModal, modalOptions);
       });
     });
 
     app.ipcRenderer.on('manual-update-modal', (e, data) => {
       this.zone.run(() => {
-        this.hideAllModals();
+        this.hideOpenModal();
         this.newVersion = data;
-        this.manualUpdateModal.show();
+        this.openModal = this.modalService.show(this.manualUpdateModal, modalOptions);
       });
     });
   }
@@ -66,11 +72,12 @@ export class AppComponent implements OnInit {
       }));
   }
 
-  hideAllModals() {
-    this.aboutModal.hide();
-    this.settingsModal.hide();
-    this.updateModal.hide();
-    this.manualUpdateModal.hide();
+  hideOpenModal() {
+    if (this.openModal) {
+      this.openModal.hide();
+    }
+
+    this.openModal = null;
   }
 
   async openDirectoryDialog(civGame: CivGame) {
@@ -84,7 +91,7 @@ export class AppComponent implements OnInit {
   saveSettings() {
     PydtSettings.saveSettings(this.settings);
     app.ipcRenderer.send('set-autostart', this.settings.startOnBoot);
-    this.settingsModal.hide();
+    this.hideOpenModal();
   }
 
   applyUpdate() {
