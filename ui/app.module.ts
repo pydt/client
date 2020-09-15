@@ -8,7 +8,7 @@ import { ProgressbarModule } from 'ngx-bootstrap/progressbar';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { CustomFormsModule } from 'ngx-custom-validators';
-import { MarkdownModule } from 'ngx-markdown';
+import { MarkdownModule, MarkedOptions } from 'ngx-markdown';
 import { ApiModule, BusyService, Configuration, MetadataCacheService, ProfileCacheService, PydtSharedModule } from 'pydt-shared';
 import { AppComponent } from './app.component';
 import { routing } from './app.routing';
@@ -42,7 +42,14 @@ export function configFactory() {
     TabsModule.forRoot(),
     PydtSharedModule,
     routing,
-    MarkdownModule.forRoot()
+    MarkdownModule.forRoot({
+      markedOptions: {
+        provide: MarkedOptions,
+        useValue: {
+          breaks: true
+        }
+      }
+    })
   ],
   declarations: [
     AppComponent,
