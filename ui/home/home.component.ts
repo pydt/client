@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import * as app from 'electron';
-import { difference } from 'lodash';
+import { difference, orderBy } from 'lodash';
 import { Game, ProfileCacheService, User, UserService } from 'pydt-shared';
 import { Observable, Subscription, timer } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -198,26 +198,24 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   setSortedTurns() {
-    const yourTurnGames = this.games.filter((game: Game) => {
-      return game.inProgress && game.currentPlayerSteamId === this.user.steamId;
-    });
-
-    this.sortedTurns = yourTurnGames.map((game: Game) => {
-      return {
-        ...game,
-        yourTurn: true
-      };
-    });
-
-    this.sortedTurns = this.sortedTurns.concat(difference(this.games, yourTurnGames).map((game: Game) => {
-      return {
-        ...game,
-        yourTurn: false
-      };
+    this.sortedTurns = this.games.map(game => ({
+      ...game,
+      yourTurn: !!game.inProgress && game.currentPlayerSteamId === this.user.steamId,
+      hasSmackTalk: DiscourseInfo.isNewSmackTalkPost(game, this.user, this.discourseInfo[game.gameId] || 0)
     }));
+
+    const yourTurns = orderBy(this.sortedTurns.filter(x => x.yourTurn), x => x.updatedAt, 'desc');
+
+    const others = orderBy(difference(this.sortedTurns, yourTurns), [x => x.hasSmackTalk, x => x.updatedAt], ['desc', 'desc']);
+
+    this.sortedTurns = [
+      ...yourTurns,
+      ...others
+    ];
   }
 }
 
-interface GameWithYourTurn {
+interface GameWithYourTurn extends Game {
   yourTurn: boolean;
+  hasSmackTalk: boolean;
 }
