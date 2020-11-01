@@ -71,9 +71,10 @@ function createWindow() {
   app.on('before-quit', () => { forceQuit = true; });
 
   win.on('close', e => {
-    if (!forceQuit && process.platform === 'darwin') {
+    if (!forceQuit) {
       e.preventDefault();
       win.hide();
+      e.returnValue = false;
     }
   });
 
@@ -83,10 +84,6 @@ function createWindow() {
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     win = null;
-  });
-
-  win.on('minimize', () => {
-    win.hide();
   });
 
   if (process.platform !== 'darwin') {
@@ -100,12 +97,16 @@ function createWindow() {
     }, {
       label: 'Exit',
       click: function () {
+        forceQuit = true;
         app.quit();
       }
     }]);
 
-    appIcon.setToolTip('Play Your Damn Turn Client')
-    appIcon.setContextMenu(contextMenu)
+    appIcon.setToolTip('Play Your Damn Turn Client');
+    appIcon.setContextMenu(contextMenu);
+    appIcon.on('double-click', () => {
+      win.show();
+    });
   }
 
   const aboutClick = (item, focusedWindow) => {
@@ -126,6 +127,12 @@ function createWindow() {
     }, {
       label: 'Settings',
       click: settingsClick
+    }, {
+      label: 'Quit',
+      click: function () {
+        forceQuit = true;
+        app.quit();
+      }
     }]
   }, {
     label: 'Debug',
