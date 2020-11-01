@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, HostListener, Input, NgZone, OnInit } from '@angular/core';
+import { Component, HostListener, Input, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import * as app from 'electron';
 import * as fs from 'fs-extra';
@@ -16,7 +16,7 @@ import { PlayTurnState } from './playTurnState.service';
   templateUrl: './playTurn.component.html',
   styleUrls: ['./playTurn.component.css']
 })
-export class PlayTurnComponent implements OnInit {
+export class PlayTurnComponent implements OnInit, OnDestroy {
   @Input() game: Game;
   @Input() gamePlayerProfiles: SteamProfileMap;
   status = 'Downloading Save File...';
@@ -28,6 +28,7 @@ export class PlayTurnComponent implements OnInit {
   showGameInfo = false;
   settings: PydtSettings;
   games: CivGame[] = [];
+  xhr: XMLHttpRequest;
   private saveDir: string;
   private archiveDir: string;
   private saveFileToPlay: string;
@@ -97,13 +98,20 @@ export class PlayTurnComponent implements OnInit {
     }
   }
 
+  ngOnDestroy() {
+    if (this.xhr) {
+      this.xhr.abort();
+      this.xhr = null;
+    }
+  }
+
   private downloadFile(url: string) {
     return new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.open('GET', url, true);
-      xhr.responseType = 'arraybuffer';
+      this.xhr = new XMLHttpRequest();
+      this.xhr.open('GET', url, true);
+      this.xhr.responseType = 'arraybuffer';
 
-      xhr.onprogress = e => {
+      this.xhr.onprogress = e => {
         this.ngZone.run(() => {
           if (e.lengthComputable) {
             this.curBytes = Math.round(e.loaded / 1024);
@@ -112,26 +120,30 @@ export class PlayTurnComponent implements OnInit {
         });
       };
 
-      xhr.onerror = () => {
-        reject(xhr.status);
+      this.xhr.onerror = () => {
+        reject(this.xhr.status);
+        this.xhr = null;
       };
 
-      xhr.onload = async () => {
+      this.xhr.onload = async () => {
+        const response = this.xhr.response;
+        this.xhr = null;
+
         try {
           await this.ngZone.run(async () => {
             this.curBytes = this.maxBytes;
           });
 
           await this.ngZone.run(async () => {
-            let data = new Uint8Array(xhr.response);
+            let data = new Uint8Array(response);
 
             try {
-              data = pako.ungzip(new Uint8Array(xhr.response));
+              data = pako.ungzip(new Uint8Array(response));
             } catch (e) {
               // Ignore - file probably wasn't gzipped...
             }
 
-            await fs.writeFile(this.saveFileToPlay, new Buffer(data));
+            await fs.writeFile(this.saveFileToPlay, Buffer.from(data));
           });
 
           await new Promise(sleepResolve => setTimeout(sleepResolve, 500));
@@ -150,7 +162,7 @@ export class PlayTurnComponent implements OnInit {
         }
       };
 
-      xhr.send();
+      this.xhr.send();
     });
   }
 
@@ -193,10 +205,10 @@ export class PlayTurnComponent implements OnInit {
       const startResp = await this.gameService.startSubmit(this.playTurnState.game.gameId).toPromise();
 
       await new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open('PUT', startResp.putUrl, true);
+        this.xhr = new XMLHttpRequest();
+        this.xhr.open('PUT', startResp.putUrl, true);
 
-        xhr.upload.onprogress = e => {
+        this.xhr.upload.onprogress = e => {
           this.ngZone.run(() => {
             if (e.lengthComputable) {
               this.curBytes = Math.round(e.loaded / 1024);
@@ -205,20 +217,23 @@ export class PlayTurnComponent implements OnInit {
           });
         };
 
-        xhr.onload = () => {
-          if (xhr.status === 200) {
+        this.xhr.onload = () => {
+          if (this.xhr.status === 200) {
             resolve();
           } else {
-            reject(xhr.status);
+            reject(this.xhr.status);
           }
+
+          this.xhr = null;
         };
 
-        xhr.onerror = () => {
-          reject(xhr.status);
+        this.xhr.onerror = () => {
+          reject(this.xhr.status);
+          this.xhr = null;
         };
 
-        xhr.setRequestHeader('Content-Type', 'application/octet-stream');
-        xhr.send(fileData);
+        this.xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+        this.xhr.send(fileData);
       });
 
       await this.gameService.finishSubmit(this.playTurnState.game.gameId).toPromise();
