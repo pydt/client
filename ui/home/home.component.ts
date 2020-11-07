@@ -6,6 +6,7 @@ import { difference, orderBy } from 'lodash';
 import { Game, ProfileCacheService, User, UserService } from 'pydt-shared';
 import { Observable, Subscription, timer } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { TurnCacheService } from '../shared/turnCacheService';
 import { AuthService } from '../shared/authService';
 import { DiscourseInfo } from '../shared/discourseInfo';
 
@@ -30,11 +31,12 @@ export class HomeComponent implements OnInit, OnDestroy {
   private sortedTurns: GameWithYourTurn[];
 
   constructor(
-    private userService: UserService,
-    private http: HttpClient,
-    private router: Router,
-    private profileCache: ProfileCacheService,
-    private authService: AuthService
+    private readonly userService: UserService,
+    private readonly http: HttpClient,
+    private readonly router: Router,
+    private readonly profileCache: ProfileCacheService,
+    private readonly turnCacheService: TurnCacheService,
+    private readonly authService: AuthService
   ) {}
 
   async ngOnInit() {
@@ -129,12 +131,9 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     // Notify about turns available
     const yourTurns = this.games
-      .filter(game => {
-        return game.currentPlayerSteamId === this.user.steamId && game.gameTurnRangeKey > 1;
-      })
-      .map(game => {
-        return game.displayName;
-      });
+      .filter(game => game.currentPlayerSteamId === this.user.steamId && game.gameTurnRangeKey > 1);
+
+    this.turnCacheService.updateGames(yourTurns);
 
     app.ipcRenderer.send('turns-available', !!yourTurns.length);
 
@@ -144,7 +143,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       if (yourTurns.length) {
         app.ipcRenderer.send('show-toast', {
           title: 'Play Your Damn Turn!',
-          message: yourTurns.join(', ')
+          message: yourTurns.map(x => x.displayName).join(', ')
         });
         notificationShown = true;
       }

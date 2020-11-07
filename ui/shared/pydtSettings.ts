@@ -11,6 +11,7 @@ export class PydtSettings {
   numSaves = 100;
   gameStores = {};
   savePaths = {};
+  autoDownload = true;
 
   static getSettings(): Promise<PydtSettings> {
     return new Promise((resolve, reject) => {
