@@ -1,10 +1,15 @@
 import { Injectable } from '@angular/core';
 import * as storage from 'electron-json-storage';
-import { Configuration } from 'pydt-shared';
+import { Configuration, User, UserService } from 'pydt-shared';
 
 @Injectable()
 export class AuthService {
-  constructor(private apiConfig: Configuration) {
+  private user: User;
+
+  constructor(
+    private readonly apiConfig: Configuration,
+    private readonly userService: UserService
+  ) {
   }
 
   async isAuthenticated() {
@@ -12,11 +17,27 @@ export class AuthService {
     return !!this.apiConfig.apiKeys.Authorization;
   }
 
+  async getUser(force: boolean) {
+    if (!this.user || force) {
+      try {
+        this.user = await this.userService.getCurrent().toPromise();
+      } catch {
+        /* Ignore error, we'll try again later... */
+      }
+    }
+
+    return this.user;
+  }
+
   storeToken(token: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       const config = {
         token: token
       };
+
+      if (!token) {
+        this.user = null;
+      }
 
       storage.set('configData', config, err => {
         if (err) {

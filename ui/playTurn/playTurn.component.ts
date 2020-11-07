@@ -6,9 +6,10 @@ import * as fs from 'fs-extra';
 import * as pako from 'pako';
 import * as path from 'path';
 import * as mkdirp from 'mkdirp';
-import { Game, GameService, PlatformSaveLocation, SteamProfileMap, MetadataCacheService, CivGame } from 'pydt-shared';
+import { Game, GameService, SteamProfileMap, MetadataCacheService, CivGame } from 'pydt-shared';
 import { PydtSettings } from '../shared/pydtSettings';
 import { PlayTurnState } from './playTurnState.service';
+import { TurnCacheService, TurnDownloader } from '../shared/turnCacheService';
 
 
 @Component({
@@ -29,16 +30,18 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
   settings: PydtSettings;
   games: CivGame[] = [];
   xhr: XMLHttpRequest;
+  turnDownloader: TurnDownloader;
   private saveDir: string;
   private archiveDir: string;
   private saveFileToPlay: string;
 
   constructor(
-    public playTurnState: PlayTurnState,
-    private metadataCache: MetadataCacheService,
-    private gameService: GameService,
-    private router: Router,
-    private ngZone: NgZone
+    public readonly playTurnState: PlayTurnState,
+    private readonly metadataCache: MetadataCacheService,
+    private readonly turnCacheService: TurnCacheService,
+    private readonly gameService: GameService,
+    private readonly router: Router,
+    private readonly ngZone: NgZone
   ) {
   }
 
@@ -86,65 +89,27 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
       throw err;
     }
 
-    try {
-      const resp = await this.gameService.getTurn(this.playTurnState.game.gameId, 'yup').toPromise();
-      await this.downloadFile(resp.downloadUrl);
-    } catch (err) {
-      this.ngZone.run(() => {
+    this.turnDownloader = this.turnCacheService.get(this.playTurnState.game.gameId);
+
+    if (this.turnDownloader.data$.value) {
+      this.status = 'Turn already downloaded, moving to save location...';
+    }
+
+    this.turnDownloader.error$.subscribe(err => {
+      if (err) {
+        this.turnDownloader = null;
         this.status = err;
         this.showGameInfo = false;
         this.abort = true;
-      });
-    }
-  }
+      }
+    });
 
-  ngOnDestroy() {
-    if (this.xhr) {
-      this.xhr.abort();
-      this.xhr = null;
-    }
-  }
-
-  private downloadFile(url: string) {
-    return new Promise((resolve, reject) => {
-      this.xhr = new XMLHttpRequest();
-      this.xhr.open('GET', url, true);
-      this.xhr.responseType = 'arraybuffer';
-
-      this.xhr.onprogress = e => {
-        this.ngZone.run(() => {
-          if (e.lengthComputable) {
-            this.curBytes = Math.round(e.loaded / 1024);
-            this.maxBytes = Math.round(e.total / 1024);
-          }
-        });
-      };
-
-      this.xhr.onerror = () => {
-        reject(this.xhr.status);
-        this.xhr = null;
-      };
-
-      this.xhr.onload = async () => {
-        const response = this.xhr.response;
-        this.xhr = null;
+    this.turnDownloader?.data$.subscribe(async data => {
+      if (data) {
+        this.turnDownloader = null;
 
         try {
-          await this.ngZone.run(async () => {
-            this.curBytes = this.maxBytes;
-          });
-
-          await this.ngZone.run(async () => {
-            let data = new Uint8Array(response);
-
-            try {
-              data = pako.ungzip(new Uint8Array(response));
-            } catch (e) {
-              // Ignore - file probably wasn't gzipped...
-            }
-
-            await fs.writeFile(this.saveFileToPlay, Buffer.from(data));
-          });
+          await fs.writeFile(this.saveFileToPlay, Buffer.from(data));
 
           await new Promise(sleepResolve => setTimeout(sleepResolve, 500));
 
@@ -155,15 +120,25 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
 
             this.watchForSave();
           });
-
-          resolve();
         } catch (err) {
-          reject(err);
+          this.status = err;
+          this.showGameInfo = false;
+          this.abort = true;
         }
-      };
-
-      this.xhr.send();
+      }
     });
+  }
+
+  ngOnDestroy() {
+    if (this.xhr) {
+      this.xhr.abort();
+      this.xhr = null;
+    }
+
+    if (this.turnDownloader) {
+      this.turnDownloader.abort();
+      this.turnDownloader = null;
+    }
   }
 
   public watchForSave() {

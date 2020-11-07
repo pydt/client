@@ -36,6 +36,11 @@
               <input type="checkbox" style="top:-5px;" name="startOnBoot" [(ngModel)]="settings.startOnBoot"> Start client on boot
             </label>
           </div>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" style="top:-5px;" name="autoDownload" [(ngModel)]="settings.autoDownload"> Automatically download turns in background (BETA)
+            </label>
+          </div>
           <div class="form-inline" [ngClass]="{ 'has-error': numSaves.errors }">
             <div class="form-group">
               <span>Archive</span>

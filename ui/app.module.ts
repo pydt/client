@@ -20,6 +20,7 @@ import { PlayTurnComponent } from './playTurn/playTurn.component';
 import { PlayTurnState } from './playTurn/playTurnState.service';
 import { RollbarErrorHandler, rollbarFactory, RollbarService } from './rollbarErrorHandler';
 import { AuthService } from './shared/authService';
+import { TurnCacheService } from './shared/turnCacheService';
 
 export function configFactory() {
   return new Configuration({
@@ -61,6 +62,7 @@ export function configFactory() {
   ],
   providers: [
     ProfileCacheService,
+    TurnCacheService,
     { provide: ErrorHandler, useClass: RollbarErrorHandler },
     { provide: RollbarService, useFactory: rollbarFactory },
     AuthService,

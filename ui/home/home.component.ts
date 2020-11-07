@@ -6,6 +6,7 @@ import { difference, orderBy } from 'lodash';
 import { Game, ProfileCacheService, User, UserService } from 'pydt-shared';
 import { Observable, Subscription, timer } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { TurnCacheService } from '../shared/turnCacheService';
 import { AuthService } from '../shared/authService';
 import { DiscourseInfo } from '../shared/discourseInfo';
 
@@ -27,14 +28,16 @@ export class HomeComponent implements OnInit, OnDestroy {
   private destroyed = false;
   private lastNotification: Date;
   private pollUrl;
+  private iotConnected = false;
   private sortedTurns: GameWithYourTurn[];
 
   constructor(
-    private userService: UserService,
-    private http: HttpClient,
-    private router: Router,
-    private profileCache: ProfileCacheService,
-    private authService: AuthService
+    private readonly userService: UserService,
+    private readonly http: HttpClient,
+    private readonly router: Router,
+    private readonly profileCache: ProfileCacheService,
+    private readonly turnCacheService: TurnCacheService,
+    private readonly authService: AuthService
   ) {}
 
   async ngOnInit() {
@@ -43,10 +46,10 @@ export class HomeComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.user = await this.userService.getCurrent().toPromise();
+    // Force a refresh of the user data
+    this.user = await this.authService.getUser(true);
 
     const $timer = timer(10, POLL_INTERVAL);
-    this.configureIot();
 
     this.timerSub = $timer.subscribe(() => {
       this.safeLoadGames();
@@ -85,6 +88,8 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     while (count < 3) {
       try {
+        this.user = await this.authService.getUser(false);
+        this.configureIot();
         await this.loadGames();
         this.errorLoading = false;
         return;
@@ -129,12 +134,9 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     // Notify about turns available
     const yourTurns = this.games
-      .filter(game => {
-        return game.currentPlayerSteamId === this.user.steamId && game.gameTurnRangeKey > 1;
-      })
-      .map(game => {
-        return game.displayName;
-      });
+      .filter(game => game.currentPlayerSteamId === this.user.steamId && game.gameTurnRangeKey > 1);
+
+    this.turnCacheService.updateGames(yourTurns);
 
     app.ipcRenderer.send('turns-available', !!yourTurns.length);
 
@@ -144,7 +146,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       if (yourTurns.length) {
         app.ipcRenderer.send('show-toast', {
           title: 'Play Your Damn Turn!',
-          message: yourTurns.join(', ')
+          message: yourTurns.map(x => x.displayName).join(', ')
         });
         notificationShown = true;
       }
@@ -170,6 +172,10 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   configureIot() {
+    if (this.iotConnected) {
+      return;
+    }
+
     if (!this.user) {
       return;
     }
@@ -195,6 +201,8 @@ export class HomeComponent implements OnInit, OnDestroy {
       accessKey: PYDT_CONFIG.IOT_CLIENT_ACCESS_KEY,
       secretKey: PYDT_CONFIG.IOT_CLIENT_SECRET_KEY
     });
+
+    this.iotConnected = true;
   }
 
   setSortedTurns() {
