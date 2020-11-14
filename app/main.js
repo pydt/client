@@ -197,8 +197,14 @@ function createWindow() {
     }
   });
 
+  let watcher;
+
   electron.ipcMain.on('start-chokidar', (event, arg) => {
-    const watcher = chokidar.watch(arg.path, {
+    if (watcher) {
+      watcher.close();
+    }
+
+    watcher = chokidar.watch(arg.path, {
       depth: 0,
       ignoreInitial: true,
       awaitWriteFinish: arg.awaitWriteFinish
@@ -208,6 +214,7 @@ function createWindow() {
       forceShowWindow();
       event.sender.send('new-save-detected', path);
       watcher.close();
+      watcher = null;
     };
 
     watcher.on('add', changeDetected);
