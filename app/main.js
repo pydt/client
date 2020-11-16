@@ -233,13 +233,15 @@ function createWindow() {
       arg.icon = path.join(__dirname, 'icon.png');
     }
 
-    arg.appID = 'play.your.damn.turn.client';
+    arg.appID = 'com.squirrel.playyourdamnturn.PlayYourDamnTurnClient';
 
     arg.wait = true;
     notifier.notify(arg);
   });
 
   notifier.on('click', () => {
+    // TODO: windows click was broken in v6, upgrade after this fix is merged in
+    // https://github.com/mikaelbr/node-notifier/issues/291
     win.show();
   });
 
