@@ -91,6 +91,8 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
 
     this.turnDownloader = this.turnCacheService.get(this.playTurnState.game.gameId);
 
+    this.turnDownloader.startDownload();
+
     if (this.turnDownloader.data$.value) {
       this.status = 'Turn already downloaded, moving to save location...';
     }
@@ -106,7 +108,9 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
 
     this.turnDownloader?.data$.subscribe(async data => {
       if (data) {
-        this.turnDownloader = null;
+        setTimeout(() => {
+          this.turnDownloader = null;
+        }, 500);
 
         try {
           await fs.writeFile(this.saveFileToPlay, Buffer.from(data));

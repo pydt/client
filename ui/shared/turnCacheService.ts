@@ -18,12 +18,12 @@ export class TurnCacheService {
 
   async backgroundDownloader() {
     while (true) {
+      // Wait 5 seconds for next check
+      await new Promise(resolve => setTimeout(resolve, 5000));
+
       const settings = await PydtSettings.getSettings();
 
       if (settings.autoDownload) {
-        // Wait 5 seconds for next check
-        await new Promise(resolve => setTimeout(resolve, 5000));
-
         for (const td of [...this.cache]) {
           if (!td.data$.value) {
             await td.waitForCompletion();
