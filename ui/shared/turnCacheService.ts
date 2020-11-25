@@ -55,6 +55,7 @@ export class TurnCacheService {
 
 export class TurnDownloader {
   private xhr: XMLHttpRequest;
+  private downloading = false;
   public readonly data$ = new BehaviorSubject<Buffer>(null);
   public readonly error$ = new BehaviorSubject<string>(null);
   public readonly curBytes$ = new BehaviorSubject<number>(0);
@@ -68,11 +69,16 @@ export class TurnDownloader {
   }
 
   abort() {
+    this.downloading = false;
+
     if (this.xhr) {
       this.error$.next('ABORTED');
       this.xhr.abort();
       this.xhr = null;
     }
+
+    this.data$.next(null);
+    this.error$.next(null);
   }
 
   waitForCompletion() {
@@ -94,10 +100,11 @@ export class TurnDownloader {
   }
 
   startDownload() {
-    if (this.xhr || this.data$.value) {
+    if (this.xhr || this.data$.value || this.downloading) {
       return;
     }
 
+    this.downloading = true;
     this.error$.next(null);
     this.curBytes$.next(0);
     this.maxBytes$.next(0);
@@ -110,6 +117,12 @@ export class TurnDownloader {
       .subscribe(resp => {
         if (!resp) {
           this.error$.next('Failed to load turn information, is your computer offline?');
+          this.downloading = false;
+          return;
+        }
+
+        if (!this.downloading) {
+          // We must have aborted, don't start xhr!
           return;
         }
 
@@ -127,6 +140,7 @@ export class TurnDownloader {
         this.xhr.onerror = () => {
           this.error$.next(`Bad response code returned: ${this.xhr.status}`);
           this.xhr = null;
+          this.downloading = false;
         };
 
         this.xhr.onload = async () => {
@@ -147,6 +161,8 @@ export class TurnDownloader {
             this.data$.next(Buffer.from(data));
           } catch (err) {
             this.error$.next(err);
+          } finally {
+            this.downloading = false;
           }
         };
 
