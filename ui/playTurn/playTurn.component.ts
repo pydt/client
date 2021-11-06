@@ -198,7 +198,7 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
 
         this.xhr.onload = () => {
           if (this.xhr.status === 200) {
-            resolve();
+            resolve(null);
           } else {
             reject(this.xhr.status);
           }

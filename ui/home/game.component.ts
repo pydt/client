@@ -1,8 +1,7 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
-import * as countdown from 'countdown';
 import * as app from 'electron';
-import { Game, SteamProfileMap, User, CivGame, MetadataCacheService } from 'pydt-shared';
+import { Game, SteamProfileMap, User, CivGame, MetadataCacheService, countdown } from 'pydt-shared';
 import { PlayTurnState } from '../playTurn/playTurnState.service';
 import { DiscourseInfo } from '../shared/discourseInfo';
 
@@ -63,7 +62,7 @@ export class GameComponent implements OnInit, OnDestroy {
   get lastTurn() {
     const lastTurnDate: any = this.game.lastTurnEndDate || this.game.updatedAt;
     // tslint:disable-next-line:no-bitwise
-    return countdown(Date.parse(lastTurnDate), this.now, countdown.HOURS | countdown.MINUTES);
+    return countdown(Date.parse(lastTurnDate), this.now, countdown.HOURS | countdown.MINUTES, 0, 0);
   }
 
   get timerExpires() {
@@ -75,6 +74,6 @@ export class GameComponent implements OnInit, OnDestroy {
     }
 
     // tslint:disable-next-line:no-bitwise
-    return 'in ' + countdown(this.now, expirationDate, countdown.HOURS | countdown.MINUTES);
+    return 'in ' + countdown(this.now, expirationDate, countdown.HOURS | countdown.MINUTES, 0, 0);
   }
 }

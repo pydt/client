@@ -7,7 +7,6 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { ProgressbarModule } from 'ngx-bootstrap/progressbar';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
-import { CustomFormsModule } from 'ngx-custom-validators';
 import { MarkdownModule, MarkedOptions } from 'ngx-markdown';
 import { ApiModule, BusyService, Configuration, MetadataCacheService, ProfileCacheService, PydtSharedModule } from 'pydt-shared';
 import { AppComponent } from './app.component';
@@ -34,7 +33,6 @@ export function configFactory() {
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
-    CustomFormsModule,
     ApiModule.forRoot(configFactory),
     FormsModule,
     ModalModule.forRoot(),

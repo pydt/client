@@ -87,13 +87,13 @@ export class TurnDownloader {
     return new Promise((resolve) => {
       this.error$.subscribe(err => {
         if (err) {
-          resolve();
+          resolve(null);
         }
       });
 
       this.data$.subscribe(data => {
         if (data) {
-          resolve();
+          resolve(null);
         }
       });
     });

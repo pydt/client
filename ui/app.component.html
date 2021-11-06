@@ -44,7 +44,7 @@
           <div class="form-inline" [ngClass]="{ 'has-error': numSaves.errors }">
             <div class="form-group">
               <span>Archive</span>
-              <input type="text" class="form-control input-sm" [(ngModel)]="settings.numSaves" name="numSaves" #numSaves="ngModel" required digits [gte]="0" style="width:100px;display:inline;">
+              <input type="number" class="form-control input-sm" [(ngModel)]="settings.numSaves" name="numSaves" #numSaves="ngModel" required min="0" style="width:100px;display:inline;">
               <span>saves in the pydt-archive folder</span>
             </div>
           </div>
