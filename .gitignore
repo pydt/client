@@ -3,7 +3,6 @@ node_modules
 app/ui_compiled
 dist
 npm-debug.log
-/.vscode
 /iot-client-creds.json
 .tmp
 /ui/envVars.js
