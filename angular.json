@@ -10,7 +10,7 @@
       "architect": {
         "build": {
           "builder": "@angular-builders/custom-webpack:browser",
-          "options": {      
+          "options": {
             "customWebpackConfig": {
               "path": "./extra-webpack.config.js"
             },
@@ -30,8 +30,7 @@
             "styles": [
               "ui/styles/app.scss"
             ],
-            "scripts": [
-            ]
+            "scripts": []
           },
           "configurations": {
             "production": {
@@ -95,14 +94,11 @@
           }
         },
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@angular-eslint/builder:lint",
           "options": {
-            "tsConfig": [
-              "ui/tsconfig.app.json",
-              "ui/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
+            "lintFilePatterns": [
+              "ui/**/*.ts",
+              "ui/**/*.html"
             ]
           }
         }
@@ -118,5 +114,8 @@
     "@schematics/angular:directive": {
       "prefix": "app"
     }
+  },
+  "cli": {
+    "defaultCollection": "@angular-eslint/schematics"
   }
 }

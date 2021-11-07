@@ -11,7 +11,7 @@
     "dist-mac": "bash -c \"npm run build-prod; electron-builder --mac --publish always\"",
     "dist-linux": "bash -c \"npm run build-prod; electron-builder --linux --publish always\"",
     "postinstall": "install-app-deps",
-    "lint": "tslint --project tsconfig.json ./ui/**/*.ts"
+    "lint": "ng lint"
   },
   "build": {
     "appId": "play.your.damn.turn.client",
@@ -43,6 +43,11 @@
   "devDependencies": {
     "@angular-builders/custom-webpack": "^12.1.3",
     "@angular-devkit/build-angular": "~12.2.13",
+    "@angular-eslint/builder": "12.6.1",
+    "@angular-eslint/eslint-plugin": "12.6.1",
+    "@angular-eslint/eslint-plugin-template": "12.6.1",
+    "@angular-eslint/schematics": "12.6.1",
+    "@angular-eslint/template-parser": "12.6.1",
     "@angular/animations": "^12.2.13",
     "@angular/cli": "^12.2.13",
     "@angular/common": "^12.2.13",
@@ -58,8 +63,9 @@
     "@types/lodash": "^4.14.152",
     "@types/node": "^12.12.6",
     "@types/pako": "^1.0.0",
+    "@typescript-eslint/eslint-plugin": "4.28.2",
+    "@typescript-eslint/parser": "4.28.2",
     "bootstrap-sass": "3.4.1",
-    "codelyzer": "^6.0.0",
     "core-js": "^3.6.5",
     "electron": "^7.3.2",
     "electron-builder": "^22.6.1",
@@ -70,6 +76,7 @@
     "electron-json-storage": "^4.1.8",
     "electron-notarize": "^0.3.0",
     "es6-shim": "^0.35.3",
+    "eslint": "^7.26.0",
     "font-awesome": "4",
     "fs-extra": "^9.0.0",
     "lodash": "^4.17.19",
@@ -83,7 +90,6 @@
     "rxjs-tslint": "^0.1.8",
     "systemjs": "^6.3.2",
     "tslib": "^2.0.0",
-    "tslint": "~6.1.0",
     "typescript": "4.3.5",
     "webpack": "^5.62.1",
     "zone.js": "~0.11.4"
