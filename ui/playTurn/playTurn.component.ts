@@ -1,15 +1,12 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, HostListener, Input, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import * as app from 'electron';
-import * as fs from 'fs-extra';
 import * as pako from 'pako';
-import * as path from 'path';
-import * as mkdirp from 'mkdirp';
 import { Game, GameService, SteamProfileMap, MetadataCacheService, CivGame } from 'pydt-shared';
 import { PydtSettings } from '../shared/pydtSettings';
 import { PlayTurnState } from './playTurnState.service';
 import { TurnCacheService, TurnDownloader } from '../shared/turnCacheService';
+import rpcChannels from '../rpcChannels';
 
 
 @Component({
@@ -49,7 +46,7 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
   onMouseEnter(event: MouseEvent) {
     const href = (event.srcElement as any).href;
     if (href) {
-      app.ipcRenderer.send('open-url', href);
+      window.pydtApi.openUrl(href);
     }
 
     event.preventDefault();
@@ -66,16 +63,16 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
     this.games = (await this.metadataCache.getCivGameMetadata()).civGames;
 
     try {
-      this.saveDir = this.settings.getSavePath(this.civGame);
+      this.saveDir = await this.settings.getSavePath(this.civGame);
 
-      if (!fs.existsSync(this.saveDir)) {
-        mkdirp.sync(this.saveDir);
+      if (!window.pydtApi.fs.existsSync(this.saveDir)) {
+        window.pydtApi.fs.mkdirp(this.saveDir);
       }
 
-      this.archiveDir = path.join(this.saveDir, 'pydt-archive');
+      this.archiveDir = window.pydtApi.path.join(this.saveDir, 'pydt-archive');
 
-      if (!fs.existsSync(this.archiveDir)) {
-        fs.mkdirSync(this.archiveDir);
+      if (!window.pydtApi.fs.existsSync(this.archiveDir)) {
+        window.pydtApi.fs.mkdirp(this.archiveDir);
       }
 
       this.saveFileToPlay = this.saveDir + '(PYDT) Play This One!.' + this.civGame.saveExtension;
@@ -113,13 +110,15 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
         }, 500);
 
         try {
-          await fs.writeFile(this.saveFileToPlay, Buffer.from(data));
+          await window.pydtApi.fs.writeFileSync(this.saveFileToPlay, data);
 
           await new Promise(sleepResolve => setTimeout(sleepResolve, 500));
 
+          const url = this.civGame.runUrls[await this.settings.getGameStore(this.civGame)]
+
           this.ngZone.run(() => {
             if (this.settings.launchCiv) {
-              app.ipcRenderer.send('open-url', this.civGame.runUrls[this.settings.getGameStore(this.civGame)]);
+              window.pydtApi.openUrl(url);
             }
 
             this.watchForSave();
@@ -152,22 +151,18 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
     this.abort = false;
     this.downloaded = true;
 
-    const newSaveDetected = (event, arg) => {
-      this.ngZone.run(() => {
-        this.status = `Detected new save: ${path.basename(arg).replace(`.${this.civGame.saveExtension}`, '')}.  Submit turn?`;
-        this.downloaded = false;
-        this.showGameInfo = false;
-        this.saveFileToUpload = arg;
-        app.ipcRenderer.removeListener('new-save-detected', newSaveDetected);
-      });
-    };
-
-    setTimeout(() => {
-      app.ipcRenderer.send('start-chokidar', {
+    setTimeout(async () => {
+      const path = await window.pydtApi.startChokidar({
         path: this.saveDir,
         awaitWriteFinish: this.playTurnState.game.gameType !== 'CIV6'
       });
-      app.ipcRenderer.on('new-save-detected', newSaveDetected);
+
+      this.ngZone.run(() => {
+        this.status = `Detected new save: ${window.pydtApi.path.basename(path).replace(`.${this.civGame.saveExtension}`, '')}.  Submit turn?`;
+        this.downloaded = false;
+        this.showGameInfo = false;
+        this.saveFileToUpload = path;
+      });
     }, 5000);
   }
 
@@ -177,8 +172,8 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
     this.abort = false;
     this.saveFileToUpload = null;
 
-    const fileData = pako.gzip(await fs.readFile(fileBeingUploaded));
-    const moveTo = path.join(this.archiveDir, path.basename(fileBeingUploaded));
+    const fileData = pako.gzip(window.pydtApi.fs.readFileSync(fileBeingUploaded));
+    const moveTo = window.pydtApi.path.join(this.archiveDir, window.pydtApi.path.basename(fileBeingUploaded));
 
     try {
       const startResp = await this.gameService.startSubmit(this.playTurnState.game.gameId).toPromise();
@@ -216,7 +211,7 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
       });
 
       await this.gameService.finishSubmit(this.playTurnState.game.gameId).toPromise();
-      await fs.rename(fileBeingUploaded, moveTo);
+      window.pydtApi.fs.renameSync(fileBeingUploaded, moveTo);
     } catch (err) {
       this.status = 'There was an error submitting your turn.  Please try again.';
 
@@ -232,19 +227,19 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
     }
 
     // If we've got too many archived files, delete some...
-    const files: string[] = (await fs.readdir(this.archiveDir))
+    const files: string[] = window.pydtApi.fs.readdirSync(this.archiveDir)
       .map(x => {
-        const file = path.join(this.archiveDir, x);
+        const file = window.pydtApi.path.join(this.archiveDir, x);
         return {
           file,
-          time: fs.statSync(file).ctime.getTime()
+          time: window.pydtApi.fs.statSync(file).ctime.getTime()
         };
       })
       .sort((a, b) => a.time - b.time)
       .map(x => x.file);
 
     while (files.length > this.settings.numSaves) {
-      await fs.unlink(files.shift());
+      await window.pydtApi.fs.unlinkSync(files.shift());
     }
 
     this.router.navigate(['/']);
@@ -255,6 +250,6 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
   }
 
   openGameOnWeb() {
-    app.ipcRenderer.send('open-url', 'https://playyourdamnturn.com/game/' + this.playTurnState.game.gameId);
+    window.pydtApi.openUrl('https://playyourdamnturn.com/game/' + this.playTurnState.game.gameId);
   }
 }

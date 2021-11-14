@@ -1,5 +1,6 @@
 import * as Rollbar from 'rollbar';
 import { Injectable, Inject, InjectionToken, ErrorHandler } from '@angular/core';
+import rpcChannels from './rpcChannels';
 
 export const RollbarService = new InjectionToken<Rollbar>('rollbar');
 
@@ -7,7 +8,7 @@ export const RollbarService = new InjectionToken<Rollbar>('rollbar');
 export class RollbarErrorHandler implements ErrorHandler {
     constructor(@Inject(RollbarService) private rollbar: Rollbar) {
         if (PYDT_CONFIG.PROD) {
-            require('electron').ipcRenderer.send('init-rollbar');
+            window.pydtApi.ipc.send(rpcChannels.INIT_ROLLBAR, null);
         }
     }
 

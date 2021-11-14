@@ -56,7 +56,7 @@ export class TurnCacheService {
 export class TurnDownloader {
   private xhr: XMLHttpRequest;
   private downloading = false;
-  public readonly data$ = new BehaviorSubject<Buffer>(null);
+  public readonly data$ = new BehaviorSubject<Uint8Array>(null);
   public readonly error$ = new BehaviorSubject<string>(null);
   public readonly curBytes$ = new BehaviorSubject<number>(0);
   public readonly maxBytes$ = new BehaviorSubject<number>(0);
@@ -158,7 +158,7 @@ export class TurnDownloader {
               // Ignore - file probably wasn't gzipped...
             }
 
-            this.data$.next(Buffer.from(data));
+            this.data$.next(data);
           } catch (err) {
             this.error$.next(err);
           } finally {

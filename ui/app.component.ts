@@ -1,8 +1,8 @@
 import { Component, NgZone, OnInit, ViewChild, TemplateRef } from '@angular/core';
-import * as app from 'electron';
-import { ModalDirective, BsModalRef, BsModalService, ModalOptions } from 'ngx-bootstrap/modal';
+import { BsModalRef, BsModalService, ModalOptions } from 'ngx-bootstrap/modal';
 import { CivGame, GameStore, MetadataCacheService } from 'pydt-shared';
 import { PydtSettings } from './shared/pydtSettings';
+import rpcChannels from './rpcChannels';
 
 @Component({
   selector: 'pydt-app',
@@ -27,7 +27,7 @@ export class AppComponent implements OnInit {
       class: 'modal-lg'
     };
 
-    app.ipcRenderer.on('show-about-modal', (e, data) => {
+    window.pydtApi.ipc.receive(rpcChannels.SHOW_ABOUT_MODAL, (e, data) => {
       this.zone.run(() => {
         this.hideOpenModal();
         this.version = data;
@@ -35,7 +35,7 @@ export class AppComponent implements OnInit {
       });
     });
 
-    app.ipcRenderer.on('show-settings-modal', (e, data) => {
+    window.pydtApi.ipc.receive(rpcChannels.SHOW_SETTINGS_MODAL, (e, data) => {
       PydtSettings.getSettings().then(settings => {
         this.zone.run(async () => {
           this.civGames = (await this.metadataCache.getCivGameMetadata()).civGames;
@@ -46,7 +46,7 @@ export class AppComponent implements OnInit {
       });
     });
 
-    app.ipcRenderer.on('show-update-modal', (e, data) => {
+    window.pydtApi.ipc.receive(rpcChannels.SHOW_UPDATE_MODAL, (e, data) => {
       this.zone.run(() => {
         this.hideOpenModal();
         this.newVersion = data;
@@ -54,7 +54,7 @@ export class AppComponent implements OnInit {
       });
     });
 
-    app.ipcRenderer.on('manual-update-modal', (e, data) => {
+    window.pydtApi.ipc.receive(rpcChannels.MANUAL_UPDATE_MODAL, (e, data) => {
       this.zone.run(() => {
         this.hideOpenModal();
         this.newVersion = data;
@@ -81,20 +81,20 @@ export class AppComponent implements OnInit {
   }
 
   async openDirectoryDialog(civGame: CivGame) {
-    const result = await app.remote.dialog.showOpenDialog({ properties: [ 'openDirectory' ] });
+    const filePath = await window.pydtApi.showOpenDialog();
 
-    if (!result.canceled && result.filePaths.length) {
-      this.settings.setSavePath(civGame, result.filePaths[0]);
+    if (filePath) {
+      this.settings.setSavePath(civGame, filePath);
     }
   }
 
   saveSettings() {
     PydtSettings.saveSettings(this.settings);
-    app.ipcRenderer.send('set-autostart', this.settings.startOnBoot);
+    window.pydtApi.setAutostart(this.settings.startOnBoot);
     this.hideOpenModal();
   }
 
   applyUpdate() {
-    app.ipcRenderer.send('apply-update');
+    window.pydtApi.applyUpdate();
   }
 }

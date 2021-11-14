@@ -98,7 +98,8 @@
           "options": {
             "lintFilePatterns": [
               "ui/**/*.ts",
-              "ui/**/*.html"
+              "ui/**/*.html",
+              "app/**/*.js"
             ]
           }
         }

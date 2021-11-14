@@ -1,9 +1,6 @@
-import * as app from 'electron';
-import * as storage from 'electron-json-storage';
-import * as path from 'path';
-import * as fs from 'fs';
-import { isEmpty } from 'lodash';
-import { CivGame, PlatformSaveLocation, GameStore, Game } from 'pydt-shared';
+import { isEmpty } from "lodash";
+import { CivGame, PlatformSaveLocation, GameStore, Game } from "pydt-shared";
+import rpcChannels from "../rpcChannels";
 
 export class PydtSettings {
   launchCiv = true;
@@ -13,55 +10,54 @@ export class PydtSettings {
   savePaths = {};
   autoDownload = false;
 
-  static getSettings(): Promise<PydtSettings> {
-    return new Promise((resolve, reject) => {
-      storage.get('settings', (err, settings: PydtSettings) => {
-        if (err) {
-          return reject(err);
-        }
+  static async getSettings(): Promise<PydtSettings> {
+    const settings = await window.pydtApi.ipc.invoke(
+      rpcChannels.STORAGE_GET,
+      "settings"
+    );
 
-        const result = new PydtSettings();
+    const result = new PydtSettings();
 
-        if (!isEmpty(settings)) {
-          Object.assign(result, settings);
-        }
+    if (!isEmpty(settings)) {
+      Object.assign(result, settings);
+    }
 
-        // Make sure numSaves is an int
-        result.numSaves = parseInt(result.numSaves.toString(), 10);
+    // Make sure numSaves is an int
+    result.numSaves = parseInt(result.numSaves.toString(), 10);
 
-        resolve(result);
-      });
-    });
+    return result;
   }
 
   static saveSettings(settings: PydtSettings): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      storage.set('settings', settings, err => {
-        if (err) {
-          return reject(err);
-        }
-
-        resolve();
-      });
-    });
+    return window.pydtApi.ipc.invoke(rpcChannels.STORAGE_SET, 'settings', settings);
   }
 
-  getDefaultDataPath(civGame: CivGame, gameStore?: GameStore) {
-    gameStore = gameStore || this.getGameStore(civGame);
-    const location: PlatformSaveLocation = civGame.saveLocations[process.platform];
-    return path.normalize(app.remote.app.getPath(location.basePath) + location.prefix + civGame.dataPaths[gameStore]);
+  async getDefaultDataPath(civGame: CivGame, gameStore?: GameStore) {
+    gameStore = gameStore || (await this.getGameStore(civGame));
+    const location: PlatformSaveLocation =
+      civGame.saveLocations[window.pydtApi.platform];
+    return window.pydtApi.path.normalize(
+      (await window.pydtApi.ipc.invoke(rpcChannels.GET_PATH, location.basePath)) +
+        location.prefix +
+        civGame.dataPaths[gameStore]
+    );
   }
 
-  getDefaultSavePath(civGame: CivGame) {
-    return path.normalize(this.getDefaultDataPath(civGame) + civGame.savePath);
+  async getDefaultSavePath(civGame: CivGame) {
+    return window.pydtApi.path.normalize(
+      (await this.getDefaultDataPath(civGame)) + civGame.savePath
+    );
   }
 
-  getGameStore(civGame: CivGame): GameStore {
+  async getGameStore(civGame: CivGame): Promise<GameStore> {
     if (!this.gameStores[civGame.id]) {
       for (const gameStoreKey of Object.keys(GameStore)) {
         if (civGame.dataPaths[GameStore[gameStoreKey]]) {
-          const dataPath = this.getDefaultDataPath(civGame, GameStore[gameStoreKey]);
-          if (fs.existsSync(dataPath)) {
+          const dataPath = await this.getDefaultDataPath(
+            civGame,
+            GameStore[gameStoreKey]
+          );
+          if (window.pydtApi.fs.existsSync(dataPath)) {
             this.gameStores[civGame.id] = GameStore[gameStoreKey];
             break;
           }
@@ -80,16 +76,16 @@ export class PydtSettings {
     this.gameStores[civGame.id] = gameStore;
   }
 
-  getSavePath(civGame: CivGame, returnDefault = true): string {
+  async getSavePath(civGame: CivGame, returnDefault = true): Promise<string> {
     if (this.savePaths[civGame.id]) {
       return this.savePaths[civGame.id];
     }
 
     if (returnDefault) {
-      return this.getDefaultSavePath(civGame);
+      return (await this.getDefaultSavePath(civGame));
     }
 
-    return '';
+    return "";
   }
 
   setSavePath(civGame: CivGame, savePath: string) {

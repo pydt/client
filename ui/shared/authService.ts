@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
-import * as storage from 'electron-json-storage';
-import { Configuration, User, UserService } from 'pydt-shared';
+import { Injectable } from "@angular/core";
+import { Configuration, User, UserService } from "pydt-shared";
+import rpcChannels from "../rpcChannels";
 
 @Injectable()
 export class AuthService {
@@ -9,8 +9,7 @@ export class AuthService {
   constructor(
     private readonly apiConfig: Configuration,
     private readonly userService: UserService
-  ) {
-  }
+  ) {}
 
   async isAuthenticated() {
     await this.setApiConfig();
@@ -29,43 +28,31 @@ export class AuthService {
     return this.user;
   }
 
-  storeToken(token: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      const config = {
-        token: token
-      };
+  async storeToken(token: string): Promise<void> {
+    const config = {
+      token: token,
+    };
 
-      if (!token) {
-        this.user = null;
-      }
+    if (!token) {
+      this.user = null;
+    }
 
-      storage.set('configData', config, err => {
-        if (err) {
-          reject(err);
-        }
-
-        resolve();
-      });
-    }).then(() => {
-      return this.setApiConfig();
-    });
+    await window.pydtApi.ipc.invoke(
+      rpcChannels.STORAGE_SET,
+      "configData",
+      config
+    );
+    
+    return this.setApiConfig();
   }
 
   private setApiConfig() {
-    return this.getConfig().then(config => {
+    return this.getConfig().then((config) => {
       this.apiConfig.apiKeys = { Authorization: config ? config.token : null };
     });
   }
 
   private getConfig(): Promise<any> {
-    return new Promise((resolve, reject) => {
-      storage.get('configData', (err, config) => {
-        if (err) {
-          reject(err);
-        }
-
-        resolve(config);
-      });
-    });
+    return window.pydtApi.ipc.invoke(rpcChannels.STORAGE_GET, "configData");
   }
 }

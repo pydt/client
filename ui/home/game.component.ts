@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
-import * as app from 'electron';
 import { Game, SteamProfileMap, User, CivGame, MetadataCacheService, countdown } from 'pydt-shared';
 import { PlayTurnState } from '../playTurn/playTurnState.service';
 import { DiscourseInfo } from '../shared/discourseInfo';
@@ -47,11 +46,11 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   openGameOnWeb() {
-    app.ipcRenderer.send('open-url', 'https://playyourdamnturn.com/game/' + this.game.gameId);
+    window.pydtApi.openUrl('https://playyourdamnturn.com/game/' + this.game.gameId);
   }
 
   readSmack() {
-    app.ipcRenderer.send('open-url', 'https://discourse.playyourdamnturn.com/t/' + this.game.discourseTopicId);
+    window.pydtApi.openUrl('https://discourse.playyourdamnturn.com/t/' + this.game.discourseTopicId);
     this.smackRead.emit(this.game.latestDiscoursePostNumber);
   }
 

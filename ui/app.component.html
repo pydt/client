@@ -53,7 +53,7 @@
           <div class="row" *ngIf="gameStoreOptions(civGame).length > 1">
             <label class="col-xs-3 control-label force-horizontal-label text-left">Game Store</label>
             <div class="col-xs-9">
-              <select class="form-control" name="civ6store" [ngModel]="settings.getGameStore(civGame)" (ngModelChange)="settings.setGameStore(civGame, $event)" >
+              <select class="form-control" name="civ6store" [ngModel]="settings.getGameStore(civGame) | async" (ngModelChange)="settings.setGameStore(civGame, $event)" >
                 <option *ngFor="let opt of gameStoreOptions(civGame)" [ngValue]="opt.value">{{ opt.key }}</option>
               </select>
             </div>
@@ -61,16 +61,16 @@
           <div class="row">
             <label class="col-xs-3 control-label force-horizontal-label text-left">Default Save Path</label>
             <div class="col-xs-9">
-              <p class="form-control-static">{{settings.getDefaultSavePath(civGame)}}</p>
+              <p class="form-control-static">{{settings.getDefaultSavePath(civGame) | async}}</p>
             </div>
           </div>
           <div class="row">
             <label class="col-xs-3 control-label force-horizontal-label text-left">Override Save Path</label>
             <div class="col-xs-9">
               <p class="form-control-static">
-                {{settings.getSavePath(civGame, false) || 'Not Set!'}}&nbsp;&nbsp;
+                {{(settings.getSavePath(civGame, false) | async) || 'Not Set!'}}&nbsp;&nbsp;
                 <button class="btn btn-primary btn-xs" (click)="openDirectoryDialog(civGame)">Set</button>&nbsp;
-                <button class="btn btn-danger btn-xs" *ngIf="!!settings.getSavePath(civGame, false)" (click)="settings.setSavePath(civGame, '')">Clear</button>
+                <button class="btn btn-danger btn-xs" *ngIf="!!settings.getSavePath(civGame, false) | async" (click)="settings.setSavePath(civGame, '')">Clear</button>
               </p>
             </div>
           </div>

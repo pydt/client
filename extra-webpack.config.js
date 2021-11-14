@@ -29,8 +29,6 @@ if (fs.existsSync("iot-client-creds.json")) {
 module.exports = (config) => {
   config.target = 'electron-renderer';
   config.devtool = 'inline-source-map';
-  // Remove SourceMapDevToolPlugin so we can have inline maps
-  config.plugins = config.plugins.filter(x => Object.keys(x).indexOf('sourceMapFilename') < 0);
   config.plugins.push(
     new webpack.DefinePlugin({
       // Environment helpers
