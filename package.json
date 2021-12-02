@@ -3,9 +3,11 @@
   "scripts": {
     "clean": "rm -rf dist app/ui_compiled",
     "build-common": "npx tsc ui/rpcChannels.ts --outDir app",
-    "build": "ng build && npm run build-common",
+    "build": "npm run create-env && ng build && npm run build-common",
     "serve": "ng serve",
-    "build-prod": "npm run lint && bash -c \"npm run clean; npm run build-common; ng build --configuration production\"",
+    "create-env": "node createEnv.js",
+    "create-env-prod": "node createEnv.js",
+    "build-prod": "npm run lint && bash -c \"npm run clean; npm run create-env-prod; ng build --configuration production; npm run build-common;\"",
     "electron": "electron app",
     "pack": "bash -c \"npm run build-prod; build --dir\"",
     "dist-win": "bash -c \"npm run build-prod; electron-builder --win squirrel --publish always\"",
@@ -43,7 +45,6 @@
   ],
   "repository": "https://github.com/pydt/client",
   "devDependencies": {
-    "@angular-builders/custom-webpack": "^12.1.3",
     "@angular-devkit/build-angular": "~12.2.13",
     "@angular-eslint/builder": "12.6.1",
     "@angular-eslint/eslint-plugin": "12.6.1",

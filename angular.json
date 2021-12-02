@@ -9,12 +9,8 @@
       "projectType": "application",
       "architect": {
         "build": {
-          "builder": "@angular-builders/custom-webpack:browser",
+          "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "customWebpackConfig": {
-              "path": "./extra-webpack.config.js"
-            },
-            "aot": true,
             "outputPath": "app/ui_compiled",
             "index": "ui/index.html",
             "main": "ui/main.ts",
@@ -30,26 +26,19 @@
             "styles": [
               "ui/styles/app.scss"
             ],
-            "scripts": []
-          },
-          "configurations": {
-            "production": {
-              "budgets": [
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "6kb"
-                }
-              ],
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": true,
-              "extractCss": true,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true
-            }
+            "fileReplacements": [
+              {
+                "replace": "ui/environments/environment.ts",
+                "with": "ui/environments/environment.build.ts"
+              }
+            ],
+            "scripts": [],
+            "vendorChunk": true,
+            "extractLicenses": false,
+            "buildOptimizer": false,
+            "sourceMap": true,
+            "optimization": true,
+            "namedChunks": true
           }
         },
         "serve": {

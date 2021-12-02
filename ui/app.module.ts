@@ -21,11 +21,12 @@ import { RollbarErrorHandler, rollbarFactory, RollbarService } from './rollbarEr
 import { AuthService } from './shared/authService';
 import { TurnCacheService } from './shared/turnCacheService';
 import { PydtSettingsFactory } from './shared/pydtSettings';
+import { environment } from './environments/environment';
 
 export function configFactory() {
   return new Configuration({
     apiKeys: {},
-    basePath: PYDT_CONFIG.API_URL
+    basePath: environment.apiUrl
   });
 }
 

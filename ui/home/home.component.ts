@@ -8,6 +8,7 @@ import { map } from 'rxjs/operators';
 import { TurnCacheService } from '../shared/turnCacheService';
 import { AuthService } from '../shared/authService';
 import { DiscourseInfo } from '../shared/discourseInfo';
+import { environment } from '../environments/environment';
 import rpcChannels from '../rpcChannels';
 
 const POLL_INTERVAL: number = 600 * 1000;
@@ -180,7 +181,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const env = PYDT_CONFIG.PROD ? 'prod' : 'dev';
+    const env = environment.production ? 'prod' : 'dev';
     const topic = `/pydt/${env}/user/${this.user.steamId}/gameupdate`;
 
     window.pydtApi.ipc.receive(rpcChannels.IOT_CONNECT, () => {
@@ -198,8 +199,8 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     window.pydtApi.ipc.send(rpcChannels.START_IOT, {
       topic,
-      accessKey: PYDT_CONFIG.IOT_CLIENT_ACCESS_KEY,
-      secretKey: PYDT_CONFIG.IOT_CLIENT_SECRET_KEY
+      accessKey: environment.iotClientAccessKey,
+      secretKey: environment.iotClientSecretKey
     });
 
     this.iotConnected = true;
