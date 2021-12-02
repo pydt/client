@@ -1,8 +1,9 @@
 import { Component, NgZone, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { BsModalRef, BsModalService, ModalOptions } from 'ngx-bootstrap/modal';
 import { CivGame, GameStore, MetadataCacheService } from 'pydt-shared';
-import { PydtSettings } from './shared/pydtSettings';
+import { PydtSettingsData, PydtSettingsFactory } from './shared/pydtSettings';
 import rpcChannels from './rpcChannels';
+import { setTheme } from 'ngx-bootstrap/utils';
 
 @Component({
   selector: 'pydt-app',
@@ -11,7 +12,7 @@ import rpcChannels from './rpcChannels';
 export class AppComponent implements OnInit {
   version: string;
   newVersion: string;
-  settings = new PydtSettings();
+  settings: PydtSettingsData;
 
   @ViewChild('aboutModal', { static: true }) aboutModal: TemplateRef<any>;
   @ViewChild('updateModal', { static: true }) updateModal: TemplateRef<any>;
@@ -20,14 +21,16 @@ export class AppComponent implements OnInit {
   openModal: BsModalRef;
   civGames: CivGame[];
 
-  constructor(private zone: NgZone, public metadataCache: MetadataCacheService, private modalService: BsModalService) {}
+  constructor(private zone: NgZone, public metadataCache: MetadataCacheService, private modalService: BsModalService, private pydtSettingsFactory: PydtSettingsFactory) {
+    setTheme('bs3');
+  }
 
-  ngOnInit() {
+  ngOnInit() {    
     const modalOptions: ModalOptions = {
       class: 'modal-lg'
     };
 
-    window.pydtApi.ipc.receive(rpcChannels.SHOW_ABOUT_MODAL, (e, data) => {
+    window.pydtApi.ipc.receive(rpcChannels.SHOW_ABOUT_MODAL, data => {
       this.zone.run(() => {
         this.hideOpenModal();
         this.version = data;
@@ -35,8 +38,8 @@ export class AppComponent implements OnInit {
       });
     });
 
-    window.pydtApi.ipc.receive(rpcChannels.SHOW_SETTINGS_MODAL, (e, data) => {
-      PydtSettings.getSettings().then(settings => {
+    window.pydtApi.ipc.receive(rpcChannels.SHOW_SETTINGS_MODAL, () => {
+      this.pydtSettingsFactory.getSettings().then(settings => {
         this.zone.run(async () => {
           this.civGames = (await this.metadataCache.getCivGameMetadata()).civGames;
           this.hideOpenModal();
@@ -46,7 +49,7 @@ export class AppComponent implements OnInit {
       });
     });
 
-    window.pydtApi.ipc.receive(rpcChannels.SHOW_UPDATE_MODAL, (e, data) => {
+    window.pydtApi.ipc.receive(rpcChannels.SHOW_UPDATE_MODAL, data => {
       this.zone.run(() => {
         this.hideOpenModal();
         this.newVersion = data;
@@ -54,7 +57,7 @@ export class AppComponent implements OnInit {
       });
     });
 
-    window.pydtApi.ipc.receive(rpcChannels.MANUAL_UPDATE_MODAL, (e, data) => {
+    window.pydtApi.ipc.receive(rpcChannels.MANUAL_UPDATE_MODAL, data => {
       this.zone.run(() => {
         this.hideOpenModal();
         this.newVersion = data;
@@ -88,8 +91,8 @@ export class AppComponent implements OnInit {
     }
   }
 
-  saveSettings() {
-    PydtSettings.saveSettings(this.settings);
+  async saveSettings() {
+    await this.settings.save();
     window.pydtApi.setAutostart(this.settings.startOnBoot);
     this.hideOpenModal();
   }

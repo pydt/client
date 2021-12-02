@@ -3,7 +3,7 @@ import { Component, HostListener, Input, NgZone, OnDestroy, OnInit } from '@angu
 import { Router } from '@angular/router';
 import * as pako from 'pako';
 import { Game, GameService, SteamProfileMap, MetadataCacheService, CivGame } from 'pydt-shared';
-import { PydtSettings } from '../shared/pydtSettings';
+import { PydtSettingsFactory, PydtSettingsData } from '../shared/pydtSettings';
 import { PlayTurnState } from './playTurnState.service';
 import { TurnCacheService, TurnDownloader } from '../shared/turnCacheService';
 import rpcChannels from '../rpcChannels';
@@ -24,7 +24,7 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
   curBytes: number;
   maxBytes: number;
   showGameInfo = false;
-  settings: PydtSettings;
+  settings: PydtSettingsData;
   games: CivGame[] = [];
   xhr: XMLHttpRequest;
   turnDownloader: TurnDownloader;
@@ -37,6 +37,7 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
     private readonly metadataCache: MetadataCacheService,
     private readonly turnCacheService: TurnCacheService,
     private readonly gameService: GameService,
+    private readonly pydtSettingsFactory: PydtSettingsFactory,
     private readonly router: Router,
     private readonly ngZone: NgZone
   ) {
@@ -59,11 +60,11 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
     this.abort = false;
-    this.settings = await PydtSettings.getSettings();
+    this.settings = await this.pydtSettingsFactory.getSettings();
     this.games = (await this.metadataCache.getCivGameMetadata()).civGames;
 
     try {
-      this.saveDir = await this.settings.getSavePath(this.civGame);
+      this.saveDir = this.settings.getSavePath(this.civGame);
 
       if (!window.pydtApi.fs.existsSync(this.saveDir)) {
         window.pydtApi.fs.mkdirp(this.saveDir);
@@ -77,7 +78,7 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
 
       this.saveFileToPlay = this.saveDir + '(PYDT) Play This One!.' + this.civGame.saveExtension;
     } catch (err) {
-      console.log(err);
+      console.error(err);
       this.showGameInfo = false;
       this.abort = true;
       this.status = 'Unable to locate/create save file directory.  ' +
@@ -114,7 +115,7 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
 
           await new Promise(sleepResolve => setTimeout(sleepResolve, 500));
 
-          const url = this.civGame.runUrls[await this.settings.getGameStore(this.civGame)]
+          const url = this.civGame.runUrls[this.settings.getGameStore(this.civGame)]
 
           this.ngZone.run(() => {
             if (this.settings.launchCiv) {

@@ -25,7 +25,7 @@ export class AuthComponent {
       await this.userService.steamProfile().toPromise();
       this.router.navigate(['/']);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       this.auth.storeToken('');
       this.authError = true;
     }

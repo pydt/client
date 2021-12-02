@@ -3,7 +3,7 @@ import * as pako from 'pako';
 import { BusyService, Game, GameService, GameTurnResponse } from 'pydt-shared';
 import { BehaviorSubject, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { PydtSettings } from './pydtSettings';
+import { PydtSettingsFactory } from './pydtSettings';
 
 @Injectable()
 export class TurnCacheService {
@@ -12,6 +12,7 @@ export class TurnCacheService {
   constructor(
     private readonly gameService: GameService,
     private readonly busyService: BusyService,
+    private readonly pydtSettingsFactory: PydtSettingsFactory,
   ) {
     this.backgroundDownloader().then();
   }
@@ -21,7 +22,7 @@ export class TurnCacheService {
       // Wait 5 seconds for next check
       await new Promise(resolve => setTimeout(resolve, 5000));
 
-      const settings = await PydtSettings.getSettings();
+      const settings = await this.pydtSettingsFactory.getSettings();
 
       if (settings.autoDownload) {
         for (const td of [...this.cache]) {

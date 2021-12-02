@@ -26,7 +26,7 @@ const { default: rpcChannels } = require("./rpcChannels");
   });
 
   electron.ipcMain.handle(rpcChannels.GET_PATH, (e, name) => {
-    return Promise.resolve(electron.app.getPath(name));
+    return electron.app.getPath(name);
   });
 
   electron.ipcMain.on(rpcChannels.SHOW_WINDOW, () => {

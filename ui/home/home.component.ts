@@ -183,15 +183,15 @@ export class HomeComponent implements OnInit, OnDestroy {
     const env = PYDT_CONFIG.PROD ? 'prod' : 'dev';
     const topic = `/pydt/${env}/user/${this.user.steamId}/gameupdate`;
 
-    window.pydtApi.ipc.receive(rpcChannels.IOT_CONNECT, (e, data) => {
+    window.pydtApi.ipc.receive(rpcChannels.IOT_CONNECT, () => {
       console.log('connected to IoT!');
     });
 
-    window.pydtApi.ipc.receive(rpcChannels.IOT_ERROR, (e, data) => {
+    window.pydtApi.ipc.receive(rpcChannels.IOT_ERROR, data => {
       console.log('IoT error...', data);
     });
 
-    window.pydtApi.ipc.receive(rpcChannels.IOT_MESSAGE, (e, data) => {
+    window.pydtApi.ipc.receive(rpcChannels.IOT_MESSAGE, data => {
       console.log('received message from topic ', data.topic);
       this.safeLoadGames();
     });
