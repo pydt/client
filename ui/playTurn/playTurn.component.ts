@@ -55,7 +55,7 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
   }
 
   get civGame() {
-    return this.games.find(x => x.id === this.playTurnState.game.gameType);
+    return this.games.find(x => x.id == this.playTurnState.game.gameType);
   }
 
   async ngOnInit() {

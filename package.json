@@ -45,7 +45,7 @@
   ],
   "repository": "https://github.com/pydt/client",
   "devDependencies": {
-    "@angular-devkit/build-angular": "~12.2.13",
+    "@angular-devkit/build-angular": "^12.2.13",
     "@angular-eslint/builder": "12.6.1",
     "@angular-eslint/eslint-plugin": "12.6.1",
     "@angular-eslint/eslint-plugin-template": "12.6.1",
@@ -75,6 +75,9 @@
     "electron-notarize": "^1.1.1",
     "es6-shim": "^0.35.6",
     "eslint": "^7.26.0",
+    "eslint-config-eslint": "^7.0.0",
+    "eslint-plugin-jsdoc": "^37.1.0",
+    "eslint-plugin-node": "^11.1.0",
     "font-awesome": "4",
     "lodash": "^4.17.21",
     "ngx-bootstrap": "^7.1.0",

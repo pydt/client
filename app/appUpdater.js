@@ -10,18 +10,18 @@ const UPDATE_SERVER_HOST = "updates.playyourdamnturn.com";
 const UPDATE_INTERVAL = 30 * 60 * 1000;
 
 module.exports = {
-  checkForUpdates: (window) => {
+  checkForUpdates: window => {
     const platform = process.platform;
     const version = electron.app.getVersion();
 
-    log.info("version: " + version);
+    log.info(`version: ${version}`);
 
-    if (/node_modules.electron/.test(electron.app.getPath("exe"))) {
+    if (/node_modules.electron/u.test(electron.app.getPath("exe"))) {
       log.info("in dev, skipping updates...");
       return;
     }
 
-    if (platform == "linux") {
+    if (platform === "linux") {
       module.exports.justCheckNoUpdate(window, version);
       return;
     }
@@ -35,10 +35,10 @@ module.exports = {
       (event, releaseNotes, releaseName) => {
         window.send(rpcChannels.SHOW_UPDATE_MODAL, releaseName);
         return true;
-      }
+      },
     );
 
-    autoUpdater.addListener("error", (error) => {
+    autoUpdater.addListener("error", error => {
       log.error(error);
     });
 
@@ -52,6 +52,7 @@ module.exports = {
 
     const updatePlatform = platform === "darwin" ? "osx" : "win32";
     const feedUrl = `https://${UPDATE_SERVER_HOST}/update/${updatePlatform}/${version}`;
+
     log.info(feedUrl);
 
     autoUpdater.setFeedURL(feedUrl);
@@ -59,7 +60,7 @@ module.exports = {
     window.webContents.once("did-frame-finish-load", () => {
       autoUpdater.checkForUpdates();
 
-      setInterval(function () {
+      setInterval(() => {
         autoUpdater.checkForUpdates();
       }, UPDATE_INTERVAL);
     });
@@ -74,11 +75,12 @@ module.exports = {
           url,
           json: true,
         },
+        // eslint-disable-next-line node/handle-callback-err
         (err, resp, body) => {
           if (body && body.name) {
             window.send(rpcChannels.MANUAL_UPDATE_MODAL, body.name);
           }
-        }
+        },
       );
     }, UPDATE_INTERVAL);
   },

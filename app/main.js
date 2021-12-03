@@ -1,4 +1,4 @@
-const electron = require('electron');
+const electron = require("electron");
 const { configureIot } = require("./iot");
 const {
   getAppIcon,
@@ -7,7 +7,8 @@ const {
   forceShowWindow,
 } = require("./window");
 const appUpdater = require("./appUpdater");
-require('./storage');
+
+require("./storage");
 const { default: rpcChannels } = require("./rpcChannels");
 
 (() => {
@@ -25,9 +26,7 @@ const { default: rpcChannels } = require("./rpcChannels");
     forceShowWindow();
   });
 
-  electron.ipcMain.handle(rpcChannels.GET_PATH, (e, name) => {
-    return electron.app.getPath(name);
-  });
+  electron.ipcMain.handle(rpcChannels.GET_PATH, (e, name) => electron.app.getPath(name));
 
   electron.ipcMain.on(rpcChannels.SHOW_WINDOW, () => {
     forceShowWindow();
@@ -58,22 +57,22 @@ const { default: rpcChannels } = require("./rpcChannels");
 
   app.on("ready", () => {
     const win = createWindow();
-    
+
     appUpdater.checkForUpdates(win);
 
     configureIot(electron, win);
   });
 
   electron.ipcMain.on(rpcChannels.INIT_ROLLBAR, () => {
-    const Rollbar = require('rollbar');
+    const Rollbar = require("rollbar");
 
     new Rollbar({
       accessToken: "67488d20e1444df7ab91d279659d519a",
       captureUncaught: true,
       captureUnhandledRejections: true,
       payload: {
-        environment: "prod"
-      }
+        environment: "prod",
+      },
     });
   });
 })();

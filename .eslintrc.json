@@ -2,7 +2,8 @@
   "root": true,
   "ignorePatterns": [
     "projects/**/*",
-    "app/ui_compiled/**/*"
+    "app/ui_compiled/**/*",
+    "app/rpcChannels.js"
   ],
   "overrides": [
     {
@@ -17,9 +18,18 @@
         "node": true,
         "es6": true
       },
-      "extends": "eslint:recommended",
+      "extends": ["eslint"],
       "rules": {
-        "semi": ["error", "always"]
+        "comma-dangle": ["error", "always-multiline"],
+        "func-style": ["error", "expression"],
+        "indent": ["error", 2, {"SwitchCase": 1}],
+        "lines-around-comment": ["off"],
+        "semi": ["error", "always"],
+        "no-new": ["off"],
+        "node/no-path-concat": ["off"],
+        "node/no-extraneous-require": ["error", {
+          "allowModules": ["electron"]
+        }]
       }
     },
     {

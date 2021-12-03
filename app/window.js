@@ -1,11 +1,9 @@
-const electron = require("electron");
+const { app, BrowserWindow, ipcMain, Menu, Tray } = require("electron");
 const path = require("path");
 const storage = require("electron-json-storage");
 const open = require("open");
 const windowStateKeeper = require("electron-window-state");
 const { default: rpcChannels } = require("./rpcChannels");
-
-const { app, BrowserWindow, ipcMain, Menu, Tray } = electron;
 
 let win;
 let forceQuit = false;
@@ -16,14 +14,14 @@ ipcMain.on(rpcChannels.SET_FORCE_QUIT, (event, data) => (forceQuit = data));
 ipcMain.on(rpcChannels.UPDATE_TURNS_AVAILABLE, (event, available) => {
   win.setOverlayIcon(
     available ? path.join(__dirname, "star.png") : null,
-    available ? "Turns Available" : ""
+    available ? "Turns Available" : "",
   );
 
   if (appIcon) {
     appIcon.setImage(
       available
         ? path.join(__dirname, "icon_red.png")
-        : path.join(__dirname, "icon.png")
+        : path.join(__dirname, "icon.png"),
     );
   }
 });
@@ -56,7 +54,7 @@ module.exports = {
         forceQuit = true;
       });
 
-      win.on("close", (e) => {
+      win.on("close", e => {
         if (!forceQuit) {
           e.preventDefault();
           win.hide();
@@ -74,17 +72,19 @@ module.exports = {
 
       if (process.platform !== "darwin") {
         const iconPath = path.join(__dirname, "icon.png");
+
         appIcon = new Tray(iconPath);
+
         const contextMenu = Menu.buildFromTemplate([
           {
             label: "Show Client",
-            click: function () {
+            click: () => {
               win.show();
             },
           },
           {
             label: "Exit",
-            click: function () {
+            click: () => {
               forceQuit = true;
               app.quit();
             },
@@ -122,7 +122,7 @@ module.exports = {
             },
             {
               label: "Quit",
-              click: function () {
+              click: () => {
                 forceQuit = true;
                 app.quit();
               },
@@ -139,7 +139,9 @@ module.exports = {
                   ? "Alt+Command+I"
                   : "Ctrl+Shift+I",
               click: (item, focusedWindow) => {
-                if (focusedWindow) focusedWindow.webContents.toggleDevTools();
+                if (focusedWindow) {
+                  focusedWindow.webContents.toggleDevTools();
+                }
               },
             },
             {
@@ -174,7 +176,7 @@ module.exports = {
           {
             label: "Edit",
             submenu: [{ role: "cut" }, { role: "copy" }, { role: "paste" }],
-          }
+          },
         );
       }
 

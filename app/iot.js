@@ -26,7 +26,7 @@ module.exports = {
             currentDevice.subscribe(data.topic);
           });
 
-          currentDevice.on("error", (err) => {
+          currentDevice.on("error", err => {
             win.send(rpcChannels.IOT_ERROR, err);
           });
 

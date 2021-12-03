@@ -12,8 +12,8 @@ const AutoLaunch = require("auto-launch");
 const { default: rpcChannels } = require("./rpcChannels");
 
 // Make right-clicks show context menu (copy/paste/etc) on input fields
-const inputMenu = require('electron-input-menu');
-const context = require('electron-contextmenu-middleware');
+const inputMenu = require("electron-input-menu");
+const context = require("electron-contextmenu-middleware");
 
 context.use(inputMenu);
 context.activate();
@@ -31,41 +31,37 @@ electron.contextBridge.exposeInMainWorld("pydtApi", {
     electron.ipcRenderer.invoke(rpcChannels.SET_FORCE_QUIT, true);
     appUpdater.applyUpdate();
   },
-  startChokidar: (arg) => {
-    return new Promise((resolve) => {
-      if (watcher) {
-        watcher.close();
-      }
+  startChokidar: arg => new Promise(resolve => {
+    if (watcher) {
+      watcher.close();
+    }
 
-      watcher = chokidar.watch(arg.path, {
-        depth: 0,
-        ignoreInitial: true,
-        awaitWriteFinish: arg.awaitWriteFinish,
-      });
-
-      const changeDetected = (path) => {
-        electron.ipcRenderer.send(rpcChannels.SHOW_WINDOW);
-        watcher.close();
-        watcher = null;
-        resolve(path);
-      };
-
-      watcher.on("add", changeDetected);
-      watcher.on("change", changeDetected);
+    watcher = chokidar.watch(arg.path, {
+      depth: 0,
+      ignoreInitial: true,
+      awaitWriteFinish: arg.awaitWriteFinish,
     });
-  },
-  showToast: (arg) => {
+
+    const changeDetected = p => {
+      electron.ipcRenderer.send(rpcChannels.SHOW_WINDOW);
+      watcher.close();
+      watcher = null;
+      resolve(p);
+    };
+
+    watcher.on("add", changeDetected);
+    watcher.on("change", changeDetected);
+  }),
+  showToast: arg => {
     if (__dirname.indexOf("app.asar") > 0) {
       const splitDirname = __dirname.split(path.sep);
-      const rootPath = path.join.apply(
-        this,
-        splitDirname.slice(0, splitDirname.length - 2)
-      );
+      const rootPath = path.join(...splitDirname.slice(0, splitDirname.length - 2));
 
       arg.icon = path.join(rootPath, "Contents/app/icon.png");
 
-      if (!fs.existsSync(arg.icon))
+      if (!fs.existsSync(arg.icon)) {
         arg.icon = path.join(rootPath, "app/icon.png");
+      }
     } else {
       arg.icon = path.join(__dirname, "icon.png");
     }
@@ -85,12 +81,12 @@ electron.contextBridge.exposeInMainWorld("pydtApi", {
       },
     });
   },
-  openUrl: (arg) => {
-    open(arg).catch((err) => {
+  openUrl: arg => {
+    open(arg).catch(err => {
       log.error(`Could not open URL ${arg}: ${err.message}`);
     });
   },
-  setAutostart: (arg) => {
+  setAutostart: arg => {
     log.info("set-autostart");
 
     const launcher = new AutoLaunch({
@@ -100,7 +96,7 @@ electron.contextBridge.exposeInMainWorld("pydtApi", {
 
     launcher
       .isEnabled()
-      .then((isEnabled) => {
+      .then(isEnabled => {
         if (isEnabled && !arg) {
           log.warn("Disabling auto start...");
           return launcher.disable();
@@ -110,8 +106,10 @@ electron.contextBridge.exposeInMainWorld("pydtApi", {
           log.warn("Enabling auto start...");
           return launcher.enable();
         }
+
+        return null;
       })
-      .catch((err) => {
+      .catch(err => {
         log.error("Error toggling auto-start: ", err.message);
       });
   },
@@ -143,8 +141,10 @@ electron.contextBridge.exposeInMainWorld("pydtApi", {
       if (Object.values(rpcChannels).includes(channel)) {
         return await electron.ipcRenderer.invoke(channel, ...args);
       }
+
+      return null;
     },
-    removeAllListeners: (channel) => {
+    removeAllListeners: channel => {
       if (Object.values(rpcChannels).includes(channel)) {
         electron.ipcRenderer.removeAllListeners(channel);
       }
@@ -153,22 +153,22 @@ electron.contextBridge.exposeInMainWorld("pydtApi", {
       if (Object.values(rpcChannels).includes(channel)) {
         electron.ipcRenderer.removeListener(channel, func);
       }
-    }
+    },
   },
   fs: {
-    existsSync: (path) => fs.existsSync(path),
-    mkdirp: (path) => mkdirp.sync(path),
-    readdirSync: (path) => fs.readdirSync(path),
-    readFileSync: (path) => fs.readFileSync(path),
+    existsSync: p => fs.existsSync(p),
+    mkdirp: p => mkdirp.sync(p),
+    readdirSync: p => fs.readdirSync(p),
+    readFileSync: p => fs.readFileSync(p),
     renameSync: (oldPath, newPath) => fs.renameSync(oldPath, newPath),
-    statSync: (path) => fs.statSync(path),
-    unlinkSync: (path) => fs.unlinkSync(path),
-    writeFileSync: (path, data) => fs.writeFileSync(path, Buffer.from(data)),
+    statSync: p => fs.statSync(p),
+    unlinkSync: p => fs.unlinkSync(p),
+    writeFileSync: (p, data) => fs.writeFileSync(p, Buffer.from(data)),
   },
   path: {
-    basename: (p) => path.basename(p),
+    basename: p => path.basename(p),
     join: (...paths) => path.join(...paths),
-    normalize: (p) => path.normalize(p),
+    normalize: p => path.normalize(p),
   },
   platform: process.platform,
 });
