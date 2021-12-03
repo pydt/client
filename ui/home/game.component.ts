@@ -1,14 +1,14 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { Router } from '@angular/router';
-import { Game, SteamProfileMap, User, CivGame, MetadataCacheService, countdown } from 'pydt-shared';
-import { PlayTurnState } from '../playTurn/playTurnState.service';
-import { DiscourseInfo } from '../shared/discourseInfo';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from "@angular/core";
+import { Router } from "@angular/router";
+import { Game, SteamProfileMap, User, CivGame, MetadataCacheService, countdown } from "pydt-shared";
+import { PlayTurnState } from "../playTurn/playTurnState.service";
+import { DiscourseInfo } from "../shared/discourseInfo";
 
 
 @Component({
-  selector: 'pydt-game',
-  templateUrl: './game.component.html',
-  styleUrls: ['./game.component.css']
+  selector: "pydt-game",
+  templateUrl: "./game.component.html",
+  styleUrls: ["./game.component.css"],
 })
 export class GameComponent implements OnInit, OnDestroy {
   @Input() game: Game;
@@ -18,61 +18,65 @@ export class GameComponent implements OnInit, OnDestroy {
   @Input() discoursePostNumber: number;
   @Output() smackRead = new EventEmitter<number>();
   private now: Date;
-  updateDateHandle: any;
+  updateDateHandle: NodeJS.Timer;
   games: CivGame[] = [];
 
   constructor(private router: Router, private playTurnState: PlayTurnState, private metadataCache: MetadataCacheService) { }
 
-  async ngOnInit() {
+  async ngOnInit(): Promise<void> {
     // Save current date to prevent "changed after it was checked" bugs
     this.now = new Date();
-    this.updateDateHandle = setInterval(() => this.now = new Date(), 30 * 1000);
+    this.updateDateHandle = setInterval(() => {
+      this.now = new Date();
+    }, 30 * 1000);
 
     this.games = (await this.metadataCache.getCivGameMetadata()).civGames;
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     clearInterval(this.updateDateHandle);
   }
 
-  get civGame() {
+  get civGame(): CivGame {
     return this.games.find(x => x.id === this.game.gameType);
   }
 
-  playTurn() {
+  playTurn(): void {
     this.playTurnState.game = this.game;
     this.playTurnState.gamePlayerProfiles = this.gamePlayerProfiles;
-    this.router.navigate(['/playTurn']);
+    void this.router.navigate(["/playTurn"]);
   }
 
-  openGameOnWeb() {
-    window.pydtApi.openUrl('https://playyourdamnturn.com/game/' + this.game.gameId);
+  openGameOnWeb(): void {
+    window.pydtApi.openUrl(`https://playyourdamnturn.com/game/${this.game.gameId}`);
   }
 
-  readSmack() {
-    window.pydtApi.openUrl('https://discourse.playyourdamnturn.com/t/' + this.game.discourseTopicId);
+  readSmack(): void {
+    window.pydtApi.openUrl(`https://discourse.playyourdamnturn.com/t/${this.game.discourseTopicId}`);
     this.smackRead.emit(this.game.latestDiscoursePostNumber);
   }
 
-  get newDiscoursePost() {
+  get newDiscoursePost(): boolean {
     return DiscourseInfo.isNewSmackTalkPost(this.game, this.user, (this.discoursePostNumber || 0));
   }
 
-  get lastTurn() {
+  get lastTurn(): string {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const lastTurnDate: any = this.game.lastTurnEndDate || this.game.updatedAt;
-    // tslint:disable-next-line:no-bitwise
-    return countdown(Date.parse(lastTurnDate), this.now, countdown.HOURS | countdown.MINUTES, 0, 0);
+
+    return countdown(Date.parse(lastTurnDate), this.now, countdown.HOURS | countdown.MINUTES, 0, 0) as string;
   }
 
-  get timerExpires() {
+  get timerExpires(): string {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const lastTurnDate: any = this.game.lastTurnEndDate || this.game.updatedAt;
     const expirationDate = new Date(Date.parse(lastTurnDate) + this.game.turnTimerMinutes * 60 * 1000);
 
     if (expirationDate.getTime() - this.now.getTime() < 0) {
-      return 'soon...';
+      return "soon...";
     }
 
-    // tslint:disable-next-line:no-bitwise
-    return 'in ' + countdown(this.now, expirationDate, countdown.HOURS | countdown.MINUTES, 0, 0);
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    return `in ${countdown(this.now, expirationDate, countdown.HOURS | countdown.MINUTES, 0, 0)}`;
   }
 }

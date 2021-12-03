@@ -2,21 +2,25 @@ import { Injectable } from "@angular/core";
 import { Configuration, User, UserService } from "pydt-shared";
 import rpcChannels from "../rpcChannels";
 
+export class ConfigData {
+  token: string;
+}
+
 @Injectable()
 export class AuthService {
   private user: User;
 
   constructor(
     private readonly apiConfig: Configuration,
-    private readonly userService: UserService
+    private readonly userService: UserService,
   ) {}
 
-  async isAuthenticated() {
+  async isAuthenticated(): Promise<boolean> {
     await this.setApiConfig();
     return !!this.apiConfig.apiKeys.Authorization;
   }
 
-  async getUser(force: boolean) {
+  async getUser(force: boolean): Promise<User> {
     if (!this.user || force) {
       try {
         this.user = await this.userService.getCurrent().toPromise();
@@ -30,7 +34,7 @@ export class AuthService {
 
   async storeToken(token: string): Promise<void> {
     const config = {
-      token: token,
+      token,
     };
 
     if (!token) {
@@ -40,19 +44,20 @@ export class AuthService {
     await window.pydtApi.ipc.invoke(
       rpcChannels.STORAGE_SET,
       "configData",
-      config
+      config,
     );
-    
+
     return this.setApiConfig();
   }
 
-  private setApiConfig() {
-    return this.getConfig().then((config) => {
+  private setApiConfig(): Promise<void> {
+    return this.getConfig().then(config => {
       this.apiConfig.apiKeys = { Authorization: config ? config.token : null };
     });
   }
 
-  private getConfig(): Promise<any> {
+  // eslint-disable-next-line class-methods-use-this
+  private getConfig(): Promise<ConfigData> {
     return window.pydtApi.ipc.invoke(rpcChannels.STORAGE_GET, "configData");
   }
 }

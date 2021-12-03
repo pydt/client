@@ -44,10 +44,25 @@
         "createDefaultProgram": true
       },
       "extends": [
+        "eslint",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:@typescript-eslint/recommended-requiring-type-checking",
         "plugin:@angular-eslint/recommended",
         "plugin:@angular-eslint/template/process-inline-templates"
       ],
       "rules": {
+        "comma-dangle": ["error", "always-multiline"],
+        "func-style": ["error", "expression"],
+        "indent": ["error", 2, {"SwitchCase": 1}],
+        "lines-around-comment": ["off"],
+        "semi": ["error", "always"],
+        "new-cap": ["off"],
+        "no-new": ["off"],
+        "no-useless-constructor": ["off"],
+        "node/no-missing-import": ["off"],
+        "node/no-unpublished-import": ["off"],
+        "node/no-unsupported-features/es-syntax": ["off"],
+
         "@angular-eslint/component-selector": [
           "error",
           {

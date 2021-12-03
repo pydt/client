@@ -1,58 +1,9 @@
-import { Injectable } from '@angular/core';
-import * as pako from 'pako';
-import { BusyService, Game, GameService, GameTurnResponse } from 'pydt-shared';
-import { BehaviorSubject, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import { PydtSettingsFactory } from './pydtSettings';
-
-@Injectable()
-export class TurnCacheService {
-  private readonly cache: TurnDownloader[] = [];
-
-  constructor(
-    private readonly gameService: GameService,
-    private readonly busyService: BusyService,
-    private readonly pydtSettingsFactory: PydtSettingsFactory,
-  ) {
-    this.backgroundDownloader().then();
-  }
-
-  async backgroundDownloader() {
-    while (true) {
-      // Wait 5 seconds for next check
-      await new Promise(resolve => setTimeout(resolve, 5000));
-
-      const settings = await this.pydtSettingsFactory.getSettings();
-
-      if (settings.autoDownload) {
-        for (const td of [...this.cache]) {
-          if (!td.data$.value) {
-            await td.waitForCompletion();
-          }
-        }
-      }
-    }
-  }
-
-  async updateGames(games: Game[]) {
-    const newGames = games.filter(x => !this.cache.some(y => x.gameId === y.game.gameId && x.version === y.game.version));
-    const downloadersToRemove = this.cache.filter(x => !games.some(y => x.game.gameId === y.gameId && x.game.version === y.version));
-
-    for (const newGame of newGames) {
-      this.cache.push(new TurnDownloader(newGame, this.gameService, this.busyService));
-    }
-
-    for (const dl of downloadersToRemove) {
-      const i = this.cache.findIndex(x => x.game.gameId === dl.game.gameId && x.game.version === dl.game.version);
-      this.cache[i].abort();
-      this.cache.splice(i, 1);
-    }
-  }
-
-  get(gameId: string) {
-    return this.cache.find(x => x.game.gameId === gameId);
-  }
-}
+import { Injectable } from "@angular/core";
+import * as pako from "pako";
+import { BusyService, Game, GameService, GameTurnResponse } from "pydt-shared";
+import { BehaviorSubject, of } from "rxjs";
+import { catchError } from "rxjs/operators";
+import { PydtSettingsFactory } from "./pydtSettings";
 
 export class TurnDownloader {
   private xhr: XMLHttpRequest;
@@ -69,11 +20,11 @@ export class TurnDownloader {
   ) {
   }
 
-  abort() {
+  abort(): void {
     this.downloading = false;
 
     if (this.xhr) {
-      this.error$.next('ABORTED');
+      this.error$.next("ABORTED");
       this.xhr.abort();
       this.xhr = null;
     }
@@ -82,10 +33,10 @@ export class TurnDownloader {
     this.error$.next(null);
   }
 
-  waitForCompletion() {
+  waitForCompletion(): Promise<void> {
     this.startDownload();
 
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       this.error$.subscribe(err => {
         if (err) {
           resolve(null);
@@ -100,7 +51,7 @@ export class TurnDownloader {
     });
   }
 
-  startDownload() {
+  startDownload(): void {
     if (this.xhr || this.data$.value || this.downloading) {
       return;
     }
@@ -113,11 +64,11 @@ export class TurnDownloader {
     // Don't want this to trigger busy notifications...
     this.busyService.incrementBusy(false);
 
-    this.gameService.getTurn(this.game.gameId, 'yup')
+    this.gameService.getTurn(this.game.gameId, "yup")
       .pipe(catchError(() => of(null as GameTurnResponse)))
       .subscribe(resp => {
         if (!resp) {
-          this.error$.next('Failed to load turn information, is your computer offline?');
+          this.error$.next("Failed to load turn information, is your computer offline?");
           this.downloading = false;
           return;
         }
@@ -128,8 +79,8 @@ export class TurnDownloader {
         }
 
         this.xhr = new XMLHttpRequest();
-        this.xhr.open('GET', resp.downloadUrl, true);
-        this.xhr.responseType = 'arraybuffer';
+        this.xhr.open("GET", resp.downloadUrl, true);
+        this.xhr.responseType = "arraybuffer";
 
         this.xhr.onprogress = e => {
           if (e.lengthComputable) {
@@ -144,17 +95,18 @@ export class TurnDownloader {
           this.downloading = false;
         };
 
-        this.xhr.onload = async () => {
-          const response = this.xhr.response;
+        this.xhr.onload = () => {
+          const localXhr = this.xhr;
+
           this.xhr = null;
 
           try {
             this.curBytes$.next(this.maxBytes$.value);
 
-            let data = new Uint8Array(response);
+            let data = new Uint8Array(localXhr.response);
 
             try {
-              data = pako.ungzip(new Uint8Array(response));
+              data = pako.ungzip(new Uint8Array(localXhr.response));
             } catch (e) {
               // Ignore - file probably wasn't gzipped...
             }
@@ -168,6 +120,57 @@ export class TurnDownloader {
         };
 
         this.xhr.send();
-      }, err => { /* Ignore error */}).add(() => this.busyService.incrementBusy(true));
+      }, () => { /* Ignore error */ }).add(() => this.busyService.incrementBusy(true));
+  }
+}
+
+@Injectable()
+export class TurnCacheService {
+  private readonly cache: TurnDownloader[] = [];
+
+  constructor(
+    private readonly gameService: GameService,
+    private readonly busyService: BusyService,
+    private readonly pydtSettingsFactory: PydtSettingsFactory,
+  ) {
+    void this.backgroundDownloader().then();
+  }
+
+  async backgroundDownloader(): Promise<void> {
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      // Wait 5 seconds for next check
+      await new Promise(resolve => setTimeout(resolve, 5000));
+
+      const settings = await this.pydtSettingsFactory.getSettings();
+
+      if (settings.autoDownload) {
+        for (const td of [...this.cache]) {
+          if (!td.data$.value) {
+            await td.waitForCompletion();
+          }
+        }
+      }
+    }
+  }
+
+  updateGames(games: Game[]): void {
+    const newGames = games.filter(x => !this.cache.some(y => x.gameId === y.game.gameId && x.version === y.game.version));
+    const downloadersToRemove = this.cache.filter(x => !games.some(y => x.game.gameId === y.gameId && x.game.version === y.version));
+
+    for (const newGame of newGames) {
+      this.cache.push(new TurnDownloader(newGame, this.gameService, this.busyService));
+    }
+
+    for (const dl of downloadersToRemove) {
+      const i = this.cache.findIndex(x => x.game.gameId === dl.game.gameId && x.game.version === dl.game.version);
+
+      this.cache[i].abort();
+      this.cache.splice(i, 1);
+    }
+  }
+
+  get(gameId: string): TurnDownloader {
+    return this.cache.find(x => x.game.gameId === gameId);
   }
 }

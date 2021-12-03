@@ -1,11 +1,15 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-import { UserService } from 'pydt-shared';
-import { AuthService } from '../shared/authService';
+import { Component } from "@angular/core";
+import { Router } from "@angular/router";
+import { UserService } from "pydt-shared";
+import { AuthService } from "../shared/authService";
+
+class AuthModel {
+  public token: string;
+}
 
 @Component({
-  selector: 'pydt-auth',
-  templateUrl: './auth.component.html'
+  selector: "pydt-auth",
+  templateUrl: "./auth.component.html",
 })
 export class AuthComponent {
   model = new AuthModel();
@@ -14,24 +18,21 @@ export class AuthComponent {
   constructor(
     private auth: AuthService,
     private userService: UserService,
-    private router: Router
+    private router: Router,
   ) {}
 
-  async onSubmit() {
+  async onSubmit(): Promise<void> {
     this.authError = false;
     await this.auth.storeToken(this.model.token);
 
     try {
       await this.userService.steamProfile().toPromise();
-      this.router.navigate(['/']);
+      await this.router.navigate(["/"]);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error(err);
-      this.auth.storeToken('');
+      await this.auth.storeToken("");
       this.authError = true;
     }
   }
-}
-
-class AuthModel {
-  public token: string;
 }

@@ -8,7 +8,7 @@ export class DiscourseInfo {
   static async getDiscourseInfo(): Promise<DiscourseInfo> {
     const di = await window.pydtApi.ipc.invoke(
       rpcChannels.STORAGE_GET,
-      "discourseInfo"
+      "discourseInfo",
     );
 
     const result = new DiscourseInfo();
@@ -21,10 +21,10 @@ export class DiscourseInfo {
   }
 
   static saveDiscourseInfo(di: DiscourseInfo): Promise<void> {
-    return window.pydtApi.ipc.invoke(rpcChannels.STORAGE_SET, 'discourseInfo', di);
+    return window.pydtApi.ipc.invoke(rpcChannels.STORAGE_SET, "discourseInfo", di);
   }
 
-  static isNewSmackTalkPost(game: Game, user: User, readPostNumber: number) {
+  static isNewSmackTalkPost(game: Game, user: User, readPostNumber: number): boolean {
     if (
       !game.latestDiscoursePostNumber ||
       game.latestDiscoursePostNumber <= readPostNumber

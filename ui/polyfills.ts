@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * This file includes polyfills needed by Angular and is loaded before the app.
  * You can add your own extra polyfills to this file.
@@ -14,7 +15,7 @@
  * Learn more in https://angular.io/guide/browser-support
  */
 
-/***************************************************************************************************
+/** *************************************************************************************************
  * BROWSER POLYFILLS
  */
 
@@ -40,7 +41,7 @@
 // import 'classlist.js';  // Run `npm install --save classlist.js`.
 
 /** Evergreen browsers require these. **/
-import 'core-js/es/reflect';
+import "core-js/es/reflect";
 
 /**
  * Required to support Web Animations `@angular/animation`.
@@ -49,15 +50,13 @@ import 'core-js/es/reflect';
 // import 'web-animations-js';  // Run `npm install --save web-animations-js`.
 
 
-
-/***************************************************************************************************
+/** *************************************************************************************************
  * Zone JS is required by Angular itself.
  */
-import 'zone.js';  // Included with Angular CLI.
+import "zone.js"; // Included with Angular CLI.
 
 
-
-/***************************************************************************************************
+/** *************************************************************************************************
  * APPLICATION IMPORTS
  */
 

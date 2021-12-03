@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { Game, SteamProfileMap } from 'pydt-shared';
+import { Injectable } from "@angular/core";
+import { Game, SteamProfileMap } from "pydt-shared";
 
 @Injectable()
 export class PlayTurnState {

@@ -1,26 +1,31 @@
-import { HttpClient } from '@angular/common/http';
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { difference, orderBy } from 'lodash';
-import { Game, ProfileCacheService, User, UserService } from 'pydt-shared';
-import { Observable, Subscription, timer } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { TurnCacheService } from '../shared/turnCacheService';
-import { AuthService } from '../shared/authService';
-import { DiscourseInfo } from '../shared/discourseInfo';
-import { environment } from '../environments/environment';
-import rpcChannels from '../rpcChannels';
+import { HttpClient } from "@angular/common/http";
+import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Router } from "@angular/router";
+import { difference, orderBy } from "lodash";
+import { Game, ProfileCacheService, SteamProfileMap, User, UserService } from "pydt-shared";
+import { Observable, Subscription, timer } from "rxjs";
+import { map } from "rxjs/operators";
+import { TurnCacheService } from "../shared/turnCacheService";
+import { AuthService } from "../shared/authService";
+import { DiscourseInfo } from "../shared/discourseInfo";
+import { environment } from "../environments/environment";
+import rpcChannels from "../rpcChannels";
 
 const POLL_INTERVAL: number = 600 * 1000;
 const TOAST_INTERVAL: number = 14.5 * 60 * 1000;
 
+interface GameWithYourTurn extends Game {
+  yourTurn: boolean;
+  hasSmackTalk: boolean;
+}
+
 @Component({
-  selector: 'pydt-home',
-  templateUrl: './home.component.html'
+  selector: "pydt-home",
+  templateUrl: "./home.component.html",
 })
 export class HomeComponent implements OnInit, OnDestroy {
   games: Game[];
-  gamePlayerProfiles: any = {};
+  gamePlayerProfiles: SteamProfileMap = {};
   discourseInfo: DiscourseInfo;
   errorLoading = false;
   refreshDisabled = false;
@@ -38,12 +43,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     private readonly router: Router,
     private readonly profileCache: ProfileCacheService,
     private readonly turnCacheService: TurnCacheService,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
   ) {}
 
-  async ngOnInit() {
+  async ngOnInit(): Promise<void> {
     if (!await this.authService.isAuthenticated()) {
-      this.router.navigate(['/auth']);
+      await this.router.navigate(["/auth"]);
       return;
     }
 
@@ -53,11 +58,11 @@ export class HomeComponent implements OnInit, OnDestroy {
     const $timer = timer(10, POLL_INTERVAL);
 
     this.timerSub = $timer.subscribe(() => {
-      this.safeLoadGames();
+      void this.safeLoadGames();
     });
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.lastNotification = null;
     if (this.timerSub) {
       this.timerSub.unsubscribe();
@@ -71,20 +76,20 @@ export class HomeComponent implements OnInit, OnDestroy {
     window.pydtApi.ipc.removeAllListeners(rpcChannels.IOT_MESSAGE);
   }
 
-  refresh() {
-    this.safeLoadGames();
+  refresh(): void {
+    void this.safeLoadGames();
     this.refreshDisabled = true;
     setTimeout(() => {
       this.refreshDisabled = false;
     }, 30000);
   }
 
-  smackRead(gameId: string, postNumber: number) {
+  smackRead(gameId: string, postNumber: number): Promise<void> {
     this.discourseInfo[gameId] = postNumber;
-    DiscourseInfo.saveDiscourseInfo(this.discourseInfo);
+    return DiscourseInfo.saveDiscourseInfo(this.discourseInfo);
   }
 
-  async safeLoadGames() {
+  async safeLoadGames(): Promise<void> {
     let count = 0;
 
     while (count < 3) {
@@ -96,7 +101,9 @@ export class HomeComponent implements OnInit, OnDestroy {
         return;
       } catch (err) {
         count++;
-        console.error('Error polling user games...', err);
+
+        // eslint-disable-next-line no-console
+        console.error("Error polling user games...", err);
 
         if (count < 3) {
           await new Promise(p => setTimeout(p, 5000));
@@ -107,11 +114,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.errorLoading = true;
   }
 
-  async loadGames() {
+  async loadGames(): Promise<void> {
     let req: Observable<Game[]>;
 
     if (this.destroyed) {
-      return this.ngOnDestroy();
+      this.ngOnDestroy();
+      return;
     }
 
     if (this.pollUrl) {
@@ -126,12 +134,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.discourseInfo = await DiscourseInfo.getDiscourseInfo();
 
     this.games = await req.toPromise();
-    this.games.forEach(x => x.gameType = x.gameType || 'CIV6');
+    this.games.forEach(x => {
+      x.gameType = x.gameType || "CIV6";
+    });
     this.setSortedTurns();
 
-    this.profileCache.getProfilesForGames(this.games).then(profiles => {
-      this.gamePlayerProfiles = profiles;
-    });
+    this.gamePlayerProfiles = await this.profileCache.getProfilesForGames(this.games);
 
     // Notify about turns available
     const yourTurns = this.games
@@ -146,22 +154,23 @@ export class HomeComponent implements OnInit, OnDestroy {
     if ((!this.lastNotification || new Date().getTime() - this.lastNotification.getTime() > TOAST_INTERVAL)) {
       if (yourTurns.length) {
         window.pydtApi.showToast({
-          title: 'Play Your Damn Turn!',
-          message: yourTurns.map(x => x.displayName).join(', ')
+          title: "Play Your Damn Turn!",
+          message: yourTurns.map(x => x.displayName).join(", "),
         });
         notificationShown = true;
       }
 
       // Notify about smack talk
-      const smackTalk = this.games.filter(x =>  {
+      const smackTalk = this.games.filter(x => {
         const readPostNumber = this.discourseInfo[x.gameId] || 0;
+
         return DiscourseInfo.isNewSmackTalkPost(x, this.user, readPostNumber);
       }).map(x => x.displayName);
 
       if (smackTalk.length) {
         window.pydtApi.showToast({
-          title: 'New Smack Talk Message!',
-          message: smackTalk.join(', ')
+          title: "New Smack Talk Message!",
+          message: smackTalk.join(", "),
         });
         notificationShown = true;
       }
@@ -172,7 +181,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   }
 
-  configureIot() {
+  configureIot(): void {
     if (this.iotConnected) {
       return;
     }
@@ -181,50 +190,48 @@ export class HomeComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const env = environment.production ? 'prod' : 'dev';
+    const env = environment.production ? "prod" : "dev";
     const topic = `/pydt/${env}/user/${this.user.steamId}/gameupdate`;
 
     window.pydtApi.ipc.receive(rpcChannels.IOT_CONNECT, () => {
-      console.log('connected to IoT!');
+      // eslint-disable-next-line no-console
+      console.log("connected to IoT!");
     });
 
     window.pydtApi.ipc.receive(rpcChannels.IOT_ERROR, data => {
-      console.log('IoT error...', data);
+      // eslint-disable-next-line no-console
+      console.error("IoT error...", data);
     });
 
-    window.pydtApi.ipc.receive(rpcChannels.IOT_MESSAGE, data => {
-      console.log('received message from topic ', data.topic);
-      this.safeLoadGames();
+    window.pydtApi.ipc.receive<{topic: string}>(rpcChannels.IOT_MESSAGE, data => {
+      // eslint-disable-next-line no-console
+      console.log("received message from topic ", data.topic);
+      void this.safeLoadGames();
     });
 
     window.pydtApi.ipc.send(rpcChannels.START_IOT, {
       topic,
       accessKey: environment.iotClientAccessKey,
-      secretKey: environment.iotClientSecretKey
+      secretKey: environment.iotClientSecretKey,
     });
 
     this.iotConnected = true;
   }
 
-  setSortedTurns() {
+  setSortedTurns(): void {
     this.sortedTurns = this.games.map(game => ({
       ...game,
       yourTurn: !!game.inProgress && game.currentPlayerSteamId === this.user.steamId,
-      hasSmackTalk: DiscourseInfo.isNewSmackTalkPost(game, this.user, this.discourseInfo[game.gameId] || 0)
+      hasSmackTalk: DiscourseInfo.isNewSmackTalkPost(game, this.user, this.discourseInfo[game.gameId] || 0),
     }));
 
-    const yourTurns = orderBy(this.sortedTurns.filter(x => x.yourTurn), x => x.updatedAt, 'desc');
+    const yourTurns = orderBy(this.sortedTurns.filter(x => x.yourTurn), x => x.updatedAt, "desc");
 
-    const others = orderBy(difference(this.sortedTurns, yourTurns), [x => x.hasSmackTalk, x => x.updatedAt], ['desc', 'desc']);
+    const others = orderBy(difference(this.sortedTurns, yourTurns), [x => x.hasSmackTalk, x => x.updatedAt], ["desc", "desc"]);
 
     this.sortedTurns = [
       ...yourTurns,
-      ...others
+      ...others,
     ];
   }
-}
-
-interface GameWithYourTurn extends Game {
-  yourTurn: boolean;
-  hasSmackTalk: boolean;
 }

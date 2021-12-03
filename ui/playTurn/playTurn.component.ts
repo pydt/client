@@ -1,23 +1,22 @@
-import { HttpErrorResponse } from '@angular/common/http';
-import { Component, HostListener, Input, NgZone, OnDestroy, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import * as pako from 'pako';
-import { Game, GameService, SteamProfileMap, MetadataCacheService, CivGame } from 'pydt-shared';
-import { PydtSettingsFactory, PydtSettingsData } from '../shared/pydtSettings';
-import { PlayTurnState } from './playTurnState.service';
-import { TurnCacheService, TurnDownloader } from '../shared/turnCacheService';
-import rpcChannels from '../rpcChannels';
+import { HttpErrorResponse } from "@angular/common/http";
+import { Component, HostListener, Input, NgZone, OnDestroy, OnInit } from "@angular/core";
+import { Router } from "@angular/router";
+import * as pako from "pako";
+import { Game, GameService, SteamProfileMap, MetadataCacheService, CivGame } from "pydt-shared";
+import { PydtSettingsFactory, PydtSettingsData } from "../shared/pydtSettings";
+import { PlayTurnState } from "./playTurnState.service";
+import { TurnCacheService, TurnDownloader } from "../shared/turnCacheService";
 
 
 @Component({
-  selector: 'pydt-home',
-  templateUrl: './playTurn.component.html',
-  styleUrls: ['./playTurn.component.css']
+  selector: "pydt-home",
+  templateUrl: "./playTurn.component.html",
+  styleUrls: ["./playTurn.component.css"],
 })
 export class PlayTurnComponent implements OnInit, OnDestroy {
   @Input() game: Game;
   @Input() gamePlayerProfiles: SteamProfileMap;
-  status = 'Downloading Save File...';
+  status = "Downloading Save File...";
   saveFileToUpload: string;
   abort: boolean;
   downloaded: boolean;
@@ -39,13 +38,15 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
     private readonly gameService: GameService,
     private readonly pydtSettingsFactory: PydtSettingsFactory,
     private readonly router: Router,
-    private readonly ngZone: NgZone
+    private readonly ngZone: NgZone,
   ) {
   }
 
-  @HostListener('click', ['$event'])
-  onMouseEnter(event: MouseEvent) {
-    const href = (event.srcElement as any).href;
+  @HostListener("click", ["$event"])
+  // eslint-disable-next-line class-methods-use-this
+  onMouseEnter(event: MouseEvent): boolean {
+    const href = (event.srcElement as { href?: string }).href;
+
     if (href) {
       window.pydtApi.openUrl(href);
     }
@@ -54,11 +55,11 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
     return false;
   }
 
-  get civGame() {
-    return this.games.find(x => x.id == this.playTurnState.game.gameType);
+  get civGame(): CivGame {
+    return this.games.find(x => x.id === this.playTurnState.game.gameType);
   }
 
-  async ngOnInit() {
+  async ngOnInit(): Promise<void> {
     this.abort = false;
     this.settings = await this.pydtSettingsFactory.getSettings();
     this.games = (await this.metadataCache.getCivGameMetadata()).civGames;
@@ -70,20 +71,21 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
         window.pydtApi.fs.mkdirp(this.saveDir);
       }
 
-      this.archiveDir = window.pydtApi.path.join(this.saveDir, 'pydt-archive');
+      this.archiveDir = window.pydtApi.path.join(this.saveDir, "pydt-archive");
 
       if (!window.pydtApi.fs.existsSync(this.archiveDir)) {
         window.pydtApi.fs.mkdirp(this.archiveDir);
       }
 
-      this.saveFileToPlay = this.saveDir + '(PYDT) Play This One!.' + this.civGame.saveExtension;
+      this.saveFileToPlay = `${this.saveDir}(PYDT) Play This One!.${this.civGame.saveExtension}`;
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error(err);
       this.showGameInfo = false;
       this.abort = true;
-      this.status = 'Unable to locate/create save file directory.  ' +
+      this.status = "Unable to locate/create save file directory.  " +
         'Are you using OneDrive and have the "Files On-Demand" option enabled?  ' +
-        'The PYDT client will not work in this mode. :(';
+        "The PYDT client will not work in this mode. :(";
       throw err;
     }
 
@@ -92,7 +94,7 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
     this.turnDownloader.startDownload();
 
     if (this.turnDownloader.data$.value) {
-      this.status = 'Turn already downloaded, moving to save location...';
+      this.status = "Turn already downloaded, moving to save location...";
     }
 
     this.turnDownloader.error$.subscribe(err => {
@@ -104,6 +106,7 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
       }
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     this.turnDownloader?.data$.subscribe(async data => {
       if (data) {
         setTimeout(() => {
@@ -111,20 +114,21 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
         }, 500);
 
         try {
-          await window.pydtApi.fs.writeFileSync(this.saveFileToPlay, data);
+          window.pydtApi.fs.writeFileSync(this.saveFileToPlay, data);
 
           await new Promise(sleepResolve => setTimeout(sleepResolve, 500));
 
-          const url = this.civGame.runUrls[this.settings.getGameStore(this.civGame)]
+          const url = this.civGame.runUrls[this.settings.getGameStore(this.civGame)];
 
-          this.ngZone.run(() => {
+          await this.ngZone.run(async () => {
             if (this.settings.launchCiv) {
               window.pydtApi.openUrl(url);
             }
 
-            this.watchForSave();
+            await this.watchForSave();
           });
         } catch (err) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           this.status = err;
           this.showGameInfo = false;
           this.abort = true;
@@ -133,7 +137,7 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     if (this.xhr) {
       this.xhr.abort();
       this.xhr = null;
@@ -145,31 +149,33 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
     }
   }
 
-  public watchForSave() {
+  public watchForSave(): Promise<void> {
     this.curBytes = this.maxBytes = null;
-    this.status = 'Downloaded file!<br />Play Your Damn Turn!';
+    this.status = "Downloaded file!<br />Play Your Damn Turn!";
     this.saveFileToUpload = null;
     this.abort = false;
     this.downloaded = true;
 
-    setTimeout(async () => {
+
+    return new Promise(resolve => setTimeout(resolve, 5000)).then(async () => {
       const path = await window.pydtApi.startChokidar({
         path: this.saveDir,
-        awaitWriteFinish: this.playTurnState.game.gameType !== 'CIV6'
+        awaitWriteFinish: this.playTurnState.game.gameType !== "CIV6",
       });
 
       this.ngZone.run(() => {
-        this.status = `Detected new save: ${window.pydtApi.path.basename(path).replace(`.${this.civGame.saveExtension}`, '')}.  Submit turn?`;
+        this.status = `Detected new save: ${window.pydtApi.path.basename(path).replace(`.${this.civGame.saveExtension}`, "")}.  Submit turn?`;
         this.downloaded = false;
         this.showGameInfo = false;
         this.saveFileToUpload = path;
       });
-    }, 5000);
+    });
   }
 
-  async submitFile() {
+  async submitFile(): Promise<void> {
     const fileBeingUploaded = this.saveFileToUpload;
-    this.status = 'Uploading...';
+
+    this.status = "Uploading...";
     this.abort = false;
     this.saveFileToUpload = null;
 
@@ -181,7 +187,7 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
 
       await new Promise((resolve, reject) => {
         this.xhr = new XMLHttpRequest();
-        this.xhr.open('PUT', startResp.putUrl, true);
+        this.xhr.open("PUT", startResp.putUrl, true);
 
         this.xhr.upload.onprogress = e => {
           this.ngZone.run(() => {
@@ -207,16 +213,17 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
           this.xhr = null;
         };
 
-        this.xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+        this.xhr.setRequestHeader("Content-Type", "application/octet-stream");
         this.xhr.send(fileData);
       });
 
       await this.gameService.finishSubmit(this.playTurnState.game.gameId).toPromise();
       window.pydtApi.fs.renameSync(fileBeingUploaded, moveTo);
     } catch (err) {
-      this.status = 'There was an error submitting your turn.  Please try again.';
+      this.status = "There was an error submitting your turn.  Please try again.";
 
       if (err instanceof HttpErrorResponse) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         this.status = err.error.errorMessage;
       }
 
@@ -231,26 +238,27 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
     const files: string[] = window.pydtApi.fs.readdirSync(this.archiveDir)
       .map(x => {
         const file = window.pydtApi.path.join(this.archiveDir, x);
+
         return {
           file,
-          time: window.pydtApi.fs.statSync(file).ctime.getTime()
+          time: window.pydtApi.fs.statSync(file).ctime.getTime(),
         };
       })
       .sort((a, b) => a.time - b.time)
       .map(x => x.file);
 
     while (files.length > this.settings.numSaves) {
-      await window.pydtApi.fs.unlinkSync(files.shift());
+      window.pydtApi.fs.unlinkSync(files.shift());
     }
 
-    this.router.navigate(['/']);
+    await this.router.navigate(["/"]);
   }
 
-  goHome() {
-    this.router.navigate(['/']);
+  async goHome(): Promise<void> {
+    await this.router.navigate(["/"]);
   }
 
-  openGameOnWeb() {
-    window.pydtApi.openUrl('https://playyourdamnturn.com/game/' + this.playTurnState.game.gameId);
+  openGameOnWeb(): void {
+    window.pydtApi.openUrl(`https://playyourdamnturn.com/game/${this.playTurnState.game.gameId}`);
   }
 }
