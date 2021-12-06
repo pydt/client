@@ -71,7 +71,6 @@ export class AppComponent implements OnInit {
     });
   }
 
-  // eslint-disable-next-line class-methods-use-this
   gameStoreOptions(civGame: CivGame): { key: string, value: string }[] {
     return Object.keys(GameStore)
       .filter(x => !!civGame.dataPaths[GameStore[x] as string])
@@ -103,7 +102,6 @@ export class AppComponent implements OnInit {
     this.hideOpenModal();
   }
 
-  // eslint-disable-next-line class-methods-use-this
   applyUpdate(): void {
     window.pydtApi.applyUpdate();
   }

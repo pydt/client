@@ -8,7 +8,7 @@ import { ProgressbarModule } from "ngx-bootstrap/progressbar";
 import { TabsModule } from "ngx-bootstrap/tabs";
 import { TooltipModule } from "ngx-bootstrap/tooltip";
 import { MarkdownModule, MarkedOptions } from "ngx-markdown";
-import { ApiModule, BusyService, Configuration, MetadataCacheService, ProfileCacheService, PydtSharedModule } from "pydt-shared";
+import { ApiModule, BusyService, Configuration, DateInterceptor, MetadataCacheService, ProfileCacheService, PydtSharedModule } from "pydt-shared";
 import { AppComponent } from "./app.component";
 import { routing } from "./app.routing";
 import { AuthComponent } from "./auth/auth.component";
@@ -66,6 +66,7 @@ export const configFactory: () => Configuration = () => new Configuration({
     { provide: RollbarService, useFactory: rollbarFactory },
     AuthService,
     { provide: HTTP_INTERCEPTORS, useExisting: BusyService, multi: true },
+    { provide: HTTP_INTERCEPTORS, useExisting: DateInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useExisting: MetadataCacheService, multi: true },
     PlayTurnState,
   ],

@@ -56,7 +56,6 @@ export class AuthService {
     });
   }
 
-  // eslint-disable-next-line class-methods-use-this
   private getConfig(): Promise<ConfigData> {
     return window.pydtApi.ipc.invoke(rpcChannels.STORAGE_GET, "configData");
   }

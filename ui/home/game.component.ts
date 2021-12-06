@@ -61,16 +61,14 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   get lastTurn(): string {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const lastTurnDate: any = this.game.lastTurnEndDate || this.game.updatedAt;
+    const lastTurnDate = this.game.lastTurnEndDate || this.game.updatedAt;
 
-    return countdown(Date.parse(lastTurnDate), this.now, countdown.HOURS | countdown.MINUTES, 0, 0) as string;
+    return countdown(lastTurnDate, this.now, countdown.HOURS | countdown.MINUTES, 0, 0) as string;
   }
 
   get timerExpires(): string {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const lastTurnDate: any = this.game.lastTurnEndDate || this.game.updatedAt;
-    const expirationDate = new Date(Date.parse(lastTurnDate) + this.game.turnTimerMinutes * 60 * 1000);
+    const lastTurnDate = this.game.lastTurnEndDate || this.game.updatedAt;
+    const expirationDate = new Date(lastTurnDate.getTime() + this.game.turnTimerMinutes * 60 * 1000);
 
     if (expirationDate.getTime() - this.now.getTime() < 0) {
       return "soon...";

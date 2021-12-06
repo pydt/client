@@ -83,7 +83,7 @@
     "ngx-bootstrap": "^7.1.0",
     "ngx-markdown": "^12.0.1",
     "pako": "^2.0.4",
-    "pydt-shared": "^1.7.1",
+    "pydt-shared": "^1.7.2",
     "rollbar": "^2.24.0",
     "rxjs": "^6.5.3",
     "rxjs-tslint": "^0.1.8",

@@ -43,7 +43,6 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
   }
 
   @HostListener("click", ["$event"])
-  // eslint-disable-next-line class-methods-use-this
   onMouseEnter(event: MouseEvent): boolean {
     const href = (event.srcElement as { href?: string }).href;
 

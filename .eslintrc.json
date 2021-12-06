@@ -3,7 +3,8 @@
   "ignorePatterns": [
     "projects/**/*",
     "app/ui_compiled/**/*",
-    "app/rpcChannels.js"
+    "app/rpcChannels.js",
+    "ui/environments/environment.build.ts"
   ],
   "overrides": [
     {
@@ -51,18 +52,19 @@
         "plugin:@angular-eslint/template/process-inline-templates"
       ],
       "rules": {
+        "class-methods-use-this": ["off"],
         "comma-dangle": ["error", "always-multiline"],
         "func-style": ["error", "expression"],
         "indent": ["error", 2, {"SwitchCase": 1}],
         "lines-around-comment": ["off"],
         "semi": ["error", "always"],
         "new-cap": ["off"],
+        "no-invalid-this": ["off"],
         "no-new": ["off"],
         "no-useless-constructor": ["off"],
         "node/no-missing-import": ["off"],
         "node/no-unpublished-import": ["off"],
         "node/no-unsupported-features/es-syntax": ["off"],
-
         "@angular-eslint/component-selector": [
           "error",
           {
