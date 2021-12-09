@@ -5,7 +5,6 @@ export default {
   IOT_CONNECT: "iot-connect",
   IOT_ERROR: "iot-error",
   IOT_MESSAGE: "iot-message",
-  MANUAL_UPDATE_MODAL: "manual-update-modal",
   SET_FORCE_QUIT: "set-force-quit",
   SHOW_ABOUT_MODAL: "show-about-modal",
   SHOW_SETTINGS_MODAL: "show-settings-modal",

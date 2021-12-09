@@ -26,7 +26,6 @@ electron.contextBridge.exposeInMainWorld("pydtApi", {
   applyUpdate: () => {
     electron.ipcRenderer.invoke(rpcChannels.SET_FORCE_QUIT, true);
     electron.ipcRenderer.send(rpcChannels.APPLY_UPDATE);
-    appUpdater.applyUpdate();
   },
   startChokidar: arg => new Promise(resolve => {
     if (watcher) {

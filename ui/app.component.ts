@@ -16,7 +16,6 @@ export class AppComponent implements OnInit {
 
   @ViewChild("aboutModal", { static: true }) aboutModal: TemplateRef<unknown>;
   @ViewChild("updateModal", { static: true }) updateModal: TemplateRef<unknown>;
-  @ViewChild("manualUpdateModal", { static: true }) manualUpdateModal: TemplateRef<unknown>;
   @ViewChild("settingsModal", { static: true }) settingsModal: TemplateRef<unknown>;
   openModal: BsModalRef;
   civGames: CivGame[];
@@ -59,14 +58,6 @@ export class AppComponent implements OnInit {
         this.hideOpenModal();
         this.newVersion = data;
         this.openModal = this.modalService.show(this.updateModal, modalOptions);
-      });
-    });
-
-    window.pydtApi.ipc.receive<string>(rpcChannels.MANUAL_UPDATE_MODAL, data => {
-      this.zone.run(() => {
-        this.hideOpenModal();
-        this.newVersion = data;
-        this.openModal = this.modalService.show(this.manualUpdateModal, modalOptions);
       });
     });
   }

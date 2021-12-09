@@ -100,19 +100,4 @@
   </div>
 </ng-template>
 
-<ng-template #manualUpdateModal>
-  <div class="modal-header">
-    <button type="button" class="close" (click)="hideOpenModal()" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-    <h4 class="modal-title">Update Available</h4>
-  </div>
-  <div class="modal-body">
-    <p>Version {{newVersion}} is available, but auto updates are not supported on this platform.  Please go download the new version from playyourdamnturn.com!</p>
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-primary" (click)="hideOpenModal()">OK!</button>
-  </div>
-</ng-template>
-
 <pydt-busy></pydt-busy>
