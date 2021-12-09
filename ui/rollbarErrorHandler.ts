@@ -20,7 +20,7 @@ export class RollbarErrorHandler implements ErrorHandler {
   }
 }
 
-export const rollbarFactory: () => Rollbar = () =>
+export const rollbarFactory = (): Rollbar =>
   new Rollbar({
     accessToken: "67488d20e1444df7ab91d279659d519a",
     captureUncaught: true,

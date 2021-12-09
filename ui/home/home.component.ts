@@ -33,7 +33,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private timerSub: Subscription;
   private destroyed = false;
   private lastNotification: Date;
-  private pollUrl;
+  private pollUrl: string;
   private iotConnected = false;
   private sortedTurns: GameWithYourTurn[];
 

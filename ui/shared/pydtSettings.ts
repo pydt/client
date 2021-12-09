@@ -17,7 +17,7 @@ export class PydtSettingsData {
         if (civGame.dataPaths[GameStore[gameStoreKey] as GameStore]) {
           const dataPath = this.getDefaultDataPath(
             civGame,
-            GameStore[gameStoreKey],
+            GameStore[gameStoreKey] as GameStore,
           );
 
           if (window.pydtApi.fs.existsSync(dataPath)) {

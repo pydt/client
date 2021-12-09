@@ -103,16 +103,18 @@ export class TurnDownloader {
           try {
             this.curBytes$.next(this.maxBytes$.value);
 
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
             let data = new Uint8Array(localXhr.response);
 
             try {
-              data = pako.ungzip(new Uint8Array(localXhr.response));
+              data = pako.ungzip(data);
             } catch (e) {
               // Ignore - file probably wasn't gzipped...
             }
 
             this.data$.next(data);
           } catch (err) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
             this.error$.next(err);
           } finally {
             this.downloading = false;

@@ -23,7 +23,7 @@ import { TurnCacheService } from "./shared/turnCacheService";
 import { PydtSettingsFactory } from "./shared/pydtSettings";
 import { environment } from "./environments/environment";
 
-export const configFactory: () => Configuration = () => new Configuration({
+export const configFactory = (): Configuration => new Configuration({
   apiKeys: {},
   basePath: environment.apiUrl,
 });
