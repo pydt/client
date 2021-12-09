@@ -1,6 +1,6 @@
 const electron = require("electron");
 const log = require("electron-log");
-const { autoUpdater} = require("electron-updater");
+const { autoUpdater } = require("electron-updater");
 const { default: rpcChannels } = require("./rpcChannels");
 
 // Check for updates every 30 minutes
