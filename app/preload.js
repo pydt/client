@@ -1,12 +1,10 @@
 const electron = require("electron");
-const log = require("electron-log");
 const path = require("path");
 const fs = require("fs");
 const mkdirp = require("mkdirp");
 const chokidar = require("chokidar");
 const notifier = require("node-notifier");
 const open = require("open");
-const appUpdater = require("./appUpdater");
 const Rollbar = require("rollbar");
 const AutoLaunch = require("auto-launch");
 const { default: rpcChannels } = require("./rpcChannels");
@@ -21,14 +19,13 @@ context.activate();
 let watcher;
 
 notifier.on("click", () => {
-  // TODO: windows click was broken in v6, upgrade after this fix is merged in
-  // https://github.com/mikaelbr/node-notifier/issues/291
   electron.ipcRenderer.send(rpcChannels.SHOW_WINDOW);
 });
 
 electron.contextBridge.exposeInMainWorld("pydtApi", {
   applyUpdate: () => {
     electron.ipcRenderer.invoke(rpcChannels.SET_FORCE_QUIT, true);
+    electron.ipcRenderer.send(rpcChannels.APPLY_UPDATE);
     appUpdater.applyUpdate();
   },
   startChokidar: arg => new Promise(resolve => {
@@ -83,11 +80,11 @@ electron.contextBridge.exposeInMainWorld("pydtApi", {
   },
   openUrl: arg => {
     open(arg).catch(err => {
-      log.error(`Could not open URL ${arg}: ${err.message}`);
+      electron.ipcRenderer.send(rpcChannels.LOG_ERROR, `Could not open URL ${arg}: ${err.message}`);
     });
   },
   setAutostart: arg => {
-    log.info("set-autostart");
+    electron.ipcRenderer.send(rpcChannels.LOG_INFO, "set-autostart");
 
     const launcher = new AutoLaunch({
       name: "Play Your Damn Turn Client",
@@ -98,19 +95,19 @@ electron.contextBridge.exposeInMainWorld("pydtApi", {
       .isEnabled()
       .then(isEnabled => {
         if (isEnabled && !arg) {
-          log.warn("Disabling auto start...");
+          electron.ipcRenderer.send(rpcChannels.LOG_INFO, "Disabling auto start...");
           return launcher.disable();
         }
 
         if (!isEnabled && !!arg) {
-          log.warn("Enabling auto start...");
+          electron.ipcRenderer.send(rpcChannels.LOG_INFO, "Enabling auto start...");
           return launcher.enable();
         }
 
         return null;
       })
       .catch(err => {
-        log.error("Error toggling auto-start: ", err.message);
+        electron.ipcRenderer.send(rpcChannels.LOG_ERROR, `Error toggling auto-start: ${err.message}`);
       });
   },
   showOpenDialog: async () => {

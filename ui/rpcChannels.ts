@@ -1,4 +1,5 @@
 export default {
+  APPLY_UPDATE: "apply-update",
   GET_PATH: "get-path",
   INIT_ROLLBAR: "init-rollbar",
   IOT_CONNECT: "iot-connect",
@@ -14,4 +15,6 @@ export default {
   STORAGE_GET: "storage-get",
   STORAGE_SET: "storage-set",
   UPDATE_TURNS_AVAILABLE: "update-turns-available",
+  LOG_INFO: "log-info",
+  LOG_ERROR: "log-error",
 };

@@ -9,6 +9,8 @@ const UPDATE_SERVER_HOST = "updates.playyourdamnturn.com";
 // Check for updates every 30 minutes
 const UPDATE_INTERVAL = 30 * 60 * 1000;
 
+electron.ipcMain.on(rpcChannels.APPLY_UPDATE, () => autoUpdater.quitAndInstall());
+
 module.exports = {
   checkForUpdates: window => {
     const platform = process.platform;
@@ -83,8 +85,5 @@ module.exports = {
         },
       );
     }, UPDATE_INTERVAL);
-  },
-  applyUpdate: () => {
-    autoUpdater.quitAndInstall();
   },
 };

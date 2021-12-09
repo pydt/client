@@ -1,4 +1,5 @@
 const electron = require("electron");
+const log = require("electron-log");
 const { configureIot } = require("./iot");
 const {
   getAppIcon,
@@ -27,6 +28,10 @@ const { default: rpcChannels } = require("./rpcChannels");
   });
 
   electron.ipcMain.handle(rpcChannels.GET_PATH, (e, name) => electron.app.getPath(name));
+
+  electron.ipcMain.on(rpcChannels.LOG_INFO, (e, message) => log.info(message));
+
+  electron.ipcMain.on(rpcChannels.LOG_ERROR, (e, message) => log.error(message));
 
   electron.ipcMain.on(rpcChannels.SHOW_WINDOW, () => {
     forceShowWindow();
