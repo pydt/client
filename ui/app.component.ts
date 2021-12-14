@@ -62,6 +62,10 @@ export class AppComponent implements OnInit {
     });
   }
 
+  openReleaseNotes(): void {
+    window.pydtApi.openUrl(`https://github.com/pydt/client/releases/tag/v${this.version}`);
+  }
+
   gameStoreOptions(civGame: CivGame): { key: string, value: string }[] {
     return Object.keys(GameStore)
       .filter(x => !!civGame.dataPaths[GameStore[x] as string])

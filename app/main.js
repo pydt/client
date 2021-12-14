@@ -8,12 +8,17 @@ const {
   forceShowWindow,
 } = require("./window");
 const appUpdater = require("./appUpdater");
+const { default: rpcChannels } = require("./rpcChannels");
 
 require("./storage");
-const { default: rpcChannels } = require("./rpcChannels");
+require("./notifications");
 
 (() => {
   const { app } = electron;
+
+  // This was probably a bad choice for the ID but I think I'm stuck with it now,
+  // needed for notifications to work right on Windows.
+  app.setAppUserModelId("play.your.damn.turn.client");
 
   app.disableHardwareAcceleration();
 

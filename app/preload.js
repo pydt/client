@@ -3,7 +3,6 @@ const path = require("path");
 const fs = require("fs");
 const mkdirp = require("mkdirp");
 const chokidar = require("chokidar");
-const notifier = require("node-notifier");
 const open = require("open");
 const Rollbar = require("rollbar");
 const AutoLaunch = require("auto-launch");
@@ -17,10 +16,6 @@ context.use(inputMenu);
 context.activate();
 
 let watcher;
-
-notifier.on("click", () => {
-  electron.ipcRenderer.send(rpcChannels.SHOW_WINDOW);
-});
 
 electron.contextBridge.exposeInMainWorld("pydtApi", {
   applyUpdate: () => {
@@ -49,23 +44,7 @@ electron.contextBridge.exposeInMainWorld("pydtApi", {
     watcher.on("change", changeDetected);
   }),
   showToast: arg => {
-    if (__dirname.indexOf("app.asar") > 0) {
-      const splitDirname = __dirname.split(path.sep);
-      const rootPath = path.join(...splitDirname.slice(0, splitDirname.length - 2));
-
-      arg.icon = path.join(rootPath, "Contents/app/icon.png");
-
-      if (!fs.existsSync(arg.icon)) {
-        arg.icon = path.join(rootPath, "app/icon.png");
-      }
-    } else {
-      arg.icon = path.join(__dirname, "icon.png");
-    }
-
-    arg.appID = "com.squirrel.playyourdamnturn.PlayYourDamnTurnClient";
-
-    arg.wait = true;
-    notifier.notify(arg);
+    electron.ipcRenderer.send(rpcChannels.SHOW_NOTIFICATION, arg);
   },
   initRollbar: () => {
     new Rollbar({

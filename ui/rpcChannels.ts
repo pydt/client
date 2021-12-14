@@ -9,6 +9,7 @@ export default {
   SHOW_ABOUT_MODAL: "show-about-modal",
   SHOW_SETTINGS_MODAL: "show-settings-modal",
   SHOW_UPDATE_MODAL: "show-update-modal",
+  SHOW_NOTIFICATION: "show-notification",
   SHOW_WINDOW: "show-window",
   START_IOT: "start-iot",
   STORAGE_GET: "storage-get",

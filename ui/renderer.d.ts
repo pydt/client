@@ -3,7 +3,7 @@ export interface PydtApi {
   openUrl: (url: string) => void;
   setAutostart: (enable: boolean) => void;
   showOpenDialog: () => Promise<string>;
-  showToast: (params: { title: string; message: string }) => void;
+  showToast: (params: { title: string; body: string }) => void;
   startChokidar: (params: { path: string; awaitWriteFinish: boolean }) => Promise<string>;
   ipc: {
     send: (channel: string, data: unknown) => void;

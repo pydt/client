@@ -155,7 +155,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       if (yourTurns.length) {
         window.pydtApi.showToast({
           title: "Play Your Damn Turn!",
-          message: yourTurns.map(x => x.displayName).join(", "),
+          body: yourTurns.map(x => x.displayName).join(", "),
         });
         notificationShown = true;
       }
@@ -170,7 +170,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       if (smackTalk.length) {
         window.pydtApi.showToast({
           title: "New Smack Talk Message!",
-          message: smackTalk.join(", "),
+          body: smackTalk.join(", "),
         });
         notificationShown = true;
       }
