@@ -76,7 +76,7 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
         window.pydtApi.fs.mkdirp(this.archiveDir);
       }
 
-      this.saveFileToPlay = `${this.saveDir}(PYDT) Play This One!.${this.civGame.saveExtension}`;
+      this.saveFileToPlay = window.pydtApi.path.join(this.saveDir, `(PYDT) Play This One!.${this.civGame.saveExtension}`);
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error(err);
