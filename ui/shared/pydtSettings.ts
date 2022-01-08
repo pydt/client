@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { isEmpty } from "lodash";
 import { CivGame, PlatformSaveLocation, GameStore, MetadataCacheService, BasePath } from "pydt-shared";
-import rpcChannels from "../rpcChannels";
+import { RPC_INVOKE } from "../rpcChannels";
 
 export class PydtSettingsData {
   launchCiv = true;
@@ -34,7 +34,7 @@ export class PydtSettingsData {
   }
 
   async save(): Promise<void> {
-    await window.pydtApi.ipc.invoke(rpcChannels.STORAGE_SET, "settings", this);
+    await window.pydtApi.ipc.invoke(RPC_INVOKE.STORAGE_SET, "settings", this);
   }
 
   getDefaultDataPath(civGame: CivGame, gameStore?: GameStore): string {
@@ -83,7 +83,7 @@ export class PydtSettingsFactory {
 
   async getSettings(): Promise<PydtSettingsData> {
     const settings = await window.pydtApi.ipc.invoke<PydtSettingsData>(
-      rpcChannels.STORAGE_GET,
+      RPC_INVOKE.STORAGE_GET,
       "settings",
     );
 
@@ -93,7 +93,7 @@ export class PydtSettingsFactory {
 
     // Get all basepaths so we don't need async in PydtSettingsData
     for (const basePath of Object.values(BasePath)) {
-      basePaths[basePath] = await window.pydtApi.ipc.invoke(rpcChannels.GET_PATH, basePath);
+      basePaths[basePath] = await window.pydtApi.ipc.invoke(RPC_INVOKE.GET_PATH, basePath);
     }
 
     const result = new PydtSettingsData(metadata.civGames, basePaths);

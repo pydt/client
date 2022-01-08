@@ -1,12 +1,12 @@
 const { device } = require("aws-iot-device-sdk");
-const { default: rpcChannels } = require("./rpcChannels");
+const { RPC_TO_RENDERER, RPC_TO_MAIN } = require("./rpcChannels");
 
 module.exports = {
   configureIot: (electron, win) => {
     let currentDevice;
     let currentTopic;
 
-    electron.ipcMain.on(rpcChannels.START_IOT, (event, data) => {
+    electron.ipcMain.on(RPC_TO_MAIN.START_IOT, (event, data) => {
       if (data.topic !== currentTopic) {
         if (currentDevice) {
           currentDevice.unsubscribe(currentTopic);
@@ -22,16 +22,16 @@ module.exports = {
           });
 
           currentDevice.on("connect", () => {
-            win.send(rpcChannels.IOT_CONNECT);
+            win.send(RPC_TO_RENDERER.IOT_CONNECT);
             currentDevice.subscribe(data.topic);
           });
 
           currentDevice.on("error", err => {
-            win.send(rpcChannels.IOT_ERROR, err);
+            win.send(RPC_TO_RENDERER.IOT_ERROR, err);
           });
 
           currentDevice.on("message", (topic, message) => {
-            win.send(rpcChannels.IOT_MESSAGE, {
+            win.send(RPC_TO_RENDERER.IOT_MESSAGE, {
               topic,
               message,
             });

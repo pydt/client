@@ -1,12 +1,12 @@
 const electron = require("electron");
 const log = require("electron-log");
 const { autoUpdater } = require("electron-updater");
-const { default: rpcChannels } = require("./rpcChannels");
+const { RPC_TO_MAIN, RPC_TO_RENDERER } = require("./rpcChannels");
 
 // Check for updates every 30 minutes
 const UPDATE_INTERVAL = 30 * 60 * 1000;
 
-electron.ipcMain.on(rpcChannels.APPLY_UPDATE, () => autoUpdater.quitAndInstall());
+electron.ipcMain.on(RPC_TO_MAIN.APPLY_UPDATE, () => autoUpdater.quitAndInstall());
 
 module.exports = {
   checkForUpdates: window => {
@@ -26,7 +26,7 @@ module.exports = {
     autoUpdater.addListener(
       "update-downloaded",
       (event, releaseNotes, releaseName) => {
-        window.send(rpcChannels.SHOW_UPDATE_MODAL, releaseName);
+        window.send(RPC_TO_RENDERER.SHOW_UPDATE_MODAL, releaseName);
         return true;
       },
     );

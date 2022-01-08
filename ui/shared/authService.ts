@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Configuration, User, UserService } from "pydt-shared";
-import rpcChannels from "../rpcChannels";
+import { RPC_INVOKE } from "../rpcChannels";
 
 export class ConfigData {
   token: string;
@@ -42,7 +42,7 @@ export class AuthService {
     }
 
     await window.pydtApi.ipc.invoke(
-      rpcChannels.STORAGE_SET,
+      RPC_INVOKE.STORAGE_SET,
       "configData",
       config,
     );
@@ -57,6 +57,6 @@ export class AuthService {
   }
 
   private getConfig(): Promise<ConfigData> {
-    return window.pydtApi.ipc.invoke(rpcChannels.STORAGE_GET, "configData");
+    return window.pydtApi.ipc.invoke(RPC_INVOKE.STORAGE_GET, "configData");
   }
 }

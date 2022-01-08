@@ -9,7 +9,7 @@ import { TurnCacheService } from "../shared/turnCacheService";
 import { AuthService } from "../shared/authService";
 import { DiscourseInfo } from "../shared/discourseInfo";
 import { environment } from "../environments/environment";
-import rpcChannels from "../rpcChannels";
+import { RPC_TO_MAIN, RPC_TO_RENDERER } from "../rpcChannels";
 
 const POLL_INTERVAL: number = 600 * 1000;
 const TOAST_INTERVAL: number = 14.5 * 60 * 1000;
@@ -71,9 +71,9 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     this.destroyed = true;
 
-    window.pydtApi.ipc.removeAllListeners(rpcChannels.IOT_CONNECT);
-    window.pydtApi.ipc.removeAllListeners(rpcChannels.IOT_ERROR);
-    window.pydtApi.ipc.removeAllListeners(rpcChannels.IOT_MESSAGE);
+    window.pydtApi.ipc.removeAllListeners(RPC_TO_RENDERER.IOT_CONNECT);
+    window.pydtApi.ipc.removeAllListeners(RPC_TO_RENDERER.IOT_ERROR);
+    window.pydtApi.ipc.removeAllListeners(RPC_TO_RENDERER.IOT_MESSAGE);
   }
 
   refresh(): void {
@@ -147,13 +147,13 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     this.turnCacheService.updateGames(yourTurns);
 
-    window.pydtApi.ipc.send(rpcChannels.UPDATE_TURNS_AVAILABLE, !!yourTurns.length);
+    window.pydtApi.ipc.send(RPC_TO_MAIN.UPDATE_TURNS_AVAILABLE, !!yourTurns.length);
 
     let notificationShown = false;
 
     if ((!this.lastNotification || new Date().getTime() - this.lastNotification.getTime() > TOAST_INTERVAL)) {
       if (yourTurns.length) {
-        window.pydtApi.showToast({
+        window.pydtApi.ipc.send(RPC_TO_MAIN.SHOW_NOTIFICATION, {
           title: "Play Your Damn Turn!",
           body: yourTurns.map(x => x.displayName).join(", "),
         });
@@ -168,7 +168,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       }).map(x => x.displayName);
 
       if (smackTalk.length) {
-        window.pydtApi.showToast({
+        window.pydtApi.ipc.send(RPC_TO_MAIN.SHOW_NOTIFICATION, {
           title: "New Smack Talk Message!",
           body: smackTalk.join(", "),
         });
@@ -193,23 +193,23 @@ export class HomeComponent implements OnInit, OnDestroy {
     const env = environment.production ? "prod" : "dev";
     const topic = `/pydt/${env}/user/${this.user.steamId}/gameupdate`;
 
-    window.pydtApi.ipc.receive(rpcChannels.IOT_CONNECT, () => {
+    window.pydtApi.ipc.receive(RPC_TO_RENDERER.IOT_CONNECT, () => {
       // eslint-disable-next-line no-console
       console.log("connected to IoT!");
     });
 
-    window.pydtApi.ipc.receive(rpcChannels.IOT_ERROR, data => {
+    window.pydtApi.ipc.receive(RPC_TO_RENDERER.IOT_ERROR, data => {
       // eslint-disable-next-line no-console
       console.error("IoT error...", data);
     });
 
-    window.pydtApi.ipc.receive<{topic: string}>(rpcChannels.IOT_MESSAGE, data => {
+    window.pydtApi.ipc.receive<{topic: string}>(RPC_TO_RENDERER.IOT_MESSAGE, data => {
       // eslint-disable-next-line no-console
       console.log("received message from topic ", data.topic);
       void this.safeLoadGames();
     });
 
-    window.pydtApi.ipc.send(rpcChannels.START_IOT, {
+    window.pydtApi.ipc.send(RPC_TO_MAIN.START_IOT, {
       topic,
       accessKey: environment.iotClientAccessKey,
       secretKey: environment.iotClientSecretKey,

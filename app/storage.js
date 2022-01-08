@@ -1,8 +1,8 @@
 const electron = require("electron");
 const storage = require("electron-json-storage");
-const { default: rpcChannels } = require("./rpcChannels");
+const { RPC_INVOKE } = require("./rpcChannels");
 
-electron.ipcMain.handle(rpcChannels.STORAGE_GET, (e, key) =>
+electron.ipcMain.handle(RPC_INVOKE.STORAGE_GET, (e, key) =>
   new Promise((resolve, reject) =>
     storage.get(key, (err, data) => {
       if (err) {
@@ -12,7 +12,7 @@ electron.ipcMain.handle(rpcChannels.STORAGE_GET, (e, key) =>
       resolve(data);
     })));
 
-electron.ipcMain.handle(rpcChannels.STORAGE_SET, (e, key, data) =>
+electron.ipcMain.handle(RPC_INVOKE.STORAGE_SET, (e, key, data) =>
   new Promise((resolve, reject) =>
     storage.set(key, data, err => {
       if (err) {

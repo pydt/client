@@ -2,7 +2,7 @@ import { Component, NgZone, OnInit, ViewChild, TemplateRef } from "@angular/core
 import { BsModalRef, BsModalService, ModalOptions } from "ngx-bootstrap/modal";
 import { CivGame, GameStore, MetadataCacheService } from "pydt-shared";
 import { PydtSettingsData, PydtSettingsFactory } from "./shared/pydtSettings";
-import rpcChannels from "./rpcChannels";
+import { RPC_INVOKE, RPC_TO_MAIN, RPC_TO_RENDERER } from "./rpcChannels";
 import { setTheme } from "ngx-bootstrap/utils";
 
 @Component({
@@ -34,7 +34,7 @@ export class AppComponent implements OnInit {
       class: "modal-lg",
     };
 
-    window.pydtApi.ipc.receive<string>(rpcChannels.SHOW_ABOUT_MODAL, data => {
+    window.pydtApi.ipc.receive<string>(RPC_TO_RENDERER.SHOW_ABOUT_MODAL, data => {
       this.zone.run(() => {
         this.hideOpenModal();
         this.version = data;
@@ -42,7 +42,7 @@ export class AppComponent implements OnInit {
       });
     });
 
-    window.pydtApi.ipc.receive(rpcChannels.SHOW_SETTINGS_MODAL, () => {
+    window.pydtApi.ipc.receive(RPC_TO_RENDERER.SHOW_SETTINGS_MODAL, () => {
       void this.pydtSettingsFactory.getSettings().then(settings => {
         void this.zone.run(async () => {
           this.civGames = (await this.metadataCache.getCivGameMetadata()).civGames;
@@ -53,7 +53,7 @@ export class AppComponent implements OnInit {
       });
     });
 
-    window.pydtApi.ipc.receive<string>(rpcChannels.SHOW_UPDATE_MODAL, data => {
+    window.pydtApi.ipc.receive<string>(RPC_TO_RENDERER.SHOW_UPDATE_MODAL, data => {
       this.zone.run(() => {
         this.hideOpenModal();
         this.newVersion = data;
@@ -84,7 +84,7 @@ export class AppComponent implements OnInit {
   }
 
   async openDirectoryDialog(civGame: CivGame): Promise<void> {
-    const filePath = await window.pydtApi.showOpenDialog();
+    const filePath = await window.pydtApi.ipc.invoke<string>(RPC_INVOKE.SHOW_OPEN_DIALOG);
 
     if (filePath) {
       this.settings.setSavePath(civGame, filePath);
@@ -97,7 +97,8 @@ export class AppComponent implements OnInit {
     this.hideOpenModal();
   }
 
-  applyUpdate(): void {
-    window.pydtApi.applyUpdate();
+  async applyUpdate(): Promise<void> {
+    await window.pydtApi.ipc.invoke(RPC_INVOKE.SET_FORCE_QUIT, true);
+    window.pydtApi.ipc.send(RPC_TO_MAIN.APPLY_UPDATE, null);
   }
 }

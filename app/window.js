@@ -3,15 +3,15 @@ const path = require("path");
 const storage = require("electron-json-storage");
 const open = require("open");
 const windowStateKeeper = require("electron-window-state");
-const { default: rpcChannels } = require("./rpcChannels");
+const { RPC_TO_MAIN, RPC_TO_RENDERER } = require("./rpcChannels");
 
 let win;
 let forceQuit = false;
 let appIcon;
 
-ipcMain.on(rpcChannels.SET_FORCE_QUIT, (event, data) => (forceQuit = data));
+ipcMain.on(RPC_TO_MAIN.SET_FORCE_QUIT, (event, data) => (forceQuit = data));
 
-ipcMain.on(rpcChannels.UPDATE_TURNS_AVAILABLE, (event, available) => {
+ipcMain.on(RPC_TO_MAIN.UPDATE_TURNS_AVAILABLE, (event, available) => {
   win.setOverlayIcon(
     available ? path.join(__dirname, "star.png") : null,
     available ? "Turns Available" : "",
@@ -100,12 +100,12 @@ module.exports = {
 
       const aboutClick = () => {
         win.show();
-        win.send(rpcChannels.SHOW_ABOUT_MODAL, app.getVersion());
+        win.send(RPC_TO_RENDERER.SHOW_ABOUT_MODAL, app.getVersion());
       };
 
       const settingsClick = () => {
         win.show();
-        win.send(rpcChannels.SHOW_SETTINGS_MODAL);
+        win.send(RPC_TO_RENDERER.SHOW_SETTINGS_MODAL);
       };
 
       const menuTemplate = [

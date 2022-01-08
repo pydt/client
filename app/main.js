@@ -8,7 +8,7 @@ const {
   forceShowWindow,
 } = require("./window");
 const appUpdater = require("./appUpdater");
-const { default: rpcChannels } = require("./rpcChannels");
+const { RPC_INVOKE, RPC_TO_MAIN } = require("./rpcChannels");
 
 require("./storage");
 require("./notifications");
@@ -32,14 +32,22 @@ require("./notifications");
     forceShowWindow();
   });
 
-  electron.ipcMain.handle(rpcChannels.GET_PATH, (e, name) => electron.app.getPath(name));
+  electron.ipcMain.handle(RPC_INVOKE.GET_PATH, (e, name) => electron.app.getPath(name));
 
-  electron.ipcMain.on(rpcChannels.LOG_INFO, (e, message) => log.info(message));
+  electron.ipcMain.on(RPC_TO_MAIN.LOG_INFO, (e, message) => log.info(message));
 
-  electron.ipcMain.on(rpcChannels.LOG_ERROR, (e, message) => log.error(message));
+  electron.ipcMain.on(RPC_TO_MAIN.LOG_ERROR, (e, message) => log.error(message));
 
-  electron.ipcMain.on(rpcChannels.SHOW_WINDOW, () => {
+  electron.ipcMain.on(RPC_TO_MAIN.SHOW_WINDOW, () => {
     forceShowWindow();
+  });
+
+  electron.ipcMain.handle(RPC_INVOKE.SHOW_OPEN_DIALOG, () => {
+    const result = electron.dialog.showOpenDialogSync({
+      properties: ["openDirectory"],
+    });
+
+    return result ? result[0] : null;
   });
 
   // Quit when all windows are closed.
@@ -73,7 +81,7 @@ require("./notifications");
     configureIot(electron, win);
   });
 
-  electron.ipcMain.on(rpcChannels.INIT_ROLLBAR, () => {
+  electron.ipcMain.on(RPC_TO_MAIN.INIT_ROLLBAR, () => {
     const Rollbar = require("rollbar");
 
     new Rollbar({

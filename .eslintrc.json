@@ -80,7 +80,9 @@
             "style": "camelCase",
             "type": "attribute"
           }
-        ]
+        ],
+        "no-shadow": "off",
+        "@typescript-eslint/no-shadow": ["error"]
       }
     },
     {
