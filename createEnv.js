@@ -3,8 +3,8 @@ var fs = require('fs');
 const environment = {
     production: process.env.npm_lifecycle_event === 'build-prod',
     apiUrl: 'https://api.playyourdamnturn.com',
-    iotClientAccessKey: process.env.IOT_CLIENT_ACCESS_KEY,
-    iotClientSecretKey: process.env.IOT_CLIENT_SECRET_KEY,
+    iotClientAccessKey: process.env.IOT_CLIENT_ACCESS_KEY || '',
+    iotClientSecretKey: process.env.IOT_CLIENT_SECRET_KEY || '',
 };
 
 if (!environment.production) {
