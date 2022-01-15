@@ -28,7 +28,19 @@ export class PydtSettingsData {
       }
 
       if (!this.gameStores[civGame.id]) {
+        // Try steam first...
         this.gameStores[civGame.id] = GameStore.Steam;
+
+        if (!civGame.dataPaths[GameStore.Steam]) {
+          for (const gs of Object.values(GameStore)) {
+            const dp = civGame.dataPaths[gs];
+
+            if (dp) {
+              this.gameStores[civGame.id] = gs;
+              break;
+            }
+          }
+        }
       }
     }
   }
@@ -41,14 +53,21 @@ export class PydtSettingsData {
     const location: PlatformSaveLocation =
       civGame.saveLocations[window.pydtApi.platform];
 
-    return window.pydtApi.path.normalize(this.basePaths[location.basePath] +
-        location.prefix +
-        civGame.dataPaths[gameStore || this.getGameStore(civGame)]);
+    return window.pydtApi.path.normalize(
+      window.pydtApi.path.join(
+        this.basePaths[location.basePath],
+        location.prefix,
+        civGame.dataPaths[gameStore || this.getGameStore(civGame)],
+      ),
+    );
   }
 
   getDefaultSavePath(civGame: CivGame): string {
     return window.pydtApi.path.normalize(
-      this.getDefaultDataPath(civGame) + civGame.savePath,
+      window.pydtApi.path.join(
+        this.getDefaultDataPath(civGame),
+        civGame.savePath,
+      ),
     );
   }
 
