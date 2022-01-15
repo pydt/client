@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { isEmpty } from "lodash";
 import { CivGame, PlatformSaveLocation, GameStore, MetadataCacheService, BasePath } from "pydt-shared";
 import { RPC_INVOKE } from "../rpcChannels";
+import { merge } from "lodash";
 
 export class PydtSettingsData {
   launchCiv = true;
@@ -118,7 +119,7 @@ export class PydtSettingsFactory {
     const result = new PydtSettingsData(metadata.civGames, basePaths);
 
     if (!isEmpty(settings)) {
-      Object.assign(result, settings);
+      merge(result, settings);
     }
 
     // Make sure numSaves is an int
