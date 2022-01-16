@@ -67,7 +67,7 @@
     "bootstrap-sass": "3.4.1",
     "core-js": "^3.20.3",
     "electron": "^16.0.7",
-    "electron-builder": "^22.14.5",
+    "electron-builder": "^22.13.1",
     "electron-builder-lib": "^20.23.1",
     "electron-notarize": "^1.1.1",
     "es6-shim": "^0.35.6",

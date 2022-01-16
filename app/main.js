@@ -9,14 +9,14 @@ const {
 } = require("./window");
 const appUpdater = require("./appUpdater");
 const { RPC_INVOKE, RPC_TO_MAIN } = require("./rpcChannels");
-const contextMenu = require('electron-context-menu');
+const contextMenu = require("electron-context-menu");
 
 require("./storage");
 require("./notifications");
 
 contextMenu({
-	showLookUpSelection: false,
-	showSearchWithGoogle: false
+  showLookUpSelection: false,
+  showSearchWithGoogle: false,
 });
 
 (() => {
