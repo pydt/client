@@ -7,13 +7,6 @@ const open = require("open");
 const AutoLaunch = require("auto-launch");
 const { RPC_INVOKE, RPC_TO_MAIN, RPC_TO_RENDERER } = require("./rpcChannels");
 
-// Make right-clicks show context menu (copy/paste/etc) on input fields
-const inputMenu = require("electron-input-menu");
-const context = require("electron-contextmenu-middleware");
-
-context.use(inputMenu);
-context.activate();
-
 let watcher;
 
 electron.contextBridge.exposeInMainWorld("pydtApi", {
