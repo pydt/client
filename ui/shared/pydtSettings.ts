@@ -1,8 +1,9 @@
 import { Injectable } from "@angular/core";
-import { isEmpty } from "lodash";
 import { CivGame, PlatformSaveLocation, GameStore, MetadataCacheService, BasePath } from "pydt-shared";
 import { RPC_INVOKE } from "../rpcChannels";
-import { merge } from "lodash";
+import { isEmpty, merge, omit } from "lodash";
+
+const FIELDS_NOT_TO_PERSIST = ["basePaths"];
 
 export class PydtSettingsData {
   launchCiv = true;
@@ -12,10 +13,17 @@ export class PydtSettingsData {
   savePaths: {[index: string]: string} = {};
   autoDownload = false;
 
-  constructor(civGames: CivGame[], private basePaths: { [index: string]: string}) {
+  constructor(civGames: CivGame[], prevData: PydtSettingsData, private basePaths: { [index: string]: string }) {
+    if (!isEmpty(prevData)) {
+      merge(this, omit(prevData, FIELDS_NOT_TO_PERSIST));
+
+      // Make sure numSaves is an int
+      this.numSaves = parseInt(this.numSaves.toString(), 10);
+    }
+
     for (const civGame of civGames) {
       for (const gameStoreKey of Object.keys(GameStore)) {
-        if (civGame.dataPaths[GameStore[gameStoreKey] as GameStore]) {
+        if (!this.gameStores[civGame.id] && civGame.dataPaths[GameStore[gameStoreKey] as GameStore]) {
           const dataPath = this.getDefaultDataPath(
             civGame,
             GameStore[gameStoreKey] as GameStore,
@@ -28,18 +36,15 @@ export class PydtSettingsData {
         }
       }
 
-      if (!this.gameStores[civGame.id]) {
-        // Try steam first...
-        this.gameStores[civGame.id] = GameStore.Steam;
+      // Ensure gamestore settings are valid
+      if (!civGame.dataPaths[this.gameStores[civGame.id]]) {
+        // If invalid, find first valid option
+        for (const gs of Object.values(GameStore)) {
+          const dp = civGame.dataPaths[gs];
 
-        if (!civGame.dataPaths[GameStore.Steam]) {
-          for (const gs of Object.values(GameStore)) {
-            const dp = civGame.dataPaths[gs];
-
-            if (dp) {
-              this.gameStores[civGame.id] = gs;
-              break;
-            }
+          if (dp) {
+            this.gameStores[civGame.id] = gs;
+            break;
           }
         }
       }
@@ -47,7 +52,7 @@ export class PydtSettingsData {
   }
 
   async save(): Promise<void> {
-    await window.pydtApi.ipc.invoke(RPC_INVOKE.STORAGE_SET, "settings", this);
+    await window.pydtApi.ipc.invoke(RPC_INVOKE.STORAGE_SET, "settings", omit(this, FIELDS_NOT_TO_PERSIST));
   }
 
   getDefaultDataPath(civGame: CivGame, gameStore?: GameStore): string {
@@ -99,7 +104,7 @@ export class PydtSettingsData {
 
 @Injectable()
 export class PydtSettingsFactory {
-  constructor(private readonly metadataCache: MetadataCacheService) {}
+  constructor(private readonly metadataCache: MetadataCacheService) { }
 
   async getSettings(): Promise<PydtSettingsData> {
     const settings = await window.pydtApi.ipc.invoke<PydtSettingsData>(
@@ -116,15 +121,6 @@ export class PydtSettingsFactory {
       basePaths[basePath] = await window.pydtApi.ipc.invoke(RPC_INVOKE.GET_PATH, basePath);
     }
 
-    const result = new PydtSettingsData(metadata.civGames, basePaths);
-
-    if (!isEmpty(settings)) {
-      merge(result, settings);
-    }
-
-    // Make sure numSaves is an int
-    result.numSaves = parseInt(result.numSaves.toString(), 10);
-
-    return result;
+    return new PydtSettingsData(metadata.civGames, settings, basePaths);
   }
 }
