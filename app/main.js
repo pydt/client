@@ -92,10 +92,11 @@ contextMenu({
 
     new Rollbar({
       accessToken: "e381e1de46414e03a95005afd73d0c48",
+      environment: "production",
       captureUncaught: true,
       captureUnhandledRejections: true,
       payload: {
-        environment: "prod",
+        platform: "client",
       },
     });
   });

@@ -25,8 +25,6 @@ export const rollbarFactory = (): Rollbar =>
     accessToken: "e381e1de46414e03a95005afd73d0c48",
     captureUncaught: true,
     captureUnhandledRejections: true,
+    environment: "production",
     enabled: !!environment.production,
-    payload: {
-      environment: "prod",
-    },
   });
