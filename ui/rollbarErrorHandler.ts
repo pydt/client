@@ -27,4 +27,7 @@ export const rollbarFactory = (): Rollbar =>
     captureUnhandledRejections: true,
     environment: "production",
     enabled: !!environment.production,
+    ignoredMessages: [
+      "Http failure response for https://api.playyourdamnturn.com/metadata",
+    ],
   });
