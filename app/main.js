@@ -1,5 +1,9 @@
 const electron = require("electron");
 const log = require("electron-log");
+const fs = require("fs");
+const path = require("path");
+const open = require("open");
+const del = require("del");
 const { configureIot } = require("./iot");
 const {
   getAppIcon,
@@ -21,6 +25,29 @@ contextMenu({
 
 (() => {
   const { app } = electron;
+
+  if (process.platform === "win32") {
+    // Check for and remove old squirrel installation, maybe we can remove this code someday
+    // https://github.com/electron-userland/electron-builder/issues/837
+    if (fs.existsSync(path.join(app.getPath("appData"), "../Local/playyourdamnturn/.shouldUninstall"))) {
+      // eslint-disable-next-line no-console
+      console.log("Removing old squirrel installation...");
+
+      open.openApp(path.join(app.getPath("appData"), "../Local/playyourdamnturn/Update.exe"), { arguments: ["--uninstall", "-s"] }).then(process => {
+        process.on("close", () => {
+          // eslint-disable-next-line no-console
+          console.log("Uninstall complete...");
+
+          setTimeout(() => {
+            del(path.join(app.getPath("appData"), "../Local/playyourdamnturn"), { force: true }).then(() => {
+              // eslint-disable-next-line no-console
+              console.log("Old folder deleted!");
+            });
+          }, 2500);
+        });
+      });
+    }
+  }
 
   // This was probably a bad choice for the ID but I think I'm stuck with it now,
   // needed for notifications to work right on Windows.
