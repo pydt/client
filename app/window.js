@@ -3,13 +3,13 @@ const path = require("path");
 const storage = require("electron-json-storage");
 const open = require("open");
 const windowStateKeeper = require("electron-window-state");
-const { RPC_TO_MAIN, RPC_TO_RENDERER } = require("./rpcChannels");
+const { RPC_TO_MAIN, RPC_TO_RENDERER, RPC_INVOKE } = require("./rpcChannels");
 
 let win;
 let forceQuit = false;
 let appIcon;
 
-ipcMain.on(RPC_TO_MAIN.SET_FORCE_QUIT, (event, data) => (forceQuit = data));
+ipcMain.handle(RPC_INVOKE.SET_FORCE_QUIT, (event, data) => (forceQuit = data));
 
 ipcMain.on(RPC_TO_MAIN.UPDATE_TURNS_AVAILABLE, (event, available) => {
   win.setOverlayIcon(

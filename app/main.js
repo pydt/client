@@ -125,6 +125,9 @@ contextMenu({
       payload: {
         platform: "client",
       },
+      ignoredMessages: [
+        "net::ERR_NETWORK",
+      ],
     });
   });
 })();
