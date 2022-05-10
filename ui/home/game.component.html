@@ -1,4 +1,4 @@
-<div class="panel" [ngClass]="{'panel-default': !yourTurn, 'panel-primary': yourTurn}">
+<div class="panel" *ngIf="!!games" [ngClass]="{'panel-default': !yourTurn, 'panel-primary': yourTurn}">
   <div class="panel-heading" style="height:32px;overflow:hidden;">
     <img src="https://playyourdamnturn.com/img/game_{{civGame?.id}}.png" style="height:15px;padding-right:8px;position:relative;top:-2px;" />
     <a href="javascript:void(0)" (click)="openGameOnWeb()">{{game.displayName}}</a>

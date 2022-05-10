@@ -1,9 +1,10 @@
 import { Component, NgZone, OnInit, ViewChild, TemplateRef } from "@angular/core";
 import { BsModalRef, BsModalService, ModalOptions } from "ngx-bootstrap/modal";
-import { CivGame, GameStore, MetadataCacheService } from "pydt-shared";
+import { CivGame, GameStore } from "pydt-shared";
 import { PydtSettingsData, PydtSettingsFactory } from "./shared/pydtSettings";
 import { RPC_INVOKE, RPC_TO_MAIN, RPC_TO_RENDERER } from "./rpcChannels";
 import { setTheme } from "ngx-bootstrap/utils";
+import { SafeMetadataLoader } from "./shared/safeMetadataLoader";
 
 @Component({
   selector: "pydt-app",
@@ -22,7 +23,7 @@ export class AppComponent implements OnInit {
 
   constructor(
     private zone: NgZone,
-    public metadataCache: MetadataCacheService,
+    private metadataLoader: SafeMetadataLoader,
     private modalService: BsModalService,
     private pydtSettingsFactory: PydtSettingsFactory,
   ) {
@@ -45,10 +46,14 @@ export class AppComponent implements OnInit {
     window.pydtApi.ipc.receive(RPC_TO_RENDERER.SHOW_SETTINGS_MODAL, () => {
       void this.pydtSettingsFactory.getSettings().then(settings => {
         void this.zone.run(async () => {
-          this.civGames = (await this.metadataCache.getCivGameMetadata()).civGames;
-          this.hideOpenModal();
-          this.settings = settings;
-          this.openModal = this.modalService.show(this.settingsModal, modalOptions);
+          const metadata = await this.metadataLoader.loadMetadata();
+
+          if (metadata) {
+            this.civGames = metadata.civGames;
+            this.hideOpenModal();
+            this.settings = settings;
+            this.openModal = this.modalService.show(this.settingsModal, modalOptions);
+          }
         });
       });
     });

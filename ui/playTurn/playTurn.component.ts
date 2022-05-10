@@ -2,10 +2,11 @@ import { HttpErrorResponse } from "@angular/common/http";
 import { Component, HostListener, Input, NgZone, OnDestroy, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import * as pako from "pako";
-import { Game, GameService, SteamProfileMap, MetadataCacheService, CivGame } from "pydt-shared";
+import { Game, GameService, SteamProfileMap, CivGame } from "pydt-shared";
 import { PydtSettingsFactory, PydtSettingsData } from "../shared/pydtSettings";
 import { PlayTurnState } from "./playTurnState.service";
 import { TurnCacheService, TurnDownloader } from "../shared/turnCacheService";
+import { SafeMetadataLoader } from "../shared/safeMetadataLoader";
 
 
 @Component({
@@ -33,7 +34,7 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
 
   constructor(
     public readonly playTurnState: PlayTurnState,
-    private readonly metadataCache: MetadataCacheService,
+    private readonly metadataLoader: SafeMetadataLoader,
     private readonly turnCacheService: TurnCacheService,
     private readonly gameService: GameService,
     private readonly pydtSettingsFactory: PydtSettingsFactory,
@@ -61,7 +62,14 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
   async ngOnInit(): Promise<void> {
     this.abort = false;
     this.settings = await this.pydtSettingsFactory.getSettings();
-    this.games = (await this.metadataCache.getCivGameMetadata()).civGames;
+
+    const metadata = await this.metadataLoader.loadMetadata();
+
+    if (!metadata) {
+      return;
+    }
+
+    this.games = metadata.civGames;
 
     try {
       this.saveDir = this.settings.getSavePath(this.civGame);

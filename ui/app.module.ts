@@ -22,6 +22,7 @@ import { AuthService } from "./shared/authService";
 import { TurnCacheService } from "./shared/turnCacheService";
 import { PydtSettingsFactory } from "./shared/pydtSettings";
 import { environment } from "./environments/environment";
+import { SafeMetadataLoader } from "./shared/safeMetadataLoader";
 
 export const configFactory = (): Configuration => new Configuration({
   apiKeys: {},
@@ -62,6 +63,7 @@ export const configFactory = (): Configuration => new Configuration({
     ProfileCacheService,
     TurnCacheService,
     PydtSettingsFactory,
+    SafeMetadataLoader,
     { provide: ErrorHandler, useClass: RollbarErrorHandler },
     { provide: RollbarService, useFactory: rollbarFactory },
     AuthService,

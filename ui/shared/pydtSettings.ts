@@ -1,7 +1,8 @@
 import { Injectable } from "@angular/core";
-import { CivGame, PlatformSaveLocation, GameStore, MetadataCacheService, BasePath } from "pydt-shared";
+import { CivGame, PlatformSaveLocation, GameStore, BasePath } from "pydt-shared";
 import { RPC_INVOKE } from "../rpcChannels";
 import { isEmpty, merge, omit } from "lodash";
+import { SafeMetadataLoader } from "./safeMetadataLoader";
 
 const FIELDS_NOT_TO_PERSIST = ["basePaths"];
 
@@ -104,7 +105,7 @@ export class PydtSettingsData {
 
 @Injectable()
 export class PydtSettingsFactory {
-  constructor(private readonly metadataCache: MetadataCacheService) { }
+  constructor(private readonly metadataLoader: SafeMetadataLoader) { }
 
   async getSettings(): Promise<PydtSettingsData> {
     const settings = await window.pydtApi.ipc.invoke<PydtSettingsData>(
@@ -112,7 +113,7 @@ export class PydtSettingsFactory {
       "settings",
     );
 
-    const metadata = await this.metadataCache.getCivGameMetadata();
+    const metadata = await this.metadataLoader.loadMetadata();
 
     const basePaths = {};
 
@@ -121,6 +122,6 @@ export class PydtSettingsFactory {
       basePaths[basePath] = await window.pydtApi.ipc.invoke(RPC_INVOKE.GET_PATH, basePath);
     }
 
-    return new PydtSettingsData(metadata.civGames, settings, basePaths);
+    return new PydtSettingsData(metadata?.civGames || [], settings, basePaths);
   }
 }
