@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Component, OnDestroy, OnInit } from "@angular/core";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { difference, orderBy } from "lodash";
 import { Game, ProfileCacheService, SteamProfileMap, User, UserService } from "pydt-shared";
 import { Observable, Subscription, timer } from "rxjs";
@@ -41,6 +41,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     private readonly userService: UserService,
     private readonly http: HttpClient,
     private readonly router: Router,
+    private readonly route: ActivatedRoute,
     private readonly profileCache: ProfileCacheService,
     private readonly turnCacheService: TurnCacheService,
     private readonly authService: AuthService,
@@ -51,6 +52,12 @@ export class HomeComponent implements OnInit, OnDestroy {
       await this.router.navigate(["/auth"]);
       return;
     }
+
+    this.route.queryParamMap.subscribe(x => {
+      if (x.has("errorLoading")) {
+        this.errorLoading = true;
+      }
+    });
 
     // Force a refresh of the user data
     this.user = await this.authService.getUser(true);

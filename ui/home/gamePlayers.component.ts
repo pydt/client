@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from "@angular/core";
-import { CivDef, Game, GamePlayer, SteamProfileMap, MetadataCacheService, CivGame } from "pydt-shared";
+import { CivDef, Game, GamePlayer, SteamProfileMap, CivGame } from "pydt-shared";
+import { SafeMetadataLoader } from "../shared/safeMetadataLoader";
 
 
 @Component({
@@ -15,19 +16,23 @@ export class GamePlayersComponent implements OnInit {
     civDefs: CivDef[] = [];
     games: CivGame[];
 
-    constructor(private metadataCache: MetadataCacheService) {
+    constructor(private metadataLoader: SafeMetadataLoader) {
     }
 
     async ngOnInit(): Promise<void> {
-      this.games = (await this.metadataCache.getCivGameMetadata()).civGames;
+      const metadata = await this.metadataLoader.loadMetadata();
 
-      for (let i = 0; i < this.game.slots; i++) {
-        if (this.game.players.length > i) {
-          this.gamePlayers.push(this.game.players[i]);
-          this.civDefs.push(this.civGame.leaders.find(leader => leader.leaderKey === this.game.players[i].civType));
-        } else {
-          this.gamePlayers.push(null);
-          this.civDefs.push(null);
+      if (metadata) {
+        this.games = metadata.civGames;
+
+        for (let i = 0; i < this.game.slots; i++) {
+          if (this.game.players.length > i) {
+            this.gamePlayers.push(this.game.players[i]);
+            this.civDefs.push(this.civGame.leaders.find(leader => leader.leaderKey === this.game.players[i].civType));
+          } else {
+            this.gamePlayers.push(null);
+            this.civDefs.push(null);
+          }
         }
       }
     }

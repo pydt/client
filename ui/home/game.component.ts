@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from "@angular/core";
 import { Router } from "@angular/router";
-import { Game, SteamProfileMap, User, CivGame, MetadataCacheService, countdown } from "pydt-shared";
+import { Game, SteamProfileMap, User, CivGame, countdown } from "pydt-shared";
+import { SafeMetadataLoader } from "../shared/safeMetadataLoader";
 import { PlayTurnState } from "../playTurn/playTurnState.service";
 import { DiscourseInfo } from "../shared/discourseInfo";
 
@@ -21,7 +22,7 @@ export class GameComponent implements OnInit, OnDestroy {
   updateDateHandle: NodeJS.Timer;
   games: CivGame[] = [];
 
-  constructor(private router: Router, private playTurnState: PlayTurnState, private metadataCache: MetadataCacheService) { }
+  constructor(private router: Router, private playTurnState: PlayTurnState, private metadataLoader: SafeMetadataLoader) { }
 
   async ngOnInit(): Promise<void> {
     // Save current date to prevent "changed after it was checked" bugs
@@ -30,7 +31,11 @@ export class GameComponent implements OnInit, OnDestroy {
       this.now = new Date();
     }, 30 * 1000);
 
-    this.games = (await this.metadataCache.getCivGameMetadata()).civGames;
+    const metadata = await this.metadataLoader.loadMetadata();
+
+    if (metadata) {
+      this.games = metadata.civGames;
+    }
   }
 
   ngOnDestroy(): void {
