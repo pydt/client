@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { CivGame, PlatformSaveLocation, GameStore, BasePath } from "pydt-shared";
+import { CivGame, PlatformSaveLocation, GameStore, BasePath, Platform } from "pydt-shared";
 import { RPC_INVOKE } from "../rpcChannels";
 import { isEmpty, merge, omit } from "lodash";
 import { SafeMetadataLoader } from "./safeMetadataLoader";
@@ -60,13 +60,34 @@ export class PydtSettingsData {
     const location: PlatformSaveLocation =
       civGame.saveLocations[window.pydtApi.platform];
 
-    return window.pydtApi.path.normalize(
+    let result = window.pydtApi.path.normalize(
       window.pydtApi.path.join(
         this.basePaths[location.basePath],
         location.prefix,
         civGame.dataPaths[gameStore || this.getGameStore(civGame)],
       ),
     );
+
+    if (window.pydtApi.platform === Platform.Linux) {
+      // User could be running proton on linux, if path doesn't exist try proton path
+      const protonLocation: PlatformSaveLocation = civGame.saveLocations[Platform.LinuxProton];
+
+      if (protonLocation && !window.pydtApi.fs.existsSync(result)) {
+        const protonPath = window.pydtApi.path.normalize(
+          window.pydtApi.path.join(
+            this.basePaths[protonLocation.basePath],
+            protonLocation.prefix,
+            civGame.dataPaths[gameStore || this.getGameStore(civGame)],
+          ),
+        );
+
+        if (window.pydtApi.fs.existsSync(protonPath)) {
+          result = protonPath;
+        }
+      }
+    }
+
+    return result;
   }
 
   getDefaultSavePath(civGame: CivGame): string {
