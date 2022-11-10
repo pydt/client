@@ -66,7 +66,7 @@
     "@typescript-eslint/parser": "^5.23.0",
     "bootstrap-sass": "^3.4.3",
     "core-js": "^3.22.5",
-    "electron": "^18.2.2",
+    "electron": "^18.3.7",
     "electron-builder": "^23.0.3",
     "electron-builder-lib": "^20.23.1",
     "electron-notarize": "^1.2.1",
