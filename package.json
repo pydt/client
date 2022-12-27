@@ -81,6 +81,7 @@
     "eslint-plugin-node": "^11.1.0",
     "font-awesome": "4",
     "lodash": "^4.17.21",
+    "marked": "^4.2.5",
     "ngx-bootstrap": "^9.0.0",
     "ngx-markdown": "^15.0.0",
     "pako": "^2.1.0",

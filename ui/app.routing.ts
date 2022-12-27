@@ -10,4 +10,4 @@ const routes: Routes = [
   { path: "playTurn", component: PlayTurnComponent },
 ];
 
-export const routing = RouterModule.forRoot(routes, { useHash: true, relativeLinkResolution: "legacy" });
+export const routing = RouterModule.forRoot(routes, { useHash: true });

@@ -42,6 +42,7 @@ module.exports = {
         height: mainWindowState.height,
         webPreferences: {
           preload: path.join(__dirname, "preload.js"),
+          sandbox: false,
         },
       });
 
