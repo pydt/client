@@ -258,11 +258,13 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
       window.pydtApi.fs.unlinkSync(files.shift());
     }
 
-    await this.router.navigate(["/"]);
+    this.goHome();
   }
 
-  async goHome(): Promise<void> {
-    await this.router.navigate(["/"]);
+  goHome(): void {
+    this.ngZone.run(() => {
+      this.router.navigate(["/"]);
+    });
   }
 
   openGameOnWeb(): void {
