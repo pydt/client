@@ -4,6 +4,7 @@ const storage = require("electron-json-storage");
 const open = require("open");
 const windowStateKeeper = require("electron-window-state");
 const { RPC_TO_MAIN, RPC_TO_RENDERER, RPC_INVOKE } = require("./rpcChannels");
+const { getConfig } = require("./storage");
 
 let win;
 let forceQuit = false;
@@ -24,6 +25,138 @@ ipcMain.on(RPC_TO_MAIN.UPDATE_TURNS_AVAILABLE, (event, available) => {
         : path.join(__dirname, "icon.png"),
     );
   }
+});
+
+const updateMenu = () => {
+  const config = getConfig("configData");
+
+  if (process.platform !== "darwin") {
+    const iconPath = path.join(__dirname, "icon.png");
+
+    appIcon = new Tray(iconPath);
+
+    const contextMenu = Menu.buildFromTemplate([
+      {
+        label: "Show Client",
+        click: () => {
+          win.show();
+        },
+      },
+      {
+        label: "Exit",
+        click: () => {
+          forceQuit = true;
+          app.quit();
+        },
+      },
+    ]);
+
+    appIcon.setToolTip("Play Your Damn Turn Client");
+    appIcon.setContextMenu(contextMenu);
+    appIcon.on("double-click", () => {
+      win.show();
+    });
+  }
+
+  const aboutClick = () => {
+    win.show();
+    win.send(RPC_TO_RENDERER.SHOW_ABOUT_MODAL, app.getVersion());
+  };
+
+  const settingsClick = () => {
+    win.show();
+    win.send(RPC_TO_RENDERER.SHOW_SETTINGS_MODAL);
+  };
+
+  const menuTemplate = [
+    {
+      label: "Options",
+      submenu: [
+        {
+          label: "About",
+          click: aboutClick,
+        },
+        {
+          label: "Settings",
+          click: settingsClick,
+        },
+        {
+          label: "Quit",
+          click: () => {
+            forceQuit = true;
+            app.quit();
+          },
+        },
+      ],
+    },
+    {
+      label: "Debug",
+      submenu: [
+        {
+          label: "Toggle Developer Tools",
+          accelerator:
+            process.platform === "darwin"
+              ? "Alt+Command+I"
+              : "Ctrl+Shift+I",
+          click: (item, focusedWindow) => {
+            if (focusedWindow) {
+              focusedWindow.webContents.toggleDevTools();
+            }
+          },
+        },
+        {
+          label: "Clear Storage",
+          click: () => {
+            storage.clear(() => {
+              win.reload();
+            });
+          },
+        },
+      ],
+    },
+    ...(config.allTokens && config.allTokens.length ? [{
+      label: "User",
+      submenu: [...config.allTokens.map(x => ({
+        label: x.name,
+        type: "radio",
+        checked: x.token === config.token,
+        click: () => win.send(RPC_TO_RENDERER.SET_USER, x.token),
+      })), {
+        label: "Add New User",
+        click: () => win.send(RPC_TO_RENDERER.NEW_USER),
+      }],
+    }] : []),
+    {
+      label: "Donate!",
+      click: () => {
+        open("https://patreon.com/pydt");
+      },
+    },
+  ];
+
+  if (process.platform === "darwin") {
+    menuTemplate.unshift(
+      {
+        label: app.getName(),
+        submenu: [
+          { label: "About", click: aboutClick },
+          { label: "Settings", click: settingsClick },
+          { type: "separator" },
+          { role: "quit" },
+        ],
+      },
+      {
+        label: "Edit",
+        submenu: [{ role: "cut" }, { role: "copy" }, { role: "paste" }],
+      },
+    );
+  }
+
+  Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate));
+};
+
+ipcMain.on(RPC_TO_MAIN.UPDATE_USERS, () => {
+  updateMenu();
 });
 
 module.exports = {
@@ -71,117 +204,7 @@ module.exports = {
         win = null;
       });
 
-      if (process.platform !== "darwin") {
-        const iconPath = path.join(__dirname, "icon.png");
-
-        appIcon = new Tray(iconPath);
-
-        const contextMenu = Menu.buildFromTemplate([
-          {
-            label: "Show Client",
-            click: () => {
-              win.show();
-            },
-          },
-          {
-            label: "Exit",
-            click: () => {
-              forceQuit = true;
-              app.quit();
-            },
-          },
-        ]);
-
-        appIcon.setToolTip("Play Your Damn Turn Client");
-        appIcon.setContextMenu(contextMenu);
-        appIcon.on("double-click", () => {
-          win.show();
-        });
-      }
-
-      const aboutClick = () => {
-        win.show();
-        win.send(RPC_TO_RENDERER.SHOW_ABOUT_MODAL, app.getVersion());
-      };
-
-      const settingsClick = () => {
-        win.show();
-        win.send(RPC_TO_RENDERER.SHOW_SETTINGS_MODAL);
-      };
-
-      const menuTemplate = [
-        {
-          label: "Options",
-          submenu: [
-            {
-              label: "About",
-              click: aboutClick,
-            },
-            {
-              label: "Settings",
-              click: settingsClick,
-            },
-            {
-              label: "Quit",
-              click: () => {
-                forceQuit = true;
-                app.quit();
-              },
-            },
-          ],
-        },
-        {
-          label: "Debug",
-          submenu: [
-            {
-              label: "Toggle Developer Tools",
-              accelerator:
-                process.platform === "darwin"
-                  ? "Alt+Command+I"
-                  : "Ctrl+Shift+I",
-              click: (item, focusedWindow) => {
-                if (focusedWindow) {
-                  focusedWindow.webContents.toggleDevTools();
-                }
-              },
-            },
-            {
-              label: "Clear Storage",
-              click: () => {
-                storage.clear(() => {
-                  win.reload();
-                });
-              },
-            },
-          ],
-        },
-        {
-          label: "Donate!",
-          click: () => {
-            open("https://patreon.com/pydt");
-          },
-        },
-      ];
-
-      if (process.platform === "darwin") {
-        menuTemplate.unshift(
-          {
-            label: app.getName(),
-            submenu: [
-              { label: "About", click: aboutClick },
-              { label: "Settings", click: settingsClick },
-              { type: "separator" },
-              { role: "quit" },
-            ],
-          },
-          {
-            label: "Edit",
-            submenu: [{ role: "cut" }, { role: "copy" }, { role: "paste" }],
-          },
-        );
-      }
-
-      Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate));
+      updateMenu();
     }
 
     return win;

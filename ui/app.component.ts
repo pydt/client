@@ -5,6 +5,8 @@ import { PydtSettingsData, PydtSettingsFactory } from "./shared/pydtSettings";
 import { RPC_INVOKE, RPC_TO_MAIN, RPC_TO_RENDERER } from "./rpcChannels";
 import { setTheme } from "ngx-bootstrap/utils";
 import { SafeMetadataLoader } from "./shared/safeMetadataLoader";
+import { AuthService } from "./shared/authService";
+import { Router } from "@angular/router";
 
 @Component({
   selector: "pydt-app",
@@ -26,6 +28,8 @@ export class AppComponent implements OnInit {
     private metadataLoader: SafeMetadataLoader,
     private modalService: BsModalService,
     private pydtSettingsFactory: PydtSettingsFactory,
+    private authService: AuthService,
+    private router: Router,
   ) {
     setTheme("bs3");
   }
@@ -63,6 +67,20 @@ export class AppComponent implements OnInit {
         this.hideOpenModal();
         this.newVersion = data;
         this.openModal = this.modalService.show(this.updateModal, modalOptions);
+      });
+    });
+
+    window.pydtApi.ipc.receive<string>(RPC_TO_RENDERER.SET_USER, token => {
+      this.zone.run(() => {
+        this.hideOpenModal();
+        void this.authService.storeToken(token).then(() => this.router.navigate(["/"]));
+      });
+    });
+
+    window.pydtApi.ipc.receive<string>(RPC_TO_RENDERER.NEW_USER, () => {
+      this.zone.run(() => {
+        this.hideOpenModal();
+        void this.router.navigate(["/auth"]);
       });
     });
   }

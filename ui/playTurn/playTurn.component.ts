@@ -263,7 +263,7 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
 
   goHome(): void {
     this.ngZone.run(() => {
-      this.router.navigate(["/"]);
+      void this.router.navigate(["/"]);
     });
   }
 

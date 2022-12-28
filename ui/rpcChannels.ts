@@ -7,6 +7,7 @@ export enum RPC_TO_MAIN {
   UPDATE_TURNS_AVAILABLE = "update-turns-available",
   LOG_INFO = "log-info",
   LOG_ERROR = "log-error",
+  UPDATE_USERS = "update-users",
 }
 
 export enum RPC_TO_RENDERER {
@@ -16,6 +17,8 @@ export enum RPC_TO_RENDERER {
   SHOW_ABOUT_MODAL = "show-about-modal",
   SHOW_SETTINGS_MODAL = "show-settings-modal",
   SHOW_UPDATE_MODAL = "show-update-modal",
+  SET_USER = "set-user",
+  NEW_USER = "new-user"
 }
 
 export enum RPC_INVOKE {

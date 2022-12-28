@@ -10,4 +10,4 @@ const routes: Routes = [
   { path: "playTurn", component: PlayTurnComponent },
 ];
 
-export const routing = RouterModule.forRoot(routes, { useHash: true });
+export const routing = RouterModule.forRoot(routes, { useHash: true, onSameUrlNavigation: "reload" });

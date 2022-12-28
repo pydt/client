@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Component, OnDestroy, OnInit } from "@angular/core";
-import { ActivatedRoute, Router } from "@angular/router";
+import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
 import { difference, orderBy } from "lodash";
 import { Game, ProfileCacheService, SteamProfileMap, User, UserService } from "pydt-shared";
 import { Observable, Subscription, timer } from "rxjs";
@@ -36,6 +36,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private pollUrl: string;
   private iotConnected = false;
   private sortedTurns: GameWithYourTurn[];
+  private navigationSubscription: Subscription;
 
   constructor(
     private readonly userService: UserService,
@@ -67,6 +68,18 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.timerSub = $timer.subscribe(() => {
       void this.safeLoadGames();
     });
+
+    this.navigationSubscription = this.router.events.subscribe((e: unknown) => {
+      // If reloading page reload user and games (could be changing user)
+      if (e instanceof NavigationEnd) {
+        void this.authService.getUser(true).then(user => {
+          this.user = user;
+          this.iotConnected = false;
+          this.pollUrl = "";
+          void this.safeLoadGames();
+        });
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -74,6 +87,11 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (this.timerSub) {
       this.timerSub.unsubscribe();
       this.timerSub = null;
+    }
+
+    if (this.navigationSubscription) {
+      this.navigationSubscription.unsubscribe();
+      this.navigationSubscription = null;
     }
 
     this.destroyed = true;
