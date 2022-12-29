@@ -19,11 +19,13 @@
         "node": true,
         "es6": true
       },
-      "extends": ["eslint"],
+      "extends": [
+        "eslint",
+        "plugin:prettier/recommended"
+      ],
       "rules": {
         "comma-dangle": ["error", "always-multiline"],
         "func-style": ["error", "expression"],
-        "indent": ["error", 2, {"SwitchCase": 1}],
         "lines-around-comment": ["off"],
         "semi": ["error", "always"],
         "no-new": ["off"],
@@ -49,13 +51,13 @@
         "plugin:@typescript-eslint/recommended",
         "plugin:@typescript-eslint/recommended-requiring-type-checking",
         "plugin:@angular-eslint/recommended",
-        "plugin:@angular-eslint/template/process-inline-templates"
+        "plugin:@angular-eslint/template/process-inline-templates",
+        "plugin:prettier/recommended"
       ],
       "rules": {
         "class-methods-use-this": ["off"],
         "comma-dangle": ["error", "always-multiline"],
         "func-style": ["error", "expression"],
-        "indent": ["error", 2, {"SwitchCase": 1}],
         "lines-around-comment": ["off"],
         "semi": ["error", "always"],
         "new-cap": ["off"],
@@ -93,6 +95,14 @@
         "plugin:@angular-eslint/template/recommended"
       ],
       "rules": {}
+    },
+    {
+      "files": ["*.html"],
+      "excludedFiles": ["*inline-template-*.component.html"],
+      "extends": ["plugin:prettier/recommended"],
+      "rules": {
+        "prettier/prettier": ["error", { "parser": "angular" }]
+      }
     }
   ]
 }

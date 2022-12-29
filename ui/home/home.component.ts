@@ -49,7 +49,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   ) {}
 
   async ngOnInit(): Promise<void> {
-    if (!await this.authService.isAuthenticated()) {
+    if (!(await this.authService.isAuthenticated())) {
       await this.router.navigate(["/auth"]);
       return;
     }
@@ -150,10 +150,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (this.pollUrl) {
       req = this.http.get<Game[]>(this.pollUrl);
     } else {
-      req = this.userService.games().pipe(map(games => {
-        this.pollUrl = games.pollUrl;
-        return games.data;
-      }));
+      req = this.userService.games().pipe(
+        map(games => {
+          this.pollUrl = games.pollUrl;
+          return games.data;
+        }),
+      );
     }
 
     this.discourseInfo = await DiscourseInfo.getDiscourseInfo();
@@ -167,8 +169,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.gamePlayerProfiles = await this.profileCache.getProfilesForGames(this.games);
 
     // Notify about turns available
-    const yourTurns = this.games
-      .filter(game => game.currentPlayerSteamId === this.user.steamId && game.gameTurnRangeKey > 1);
+    const yourTurns = this.games.filter(
+      game => game.currentPlayerSteamId === this.user.steamId && game.gameTurnRangeKey > 1,
+    );
 
     this.turnCacheService.updateGames(yourTurns);
 
@@ -176,7 +179,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     let notificationShown = false;
 
-    if ((!this.lastNotification || new Date().getTime() - this.lastNotification.getTime() > TOAST_INTERVAL)) {
+    if (!this.lastNotification || new Date().getTime() - this.lastNotification.getTime() > TOAST_INTERVAL) {
       if (yourTurns.length) {
         window.pydtApi.ipc.send(RPC_TO_MAIN.SHOW_NOTIFICATION, {
           title: "Play Your Damn Turn!",
@@ -186,11 +189,13 @@ export class HomeComponent implements OnInit, OnDestroy {
       }
 
       // Notify about smack talk
-      const smackTalk = this.games.filter(x => {
-        const readPostNumber = this.discourseInfo[x.gameId] || 0;
+      const smackTalk = this.games
+        .filter(x => {
+          const readPostNumber = this.discourseInfo[x.gameId] || 0;
 
-        return DiscourseInfo.isNewSmackTalkPost(x, this.user, readPostNumber);
-      }).map(x => x.displayName);
+          return DiscourseInfo.isNewSmackTalkPost(x, this.user, readPostNumber);
+        })
+        .map(x => x.displayName);
 
       if (smackTalk.length) {
         window.pydtApi.ipc.send(RPC_TO_MAIN.SHOW_NOTIFICATION, {
@@ -228,7 +233,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       console.error("IoT error...", data);
     });
 
-    window.pydtApi.ipc.receive<{topic: string}>(RPC_TO_RENDERER.IOT_MESSAGE, data => {
+    window.pydtApi.ipc.receive<{ topic: string }>(RPC_TO_RENDERER.IOT_MESSAGE, data => {
       // eslint-disable-next-line no-console
       console.log("received message from topic ", data.topic);
       void this.safeLoadGames();
@@ -250,13 +255,18 @@ export class HomeComponent implements OnInit, OnDestroy {
       hasSmackTalk: DiscourseInfo.isNewSmackTalkPost(game, this.user, this.discourseInfo[game.gameId] || 0),
     }));
 
-    const yourTurns = orderBy(this.sortedTurns.filter(x => x.yourTurn), x => x.updatedAt, "desc");
+    const yourTurns = orderBy(
+      this.sortedTurns.filter(x => x.yourTurn),
+      x => x.updatedAt,
+      "desc",
+    );
 
-    const others = orderBy(difference(this.sortedTurns, yourTurns), [x => x.hasSmackTalk, x => x.updatedAt], ["desc", "desc"]);
+    const others = orderBy(
+      difference(this.sortedTurns, yourTurns),
+      [x => x.hasSmackTalk, x => x.updatedAt],
+      ["desc", "desc"],
+    );
 
-    this.sortedTurns = [
-      ...yourTurns,
-      ...others,
-    ];
+    this.sortedTurns = [...yourTurns, ...others];
   }
 }

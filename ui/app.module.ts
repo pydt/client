@@ -8,7 +8,15 @@ import { ProgressbarModule } from "ngx-bootstrap/progressbar";
 import { TabsModule } from "ngx-bootstrap/tabs";
 import { TooltipModule } from "ngx-bootstrap/tooltip";
 import { MarkdownModule, MarkedOptions } from "ngx-markdown";
-import { ApiModule, BusyService, Configuration, DateInterceptor, MetadataCacheService, ProfileCacheService, PydtSharedModule } from "pydt-shared";
+import {
+  ApiModule,
+  BusyService,
+  Configuration,
+  DateInterceptor,
+  MetadataCacheService,
+  ProfileCacheService,
+  PydtSharedModule,
+} from "pydt-shared";
 import { AppComponent } from "./app.component";
 import { routing } from "./app.routing";
 import { AuthComponent } from "./auth/auth.component";
@@ -24,10 +32,11 @@ import { PydtSettingsFactory } from "./shared/pydtSettings";
 import { environment } from "./environments/environment";
 import { SafeMetadataLoader } from "./shared/safeMetadataLoader";
 
-export const configFactory = (): Configuration => new Configuration({
-  apiKeys: {},
-  basePath: environment.apiUrl,
-});
+export const configFactory = (): Configuration =>
+  new Configuration({
+    apiKeys: {},
+    basePath: environment.apiUrl,
+  });
 
 @NgModule({
   imports: [
@@ -51,14 +60,7 @@ export const configFactory = (): Configuration => new Configuration({
       },
     }),
   ],
-  declarations: [
-    AppComponent,
-    AuthComponent,
-    HomeComponent,
-    GameComponent,
-    PlayTurnComponent,
-    GamePlayersComponent,
-  ],
+  declarations: [AppComponent, AuthComponent, HomeComponent, GameComponent, PlayTurnComponent, GamePlayersComponent],
   providers: [
     ProfileCacheService,
     TurnCacheService,
@@ -74,5 +76,4 @@ export const configFactory = (): Configuration => new Configuration({
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {
-}
+export class AppModule {}

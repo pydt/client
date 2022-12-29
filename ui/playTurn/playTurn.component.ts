@@ -8,7 +8,6 @@ import { PlayTurnState } from "./playTurnState.service";
 import { TurnCacheService, TurnDownloader } from "../shared/turnCacheService";
 import { SafeMetadataLoader } from "../shared/safeMetadataLoader";
 
-
 @Component({
   selector: "pydt-home",
   templateUrl: "./playTurn.component.html",
@@ -40,8 +39,7 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
     private readonly pydtSettingsFactory: PydtSettingsFactory,
     private readonly router: Router,
     private readonly ngZone: NgZone,
-  ) {
-  }
+  ) {}
 
   @HostListener("click", ["$event"])
   onMouseEnter(event: MouseEvent): boolean {
@@ -84,13 +82,17 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
         window.pydtApi.fs.mkdirp(this.archiveDir);
       }
 
-      this.saveFileToPlay = window.pydtApi.path.join(this.saveDir, `(PYDT) Play This One!.${this.civGame.saveExtension}`);
+      this.saveFileToPlay = window.pydtApi.path.join(
+        this.saveDir,
+        `(PYDT) Play This One!.${this.civGame.saveExtension}`,
+      );
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error(err);
       this.showGameInfo = false;
       this.abort = true;
-      this.status = "Unable to locate/create save file directory.  " +
+      this.status =
+        "Unable to locate/create save file directory.  " +
         'Are you using OneDrive and have the "Files On-Demand" option enabled?  ' +
         "The PYDT client will not work in this mode. :(";
       throw err;
@@ -163,7 +165,6 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
     this.abort = false;
     this.downloaded = true;
 
-
     return new Promise(resolve => setTimeout(resolve, 5000)).then(async () => {
       const path = await window.pydtApi.startChokidar({
         path: this.saveDir,
@@ -171,7 +172,9 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
       });
 
       this.ngZone.run(() => {
-        this.status = `Detected new save: ${window.pydtApi.path.basename(path).replace(`.${this.civGame.saveExtension}`, "")}.  Submit turn?`;
+        this.status = `Detected new save: ${window.pydtApi.path
+          .basename(path)
+          .replace(`.${this.civGame.saveExtension}`, "")}.  Submit turn?`;
         this.downloaded = false;
         this.showGameInfo = false;
         this.saveFileToUpload = path;
@@ -242,7 +245,8 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
     }
 
     // If we've got too many archived files, delete some...
-    const files: string[] = window.pydtApi.fs.readdirSync(this.archiveDir)
+    const files: string[] = window.pydtApi.fs
+      .readdirSync(this.archiveDir)
       .map(x => {
         const file = window.pydtApi.path.join(this.archiveDir, x);
 

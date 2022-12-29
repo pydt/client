@@ -1,6 +1,15 @@
 <ng-container *ngIf="!!games">
-    <div *ngFor="let player of gamePlayers; let i = index;" class="col-{{game.slots}}-slots"
-        style="padding-left:2px; padding-right:2px;">
-        <pydt-player-avatar [game]="game" [players]="gamePlayers" [gamePlayerProfiles]="gamePlayerProfiles" [civDefs]="civDefs" [index]="i"></pydt-player-avatar>
-    </div>
+  <div
+    *ngFor="let player of gamePlayers; let i = index"
+    class="col-{{ game.slots }}-slots"
+    style="padding-left: 2px; padding-right: 2px"
+  >
+    <pydt-player-avatar
+      [game]="game"
+      [players]="gamePlayers"
+      [gamePlayerProfiles]="gamePlayerProfiles"
+      [civDefs]="civDefs"
+      [index]="i"
+    ></pydt-player-avatar>
+  </div>
 </ng-container>

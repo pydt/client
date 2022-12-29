@@ -17,8 +17,7 @@ export class TurnDownloader {
     public readonly game: Game,
     private readonly gameService: GameService,
     private readonly busyService: BusyService,
-  ) {
-  }
+  ) {}
 
   abort(): void {
     this.downloading = false;
@@ -64,65 +63,72 @@ export class TurnDownloader {
     // Don't want this to trigger busy notifications...
     this.busyService.incrementBusy(false);
 
-    this.gameService.getTurn(this.game.gameId, "yup")
+    this.gameService
+      .getTurn(this.game.gameId, "yup")
       .pipe(catchError(() => of(null as GameTurnResponse)))
-      .subscribe(resp => {
-        if (!resp) {
-          this.error$.next("Failed to load turn information, is your computer offline?");
-          this.downloading = false;
-          return;
-        }
-
-        if (!this.downloading) {
-          // We must have aborted, don't start xhr!
-          return;
-        }
-
-        this.xhr = new XMLHttpRequest();
-        this.xhr.open("GET", resp.downloadUrl, true);
-        this.xhr.responseType = "arraybuffer";
-
-        this.xhr.onprogress = e => {
-          if (e.lengthComputable) {
-            this.curBytes$.next(Math.round(e.loaded / 1024));
-            this.maxBytes$.next(Math.round(e.total / 1024));
+      .subscribe(
+        resp => {
+          if (!resp) {
+            this.error$.next("Failed to load turn information, is your computer offline?");
+            this.downloading = false;
+            return;
           }
-        };
 
-        this.xhr.onerror = () => {
-          this.error$.next(`Bad response code returned: ${this.xhr.status}`);
-          this.xhr = null;
-          this.downloading = false;
-        };
+          if (!this.downloading) {
+            // We must have aborted, don't start xhr!
+            return;
+          }
 
-        this.xhr.onload = () => {
-          const localXhr = this.xhr;
+          this.xhr = new XMLHttpRequest();
+          this.xhr.open("GET", resp.downloadUrl, true);
+          this.xhr.responseType = "arraybuffer";
 
-          this.xhr = null;
+          this.xhr.onprogress = e => {
+            if (e.lengthComputable) {
+              this.curBytes$.next(Math.round(e.loaded / 1024));
+              this.maxBytes$.next(Math.round(e.total / 1024));
+            }
+          };
 
-          try {
-            this.curBytes$.next(this.maxBytes$.value);
+          this.xhr.onerror = () => {
+            this.error$.next(`Bad response code returned: ${this.xhr.status}`);
+            this.xhr = null;
+            this.downloading = false;
+          };
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-            let data = new Uint8Array(localXhr.response);
+          this.xhr.onload = () => {
+            const localXhr = this.xhr;
+
+            this.xhr = null;
 
             try {
-              data = pako.ungzip(data);
-            } catch (e) {
-              // Ignore - file probably wasn't gzipped...
+              this.curBytes$.next(this.maxBytes$.value);
+
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+              let data = new Uint8Array(localXhr.response);
+
+              try {
+                data = pako.ungzip(data);
+              } catch (e) {
+                // Ignore - file probably wasn't gzipped...
+              }
+
+              this.data$.next(data);
+            } catch (err) {
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+              this.error$.next(err);
+            } finally {
+              this.downloading = false;
             }
+          };
 
-            this.data$.next(data);
-          } catch (err) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-            this.error$.next(err);
-          } finally {
-            this.downloading = false;
-          }
-        };
-
-        this.xhr.send();
-      }, () => { /* Ignore error */ }).add(() => this.busyService.incrementBusy(true));
+          this.xhr.send();
+        },
+        () => {
+          /* Ignore error */
+        },
+      )
+      .add(() => this.busyService.incrementBusy(true));
   }
 }
 
@@ -157,8 +163,12 @@ export class TurnCacheService {
   }
 
   updateGames(games: Game[]): void {
-    const newGames = games.filter(x => !this.cache.some(y => x.gameId === y.game.gameId && x.version === y.game.version));
-    const downloadersToRemove = this.cache.filter(x => !games.some(y => x.game.gameId === y.gameId && x.game.version === y.version));
+    const newGames = games.filter(
+      x => !this.cache.some(y => x.gameId === y.game.gameId && x.version === y.game.version),
+    );
+    const downloadersToRemove = this.cache.filter(
+      x => !games.some(y => x.game.gameId === y.gameId && x.game.version === y.version),
+    );
 
     for (const newGame of newGames) {
       this.cache.push(new TurnDownloader(newGame, this.gameService, this.busyService));

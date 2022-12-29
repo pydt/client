@@ -13,17 +13,10 @@ let appIcon;
 ipcMain.handle(RPC_INVOKE.SET_FORCE_QUIT, (event, data) => (forceQuit = data));
 
 ipcMain.on(RPC_TO_MAIN.UPDATE_TURNS_AVAILABLE, (event, available) => {
-  win.setOverlayIcon(
-    available ? path.join(__dirname, "star.png") : null,
-    available ? "Turns Available" : "",
-  );
+  win.setOverlayIcon(available ? path.join(__dirname, "star.png") : null, available ? "Turns Available" : "");
 
   if (appIcon) {
-    appIcon.setImage(
-      available
-        ? path.join(__dirname, "icon_red.png")
-        : path.join(__dirname, "icon.png"),
-    );
+    appIcon.setImage(available ? path.join(__dirname, "icon_red.png") : path.join(__dirname, "icon.png"));
   }
 });
 
@@ -94,10 +87,7 @@ const updateMenu = () => {
       submenu: [
         {
           label: "Toggle Developer Tools",
-          accelerator:
-            process.platform === "darwin"
-              ? "Alt+Command+I"
-              : "Ctrl+Shift+I",
+          accelerator: process.platform === "darwin" ? "Alt+Command+I" : "Ctrl+Shift+I",
           click: (item, focusedWindow) => {
             if (focusedWindow) {
               focusedWindow.webContents.toggleDevTools();
@@ -114,18 +104,25 @@ const updateMenu = () => {
         },
       ],
     },
-    ...(config.allTokens && config.allTokens.length ? [{
-      label: "User",
-      submenu: [...config.allTokens.map(x => ({
-        label: x.name,
-        type: "radio",
-        checked: x.token === config.token,
-        click: () => win.send(RPC_TO_RENDERER.SET_USER, x.token),
-      })), {
-        label: "Add New User",
-        click: () => win.send(RPC_TO_RENDERER.NEW_USER),
-      }],
-    }] : []),
+    ...(config?.allTokens?.length
+      ? [
+          {
+            label: "User",
+            submenu: [
+              ...config.allTokens.map(x => ({
+                label: x.name,
+                type: "radio",
+                checked: x.token === config.token,
+                click: () => win.send(RPC_TO_RENDERER.SET_USER, x.token),
+              })),
+              {
+                label: "Add New User",
+                click: () => win.send(RPC_TO_RENDERER.NEW_USER),
+              },
+            ],
+          },
+        ]
+      : []),
     {
       label: "Donate!",
       click: () => {

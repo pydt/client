@@ -5,12 +5,7 @@ const path = require("path");
 const open = require("open");
 const del = require("del");
 const { configureIot } = require("./iot");
-const {
-  getAppIcon,
-  getWindow,
-  createWindow,
-  forceShowWindow,
-} = require("./window");
+const { getAppIcon, getWindow, createWindow, forceShowWindow } = require("./window");
 const appUpdater = require("./appUpdater");
 const { RPC_INVOKE, RPC_TO_MAIN } = require("./rpcChannels");
 const contextMenu = require("electron-context-menu");
@@ -33,19 +28,23 @@ contextMenu({
       // eslint-disable-next-line no-console
       console.log("Removing old squirrel installation...");
 
-      open.openApp(path.join(app.getPath("appData"), "../Local/playyourdamnturn/Update.exe"), { arguments: ["--uninstall", "-s"] }).then(process => {
-        process.on("close", () => {
-          // eslint-disable-next-line no-console
-          console.log("Uninstall complete...");
+      open
+        .openApp(path.join(app.getPath("appData"), "../Local/playyourdamnturn/Update.exe"), {
+          arguments: ["--uninstall", "-s"],
+        })
+        .then(process => {
+          process.on("close", () => {
+            // eslint-disable-next-line no-console
+            console.log("Uninstall complete...");
 
-          setTimeout(() => {
-            del(path.join(app.getPath("appData"), "../Local/playyourdamnturn"), { force: true }).then(() => {
-              // eslint-disable-next-line no-console
-              console.log("Old folder deleted!");
-            });
-          }, 2500);
+            setTimeout(() => {
+              del(path.join(app.getPath("appData"), "../Local/playyourdamnturn"), { force: true }).then(() => {
+                // eslint-disable-next-line no-console
+                console.log("Old folder deleted!");
+              });
+            }, 2500);
+          });
         });
-      });
     }
   }
 
@@ -125,9 +124,7 @@ contextMenu({
       payload: {
         platform: "client",
       },
-      ignoredMessages: [
-        "net::ERR_NETWORK",
-      ],
+      ignoredMessages: ["net::ERR_NETWORK"],
     });
   });
 })();

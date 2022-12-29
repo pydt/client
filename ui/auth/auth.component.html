@@ -1,13 +1,21 @@
 <div class="container">
-  <h2>Enter your token...
-    <i style="font-size:20px;margin-left:20px;" class="glyphicon glyphicon-question-sign" tooltip="You can find your token in the 'Your Profile' section of the website."
-      placement="bottom"></i>
+  <h2>
+    Enter your token...
+    <i
+      style="font-size: 20px; margin-left: 20px"
+      class="glyphicon glyphicon-question-sign"
+      tooltip="You can find your token in the 'Your Profile' section of the website."
+      placement="bottom"
+    ></i>
   </h2>
-  <p *ngIf="authError" style="color: red;font-weight:bold;">The token you entered isn't working, are you sure you're pasting in the token from the "Client Token" section of the "Your Profile" page on the website?</p>
+  <p *ngIf="authError" style="color: red; font-weight: bold">
+    The token you entered isn't working, are you sure you're pasting in the token from the "Client Token" section of the
+    "Your Profile" page on the website?
+  </p>
   <form (ngSubmit)="onSubmit()" #tokenForm="ngForm">
     <div class="form-group">
       <label for="token">Token</label>
-      <input type="text" class="form-control" id="token" required [(ngModel)]="model.token" name="token">
+      <input type="text" class="form-control" id="token" required [(ngModel)]="model.token" name="token" />
     </div>
     <button type="submit" class="btn btn-primary btn-sm btn-block" [disabled]="!tokenForm.form.valid">Submit</button>
   </form>

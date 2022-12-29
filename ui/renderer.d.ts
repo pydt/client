@@ -10,22 +10,22 @@ export interface PydtApi {
     invoke: <T>(channel: RPC_INVOKE, ...args: unknown[]) => Promise<T>;
     removeListener: (channel: RPC_TO_RENDERER, func: (...args: unknown[]) => void) => void;
     removeAllListeners: (channel: RPC_TO_RENDERER) => void;
-  }
+  };
   fs: {
     existsSync: (path: string) => boolean;
     mkdirp: (path: string) => void;
     readFileSync: (path: string) => Uint8Array;
     readdirSync: (path: string) => string[];
     renameSync: (oldPath: string, newPath: string) => void;
-    statSync: (path: string) => { ctime: { getTime(): number} };
+    statSync: (path: string) => { ctime: { getTime(): number } };
     unlinkSync: (path: string) => void;
     writeFileSync: (path: string, data: Uint8Array) => void;
-  }
+  };
   path: {
     basename: (path: string) => string;
     join: (...paths: string[]) => string;
     normalize: (path: string) => string;
-  }
+  };
   platform: string;
 }
 

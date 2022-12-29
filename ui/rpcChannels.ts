@@ -18,7 +18,7 @@ export enum RPC_TO_RENDERER {
   SHOW_SETTINGS_MODAL = "show-settings-modal",
   SHOW_UPDATE_MODAL = "show-update-modal",
   SET_USER = "set-user",
-  NEW_USER = "new-user"
+  NEW_USER = "new-user",
 }
 
 export enum RPC_INVOKE {

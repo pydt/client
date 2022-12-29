@@ -11,9 +11,7 @@ let lastNotification;
 electron.ipcMain.on(RPC_TO_MAIN.SHOW_NOTIFICATION, (e, arg) => {
   if (__dirname.indexOf("app.asar") > 0) {
     const splitDirname = __dirname.split(path.sep);
-    const rootPath = path.join(
-      ...splitDirname.slice(0, splitDirname.length - 2),
-    );
+    const rootPath = path.join(...splitDirname.slice(0, splitDirname.length - 2));
 
     arg.icon = path.join(rootPath, "Contents/app/icon.png");
 

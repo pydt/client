@@ -5,7 +5,6 @@ import { SafeMetadataLoader } from "../shared/safeMetadataLoader";
 import { PlayTurnState } from "../playTurn/playTurnState.service";
 import { DiscourseInfo } from "../shared/discourseInfo";
 
-
 @Component({
   selector: "pydt-game",
   templateUrl: "./game.component.html",
@@ -22,7 +21,11 @@ export class GameComponent implements OnInit, OnDestroy {
   updateDateHandle: NodeJS.Timer;
   games: CivGame[] = [];
 
-  constructor(private router: Router, private playTurnState: PlayTurnState, private metadataLoader: SafeMetadataLoader) { }
+  constructor(
+    private router: Router,
+    private playTurnState: PlayTurnState,
+    private metadataLoader: SafeMetadataLoader,
+  ) {}
 
   async ngOnInit(): Promise<void> {
     // Save current date to prevent "changed after it was checked" bugs
@@ -62,7 +65,7 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   get newDiscoursePost(): boolean {
-    return DiscourseInfo.isNewSmackTalkPost(this.game, this.user, (this.discoursePostNumber || 0));
+    return DiscourseInfo.isNewSmackTalkPost(this.game, this.user, this.discoursePostNumber || 0);
   }
 
   get lastTurn(): string {

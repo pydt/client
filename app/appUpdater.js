@@ -23,13 +23,10 @@ module.exports = {
       log.info("A new update is available");
     });
 
-    autoUpdater.addListener(
-      "update-downloaded",
-      (event, releaseNotes, releaseName) => {
-        window.send(RPC_TO_RENDERER.SHOW_UPDATE_MODAL, releaseName);
-        return true;
-      },
-    );
+    autoUpdater.addListener("update-downloaded", (event, releaseNotes, releaseName) => {
+      window.send(RPC_TO_RENDERER.SHOW_UPDATE_MODAL, releaseName);
+      return true;
+    });
 
     autoUpdater.addListener("error", error => {
       log.error(error);

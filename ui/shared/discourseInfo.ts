@@ -6,10 +6,7 @@ export class DiscourseInfo {
   [gameId: string]: number;
 
   static async getDiscourseInfo(): Promise<DiscourseInfo> {
-    const di = await window.pydtApi.ipc.invoke(
-      RPC_INVOKE.STORAGE_GET,
-      "discourseInfo",
-    );
+    const di = await window.pydtApi.ipc.invoke(RPC_INVOKE.STORAGE_GET, "discourseInfo");
 
     const result = new DiscourseInfo();
 
@@ -25,10 +22,7 @@ export class DiscourseInfo {
   }
 
   static isNewSmackTalkPost(game: Game, user: User, readPostNumber: number): boolean {
-    if (
-      !game.latestDiscoursePostNumber ||
-      game.latestDiscoursePostNumber <= readPostNumber
-    ) {
+    if (!game.latestDiscoursePostNumber || game.latestDiscoursePostNumber <= readPostNumber) {
       return false;
     }
 

@@ -14,10 +14,7 @@ export class ConfigData {
 export class AuthService {
   private user: User;
 
-  constructor(
-    private readonly apiConfig: Configuration,
-    private readonly userService: UserService,
-  ) {}
+  constructor(private readonly apiConfig: Configuration, private readonly userService: UserService) {}
 
   async isAuthenticated(): Promise<boolean> {
     await this.setApiConfig();
@@ -65,10 +62,13 @@ export class AuthService {
 
   private static validateAllTokens(config: ConfigData) {
     if (config.token && !(config.allTokens || []).some(x => x.token === config.token)) {
-      config.allTokens = [...(config.allTokens || []), {
-        name: `User ${(config.allTokens || []).length + 1}`,
-        token: config.token,
-      }];
+      config.allTokens = [
+        ...(config.allTokens || []),
+        {
+          name: `User ${(config.allTokens || []).length + 1}`,
+          token: config.token,
+        },
+      ];
     }
   }
 
@@ -83,10 +83,6 @@ export class AuthService {
   }
 
   private setConfig(config: ConfigData): Promise<void> {
-    return window.pydtApi.ipc.invoke(
-      RPC_INVOKE.STORAGE_SET,
-      "configData",
-      config,
-    );
+    return window.pydtApi.ipc.invoke(RPC_INVOKE.STORAGE_SET, "configData", config);
   }
 }

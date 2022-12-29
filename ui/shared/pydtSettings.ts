@@ -10,8 +10,8 @@ export class PydtSettingsData {
   launchCiv = true;
   startOnBoot = false;
   numSaves = 100;
-  gameStores: {[index: string]: GameStore} = {};
-  savePaths: {[index: string]: string} = {};
+  gameStores: { [index: string]: GameStore } = {};
+  savePaths: { [index: string]: string } = {};
   autoDownload = false;
 
   constructor(civGames: CivGame[], prevData: PydtSettingsData, private basePaths: { [index: string]: string }) {
@@ -25,10 +25,7 @@ export class PydtSettingsData {
     for (const civGame of civGames) {
       for (const gameStoreKey of Object.keys(GameStore)) {
         if (!this.gameStores[civGame.id] && civGame.dataPaths[GameStore[gameStoreKey] as GameStore]) {
-          const dataPath = this.getDefaultDataPath(
-            civGame,
-            GameStore[gameStoreKey] as GameStore,
-          );
+          const dataPath = this.getDefaultDataPath(civGame, GameStore[gameStoreKey] as GameStore);
 
           if (window.pydtApi.fs.existsSync(dataPath)) {
             this.gameStores[civGame.id] = GameStore[gameStoreKey] as GameStore;
@@ -57,8 +54,7 @@ export class PydtSettingsData {
   }
 
   getDefaultDataPath(civGame: CivGame, gameStore?: GameStore): string {
-    const location: PlatformSaveLocation =
-      civGame.saveLocations[window.pydtApi.platform];
+    const location: PlatformSaveLocation = civGame.saveLocations[window.pydtApi.platform];
 
     let result = window.pydtApi.path.normalize(
       window.pydtApi.path.join(
@@ -91,12 +87,7 @@ export class PydtSettingsData {
   }
 
   getDefaultSavePath(civGame: CivGame): string {
-    return window.pydtApi.path.normalize(
-      window.pydtApi.path.join(
-        this.getDefaultDataPath(civGame),
-        civGame.savePath,
-      ),
-    );
+    return window.pydtApi.path.normalize(window.pydtApi.path.join(this.getDefaultDataPath(civGame), civGame.savePath));
   }
 
   getGameStore(civGame: CivGame): GameStore {
@@ -126,13 +117,10 @@ export class PydtSettingsData {
 
 @Injectable()
 export class PydtSettingsFactory {
-  constructor(private readonly metadataLoader: SafeMetadataLoader) { }
+  constructor(private readonly metadataLoader: SafeMetadataLoader) {}
 
   async getSettings(): Promise<PydtSettingsData> {
-    const settings = await window.pydtApi.ipc.invoke<PydtSettingsData>(
-      RPC_INVOKE.STORAGE_GET,
-      "settings",
-    );
+    const settings = await window.pydtApi.ipc.invoke<PydtSettingsData>(RPC_INVOKE.STORAGE_GET, "settings");
 
     const metadata = await this.metadataLoader.loadMetadata();
 

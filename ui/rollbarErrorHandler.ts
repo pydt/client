@@ -1,10 +1,5 @@
 import * as Rollbar from "rollbar";
-import {
-  Injectable,
-  Inject,
-  InjectionToken,
-  ErrorHandler,
-} from "@angular/core";
+import { Injectable, Inject, InjectionToken, ErrorHandler } from "@angular/core";
 import { RPC_TO_MAIN } from "./rpcChannels";
 import { environment } from "./environments/environment";
 
@@ -32,7 +27,5 @@ export const rollbarFactory = (): Rollbar =>
     captureUnhandledRejections: true,
     environment: "production",
     enabled: !!environment.production,
-    ignoredMessages: [
-      "Http failure response for https://api.playyourdamnturn.com/metadata",
-    ],
+    ignoredMessages: ["Http failure response for https://api.playyourdamnturn.com/metadata"],
   });

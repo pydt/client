@@ -1,11 +1,26 @@
 <div>
-  <button type="button" class="btn btn-xs btn-default" [disabled]="refreshDisabled" style="position:fixed;top:0;right:20px;z-index:1000;" (click)="refresh()">Refresh</button>
-  <h1 *ngIf="errorLoading">There was an error loading your games.  Please check your internet connection.</h1>
+  <button
+    type="button"
+    class="btn btn-xs btn-default"
+    [disabled]="refreshDisabled"
+    style="position: fixed; top: 0; right: 20px; z-index: 1000"
+    (click)="refresh()"
+  >
+    Refresh
+  </button>
+  <h1 *ngIf="errorLoading">There was an error loading your games. Please check your internet connection.</h1>
   <ng-container *ngIf="!errorLoading">
     <h1 *ngIf="games?.length === 0">You have no games. :(</h1>
-    <div *ngIf="games" style="margin-top:30px;">
+    <div *ngIf="games" style="margin-top: 30px">
       <div *ngFor="let game of sortedTurns">
-        <pydt-game [game]="game" [user]="user" (smackRead)="smackRead(game.gameId, $event)" [discoursePostNumber]="discourseInfo[game.gameId]" [gamePlayerProfiles]="gamePlayerProfiles" [yourTurn]="game.yourTurn"></pydt-game>
+        <pydt-game
+          [game]="game"
+          [user]="user"
+          (smackRead)="smackRead(game.gameId, $event)"
+          [discoursePostNumber]="discourseInfo[game.gameId]"
+          [gamePlayerProfiles]="gamePlayerProfiles"
+          [yourTurn]="game.yourTurn"
+        ></pydt-game>
       </div>
     </div>
   </ng-container>

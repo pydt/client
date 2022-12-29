@@ -10,27 +10,28 @@ const { RPC_INVOKE, RPC_TO_MAIN, RPC_TO_RENDERER } = require("./rpcChannels");
 let watcher;
 
 electron.contextBridge.exposeInMainWorld("pydtApi", {
-  startChokidar: arg => new Promise(resolve => {
-    if (watcher) {
-      watcher.close();
-    }
+  startChokidar: arg =>
+    new Promise(resolve => {
+      if (watcher) {
+        watcher.close();
+      }
 
-    watcher = chokidar.watch(arg.path, {
-      depth: 0,
-      ignoreInitial: true,
-      awaitWriteFinish: arg.awaitWriteFinish,
-    });
+      watcher = chokidar.watch(arg.path, {
+        depth: 0,
+        ignoreInitial: true,
+        awaitWriteFinish: arg.awaitWriteFinish,
+      });
 
-    const changeDetected = p => {
-      electron.ipcRenderer.send(RPC_TO_MAIN.SHOW_WINDOW);
-      watcher.close();
-      watcher = null;
-      resolve(p);
-    };
+      const changeDetected = p => {
+        electron.ipcRenderer.send(RPC_TO_MAIN.SHOW_WINDOW);
+        watcher.close();
+        watcher = null;
+        resolve(p);
+      };
 
-    watcher.on("add", changeDetected);
-    watcher.on("change", changeDetected);
-  }),
+      watcher.on("add", changeDetected);
+      watcher.on("change", changeDetected);
+    }),
   openUrl: arg => {
     open(arg).catch(err => {
       electron.ipcRenderer.send(RPC_TO_MAIN.LOG_ERROR, `Could not open URL ${arg}: ${err.message}`);
