@@ -18,7 +18,7 @@ module.exports = {
             keepalive: 600,
             accessKeyId: data.accessKey,
             secretKey: data.secretKey,
-            host: "a21s639tnrshxf.iot.us-east-1.amazonaws.com",
+            host: "a21s639tnrshxf-ats.iot.us-east-1.amazonaws.com",
           });
 
           currentDevice.on("connect", () => {
