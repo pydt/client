@@ -53,7 +53,7 @@
           <div class="row" *ngIf="gameStoreOptions(civGame).length > 1">
             <label class="col-xs-3 control-label force-horizontal-label text-left">Game Store</label>
             <div class="col-xs-9">
-              <select class="form-control" name="civ6store" [ngModel]="settings.getGameStore(civGame)" (ngModelChange)="settings.setGameStore(civGame, $event)" >
+              <select class="form-control" [name]="'civstore' + civGame.id" [ngModel]="settings.getGameStore(civGame)" (ngModelChange)="settings.setGameStore(civGame, $event)" >
                 <option *ngFor="let opt of gameStoreOptions(civGame)" [ngValue]="opt.value">{{ opt.key }}</option>
               </select>
             </div>
