@@ -32,7 +32,13 @@
         "node/no-path-concat": ["off"],
         "node/no-extraneous-require": ["error", {
           "allowModules": ["electron"]
-        }]
+        }],
+        "prettier/prettier": [
+          "error",
+          {
+            "endOfLine": "auto"
+          }
+        ]
       }
     },
     {
@@ -84,7 +90,13 @@
           }
         ],
         "no-shadow": "off",
-        "@typescript-eslint/no-shadow": ["error"]
+        "@typescript-eslint/no-shadow": ["error"],
+        "prettier/prettier": [
+          "error",
+          {
+            "endOfLine": "auto"
+          }
+        ]
       }
     },
     {
@@ -101,7 +113,7 @@
       "excludedFiles": ["*inline-template-*.component.html"],
       "extends": ["plugin:prettier/recommended"],
       "rules": {
-        "prettier/prettier": ["error", { "parser": "angular" }]
+        "prettier/prettier": ["error", { "parser": "angular", "endOfLine": "auto" }]
       }
     }
   ]
