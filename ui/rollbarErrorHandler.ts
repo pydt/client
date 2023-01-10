@@ -1,5 +1,10 @@
 import * as Rollbar from "rollbar";
-import { Injectable, Inject, InjectionToken, ErrorHandler } from "@angular/core";
+import {
+  Injectable,
+  Inject,
+  InjectionToken,
+  ErrorHandler,
+} from "@angular/core";
 import { RPC_TO_MAIN } from "./rpcChannels";
 import { environment } from "./environments/environment";
 
@@ -13,7 +18,7 @@ export class RollbarErrorHandler implements ErrorHandler {
     }
   }
 
-  handleError(err: Error & { originalError: Error}): void {
+  handleError(err: Error & { originalError: Error }): void {
     this.rollbar.error(err.originalError || err);
     // eslint-disable-next-line no-console
     console.error(err);
@@ -22,7 +27,7 @@ export class RollbarErrorHandler implements ErrorHandler {
 
 export const rollbarFactory = (): Rollbar =>
   new Rollbar({
-    accessToken: "e381e1de46414e03a95005afd73d0c48",
+    accessToken: "2657e39f6c2847edb4f750a37ef4b20b",
     captureUncaught: true,
     captureUnhandledRejections: true,
     environment: "production",

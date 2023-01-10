@@ -118,7 +118,7 @@ contextMenu({
     const Rollbar = require("rollbar");
 
     new Rollbar({
-      accessToken: "e381e1de46414e03a95005afd73d0c48",
+      accessToken: "2657e39f6c2847edb4f750a37ef4b20b",
       environment: "production",
       captureUncaught: true,
       captureUnhandledRejections: true,
