@@ -23,7 +23,7 @@ ipcMain.on(RPC_TO_MAIN.UPDATE_TURNS_AVAILABLE, (event, available) => {
 const updateMenu = () => {
   const config = getConfig("configData");
 
-  if (process.platform !== "darwin") {
+  if (process.platform !== "darwin" && !appIcon) {
     const iconPath = path.join(__dirname, "icon.png");
 
     appIcon = new Tray(iconPath);
