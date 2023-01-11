@@ -2,6 +2,7 @@ import * as Rollbar from "rollbar";
 import { Injectable, Inject, InjectionToken, ErrorHandler } from "@angular/core";
 import { RPC_TO_MAIN } from "./rpcChannels";
 import { environment } from "./environments/environment";
+import { ROLLBAR_CONFIG } from "./rollbarConfig";
 
 export const RollbarService = new InjectionToken<Rollbar>("rollbar");
 
@@ -22,10 +23,6 @@ export class RollbarErrorHandler implements ErrorHandler {
 
 export const rollbarFactory = (): Rollbar =>
   new Rollbar({
-    accessToken: "2657e39f6c2847edb4f750a37ef4b20b",
-    captureUncaught: true,
-    captureUnhandledRejections: true,
-    environment: "production",
+    ...ROLLBAR_CONFIG,
     enabled: !!environment.production,
-    ignoredMessages: ["Http failure response for https://api.playyourdamnturn.com/metadata"],
   });

@@ -5,7 +5,7 @@
   },
   "scripts": {
     "clean": "rimraf dist app/ui_compiled",
-    "build-common": "npx tsc ui/rpcChannels.ts --outDir app",
+    "build-common": "npx tsc ui/rpcChannels.ts ui/rollbarConfig.ts --outDir app",
     "build": "node createEnv.js && ng build && npm run build-common",
     "serve": "ng serve",
     "build-prod": "npm run lint && npm run clean && node createEnv.js && ng build",
