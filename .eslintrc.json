@@ -3,6 +3,7 @@
   "ignorePatterns": [
     "projects/**/*",
     "app/ui_compiled/**/*",
+    "app/rollbarConfig.js",
     "app/rpcChannels.js",
     "ui/environments/environment.build.ts"
   ],

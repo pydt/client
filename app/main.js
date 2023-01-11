@@ -9,6 +9,7 @@ const { getAppIcon, getWindow, createWindow, forceShowWindow } = require("./wind
 const appUpdater = require("./appUpdater");
 const { RPC_INVOKE, RPC_TO_MAIN } = require("./rpcChannels");
 const contextMenu = require("electron-context-menu");
+const { ROLLBAR_CONFIG } = require("./rollbarConfig");
 
 require("./storage");
 require("./notifications");
@@ -117,14 +118,10 @@ contextMenu({
     const Rollbar = require("rollbar");
 
     new Rollbar({
-      accessToken: "2657e39f6c2847edb4f750a37ef4b20b",
-      environment: "production",
-      captureUncaught: true,
-      captureUnhandledRejections: true,
+      ...ROLLBAR_CONFIG,
       payload: {
         platform: "client",
       },
-      ignoredMessages: ["net::ERR_NETWORK"],
     });
   });
 })();
