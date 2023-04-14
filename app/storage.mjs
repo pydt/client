@@ -1,6 +1,6 @@
-const electron = require("electron");
-const storage = require("electron-json-storage");
-const { RPC_INVOKE } = require("./rpcChannels");
+import electron from "electron";
+import storage from "electron-json-storage";
+import { RPC_INVOKE } from "./rpcChannels.js";
 
 const configs = {};
 
@@ -34,6 +34,6 @@ electron.ipcMain.handle(
     }),
 );
 
-module.exports = {
-  getConfig: key => ({ ...configs[key] }),
-};
+export const getConfig = key => ({ ...configs[key] });
+
+export const clearConfig = () => new Promise((resolve) => storage.clear(resolve));

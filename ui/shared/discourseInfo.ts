@@ -1,4 +1,4 @@
-import { isEmpty } from "lodash";
+import { isEmpty } from "lodash-es";
 import { User, Game } from "pydt-shared";
 import { RPC_INVOKE } from "../rpcChannels";
 

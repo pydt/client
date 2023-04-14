@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
-import { difference, orderBy } from "lodash";
+import { difference, orderBy } from "lodash-es";
 import { Game, ProfileCacheService, SteamProfileMap, User, UserService } from "pydt-shared";
 import { Observable, Subscription, timer } from "rxjs";
 import { map } from "rxjs/operators";

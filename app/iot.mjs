@@ -1,8 +1,7 @@
-const { device } = require("aws-iot-device-sdk");
-const { RPC_TO_RENDERER, RPC_TO_MAIN } = require("./rpcChannels");
+import { device } from 'aws-iot-device-sdk';
+import { RPC_TO_RENDERER, RPC_TO_MAIN } from './rpcChannels.js'
 
-module.exports = {
-  configureIot: (electron, win) => {
+export const configureIot = (electron, win) => {
     let currentDevice;
     let currentTopic;
 
@@ -41,5 +40,4 @@ module.exports = {
         currentTopic = data.topic;
       }
     });
-  },
-};
+  };

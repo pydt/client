@@ -8,6 +8,7 @@ export enum RPC_TO_MAIN {
   LOG_INFO = "log-info",
   LOG_ERROR = "log-error",
   UPDATE_USERS = "update-users",
+  OPEN_URL = "open-url",
 }
 
 export enum RPC_TO_RENDERER {

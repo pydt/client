@@ -1,14 +1,15 @@
-const { app, BrowserWindow, ipcMain, Menu, Tray } = require("electron");
-const path = require("path");
-const storage = require("electron-json-storage");
-const open = require("open");
-const windowStateKeeper = require("electron-window-state");
-const { RPC_TO_MAIN, RPC_TO_RENDERER, RPC_INVOKE } = require("./rpcChannels");
-const { getConfig } = require("./storage");
+import open from "open";
+import { app, BrowserWindow, ipcMain, Menu, Tray } from "electron";
+import * as path from "path";
+import * as url from "url";
+import { default as windowStateKeeper } from "electron-window-state";
+import { RPC_TO_MAIN, RPC_TO_RENDERER, RPC_INVOKE } from "./rpcChannels.js";
+import { clearConfig, getConfig } from "./storage.mjs";
 
 let win;
 let forceQuit = false;
 let appIcon;
+const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
 
 ipcMain.handle(RPC_INVOKE.SET_FORCE_QUIT, (event, data) => (forceQuit = data));
 
@@ -96,10 +97,9 @@ const updateMenu = () => {
         },
         {
           label: "Clear Storage",
-          click: () => {
-            storage.clear(() => {
-              win.reload();
-            });
+          click: async () => {
+            await clearConfig();
+            win.reload();
           },
         },
       ],
@@ -156,62 +156,63 @@ ipcMain.on(RPC_TO_MAIN.UPDATE_USERS, () => {
   updateMenu();
 });
 
-module.exports = {
-  getAppIcon: () => appIcon,
-  getWindow: () => win,
-  createWindow: () => {
-    if (!win) {
-      // Create the browser window.
-      const mainWindowState = windowStateKeeper({
-        defaultWidth: 500,
-        defaultHeight: 350,
-      });
+export const getAppIcon = () => appIcon;
 
-      win = new BrowserWindow({
-        width: mainWindowState.width,
-        height: mainWindowState.height,
-        webPreferences: {
-          preload: path.join(__dirname, "preload.js"),
-          sandbox: false,
-        },
-      });
+export const getWindow = () => win;
 
-      mainWindowState.manage(win);
+export const createWindow = () => {
+  if (!win) {
+    // Create the browser window.
+    const mainWindowState = windowStateKeeper({
+      defaultWidth: 500,
+      defaultHeight: 350,
+    });
 
-      // and load the index.html of the app.
-      win.loadURL(`file://${__dirname}/ui_compiled/index.html`);
+    win = new BrowserWindow({
+      width: mainWindowState.width,
+      height: mainWindowState.height,
+      webPreferences: {
+        preload: path.join(__dirname, "preload.js"),
+        sandbox: false,
+      },
+    });
 
-      app.on("before-quit", () => {
-        forceQuit = true;
-      });
+    mainWindowState.manage(win);
 
-      win.on("close", e => {
-        if (!forceQuit) {
-          e.preventDefault();
-          win.hide();
-          e.returnValue = false;
-        }
-      });
+    // and load the index.html of the app.
+    win.loadURL(`file://${__dirname}/ui_compiled/index.html`);
 
-      // Emitted when the window is closed.
-      win.on("closed", () => {
-        // Dereference the window object, usually you would store windows
-        // in an array if your app supports multi windows, this is the time
-        // when you should delete the corresponding element.
-        win = null;
-      });
+    app.on("before-quit", () => {
+      forceQuit = true;
+    });
 
-      updateMenu();
-    }
+    win.on("close", e => {
+      if (!forceQuit) {
+        e.preventDefault();
+        win.hide();
+        e.returnValue = false;
+      }
+    });
 
-    return win;
-  },
-  forceShowWindow: () => {
-    if (win) {
-      win.setAlwaysOnTop(true);
-      win.show();
-      win.focus();
-      win.setAlwaysOnTop(false);
-    }
-  },
+    // Emitted when the window is closed.
+    win.on("closed", () => {
+      // Dereference the window object, usually you would store windows
+      // in an array if your app supports multi windows, this is the time
+      // when you should delete the corresponding element.
+      win = null;
+    });
+
+    updateMenu();
+  }
+
+  return win;
+};
+
+export const forceShowWindow = () => {
+  if (win) {
+    win.setAlwaysOnTop(true);
+    win.show();
+    win.focus();
+    win.setAlwaysOnTop(false);
+  }
 };

@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { CivGame, PlatformSaveLocation, GameStore, BasePath, Platform } from "pydt-shared";
 import { RPC_INVOKE } from "../rpcChannels";
-import { isEmpty, merge, omit } from "lodash";
+import { isEmpty, merge, omit } from "lodash-es";
 import { SafeMetadataLoader } from "./safeMetadataLoader";
 
 const FIELDS_NOT_TO_PERSIST = ["basePaths"];

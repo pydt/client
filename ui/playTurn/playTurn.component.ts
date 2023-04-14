@@ -7,6 +7,7 @@ import { PydtSettingsFactory, PydtSettingsData } from "../shared/pydtSettings";
 import { PlayTurnState } from "./playTurnState.service";
 import { TurnCacheService, TurnDownloader } from "../shared/turnCacheService";
 import { SafeMetadataLoader } from "../shared/safeMetadataLoader";
+import { RPC_TO_MAIN } from "../rpcChannels";
 
 @Component({
   selector: "pydt-home",
@@ -46,7 +47,7 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
     const href = (event.srcElement as { href?: string }).href;
 
     if (href) {
-      window.pydtApi.openUrl(href);
+      window.pydtApi.ipc.send(RPC_TO_MAIN.OPEN_URL, href);
     }
 
     event.preventDefault();
@@ -131,7 +132,7 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
 
           await this.ngZone.run(async () => {
             if (this.settings.launchCiv) {
-              window.pydtApi.openUrl(url);
+              window.pydtApi.ipc.send(RPC_TO_MAIN.OPEN_URL, url);
             }
 
             await this.watchForSave();
@@ -272,6 +273,9 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
   }
 
   openGameOnWeb(): void {
-    window.pydtApi.openUrl(`https://playyourdamnturn.com/game/${this.playTurnState.game.gameId}`);
+    window.pydtApi.ipc.send(
+      RPC_TO_MAIN.OPEN_URL,
+      `https://playyourdamnturn.com/game/${this.playTurnState.game.gameId}`,
+    );
   }
 }
