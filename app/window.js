@@ -1,7 +1,7 @@
 const { app, BrowserWindow, ipcMain, Menu, Tray } = require("electron");
 const path = require("path");
 const storage = require("electron-json-storage");
-const open = require("open");
+const openPromise = import("open");
 const windowStateKeeper = require("electron-window-state");
 const { RPC_TO_MAIN, RPC_TO_RENDERER, RPC_INVOKE } = require("./rpcChannels");
 const { getConfig } = require("./storage");
@@ -126,7 +126,7 @@ const updateMenu = () => {
     {
       label: "Donate!",
       click: () => {
-        open("https://patreon.com/pydt");
+        openPromise.then(open => open("https://patreon.com/pydt"));
       },
     },
   ];

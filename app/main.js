@@ -2,8 +2,8 @@ const electron = require("electron");
 const log = require("electron-log");
 const fs = require("fs");
 const path = require("path");
-const open = require("open");
-const del = require("del");
+const openPromise = import("open");
+const delPromise = import("del");
 const { configureIot } = require("./iot");
 const { getAppIcon, getWindow, createWindow, forceShowWindow } = require("./window");
 const appUpdater = require("./appUpdater");
@@ -39,10 +39,10 @@ contextMenu({
             console.log("Uninstall complete...");
 
             setTimeout(() => {
-              del(path.join(app.getPath("appData"), "../Local/playyourdamnturn"), { force: true }).then(() => {
+              delPromise.then(del => del(path.join(app.getPath("appData"), "../Local/playyourdamnturn"), { force: true }).then(() => {
                 // eslint-disable-next-line no-console
                 console.log("Old folder deleted!");
-              });
+              }));
             }, 2500);
           });
         });
@@ -70,6 +70,8 @@ contextMenu({
   electron.ipcMain.on(RPC_TO_MAIN.LOG_INFO, (e, message) => log.info(message));
 
   electron.ipcMain.on(RPC_TO_MAIN.LOG_ERROR, (e, message) => log.error(message));
+
+  electron.ipcMain.on(RPC_TO_MAIN.OPEN_URL, (e, url) => openPromise.then(open => open(url)));
 
   electron.ipcMain.on(RPC_TO_MAIN.SHOW_WINDOW, () => {
     forceShowWindow();

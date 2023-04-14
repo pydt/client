@@ -4,6 +4,7 @@ import { Game, SteamProfileMap, User, CivGame, countdown } from "pydt-shared";
 import { SafeMetadataLoader } from "../shared/safeMetadataLoader";
 import { PlayTurnState } from "../playTurn/playTurnState.service";
 import { DiscourseInfo } from "../shared/discourseInfo";
+import { RPC_TO_MAIN } from "../rpcChannels";
 
 @Component({
   selector: "pydt-game",
@@ -56,11 +57,14 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   openGameOnWeb(): void {
-    window.pydtApi.openUrl(`https://playyourdamnturn.com/game/${this.game.gameId}`);
+    window.pydtApi.ipc.send(RPC_TO_MAIN.OPEN_URL, `https://playyourdamnturn.com/game/${this.game.gameId}`);
   }
 
   readSmack(): void {
-    window.pydtApi.openUrl(`https://discourse.playyourdamnturn.com/t/${this.game.discourseTopicId}`);
+    window.pydtApi.ipc.send(
+      RPC_TO_MAIN.OPEN_URL,
+      `https://discourse.playyourdamnturn.com/t/${this.game.discourseTopicId}`,
+    );
     this.smackRead.emit(this.game.latestDiscoursePostNumber);
   }
 

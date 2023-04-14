@@ -86,7 +86,7 @@ export class AppComponent implements OnInit {
   }
 
   openReleaseNotes(): void {
-    window.pydtApi.openUrl(`https://github.com/pydt/client/releases/tag/v${this.version}`);
+    window.pydtApi.ipc.send(RPC_TO_MAIN.OPEN_URL, `https://github.com/pydt/client/releases/tag/v${this.version}`);
   }
 
   gameStoreOptions(civGame: CivGame): { key: string; value: string }[] {

@@ -3,7 +3,6 @@ const path = require("path");
 const fs = require("fs");
 const mkdirp = require("mkdirp");
 const chokidar = require("chokidar");
-const open = require("open");
 const AutoLaunch = require("auto-launch");
 const { RPC_INVOKE, RPC_TO_MAIN, RPC_TO_RENDERER } = require("./rpcChannels");
 
@@ -32,11 +31,6 @@ electron.contextBridge.exposeInMainWorld("pydtApi", {
       watcher.on("add", changeDetected);
       watcher.on("change", changeDetected);
     }),
-  openUrl: arg => {
-    open(arg).catch(err => {
-      electron.ipcRenderer.send(RPC_TO_MAIN.LOG_ERROR, `Could not open URL ${arg}: ${err.message}`);
-    });
-  },
   setAutostart: arg => {
     electron.ipcRenderer.send(RPC_TO_MAIN.LOG_INFO, "set-autostart");
 
