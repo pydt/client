@@ -5,6 +5,7 @@ import * as url from "url";
 import { default as windowStateKeeper } from "electron-window-state";
 import { RPC_TO_MAIN, RPC_TO_RENDERER, RPC_INVOKE } from "./rpcChannels.js";
 import { clearConfig, getConfig } from "./storage.mjs";
+import { STORAGE_CONFIG } from "./storageConfig.js";
 
 let win;
 let forceQuit = false;
@@ -21,8 +22,8 @@ ipcMain.on(RPC_TO_MAIN.UPDATE_TURNS_AVAILABLE, (event, available) => {
   }
 });
 
-const updateMenu = () => {
-  const config = getConfig("configData");
+const updateMenu = async () => {
+  const config = await getConfig("configData");
 
   if (process.platform !== "darwin" && !appIcon) {
     const iconPath = path.join(__dirname, "icon.png");
@@ -160,7 +161,7 @@ export const getAppIcon = () => appIcon;
 
 export const getWindow = () => win;
 
-export const createWindow = () => {
+export const createWindow = async () => {
   if (!win) {
     // Create the browser window.
     const mainWindowState = windowStateKeeper({
@@ -168,7 +169,10 @@ export const createWindow = () => {
       defaultHeight: 350,
     });
 
+    const settings = await getConfig(STORAGE_CONFIG.SETTINGS);
+
     win = new BrowserWindow({
+      show: !settings?.startHidden,
       width: mainWindowState.width,
       height: mainWindowState.height,
       webPreferences: {

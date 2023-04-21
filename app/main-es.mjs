@@ -15,7 +15,7 @@ contextMenu({
   showSearchWithGoogle: false,
 });
 
-(() => {
+(async () => {
   const { app, dialog, ipcMain } = electron;
 
   app.on("second-instance", () => {
@@ -77,7 +77,7 @@ contextMenu({
     });
   });
 
-  const win = createWindow();
+  const win = await createWindow();
 
   checkForUpdates(win);
 

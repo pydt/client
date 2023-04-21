@@ -36,7 +36,6 @@ electron.contextBridge.exposeInMainWorld("pydtApi", {
 
     const launcher = new AutoLaunch({
       name: "Play Your Damn Turn Client",
-      isHidden: true,
     });
 
     launcher

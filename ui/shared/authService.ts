@@ -1,8 +1,9 @@
 import { Injectable } from "@angular/core";
 import { Configuration, User, UserService } from "pydt-shared";
 import { RPC_INVOKE, RPC_TO_MAIN } from "../rpcChannels";
+import { STORAGE_CONFIG } from "../storageConfig";
 
-export class ConfigData {
+export class AuthConfigData {
   token: string;
   allTokens?: {
     name: string;
@@ -60,7 +61,7 @@ export class AuthService {
     return this.setApiConfig();
   }
 
-  private static validateAllTokens(config: ConfigData) {
+  private static validateAllTokens(config: AuthConfigData) {
     if (config.token && !(config.allTokens || []).some(x => x.token === config.token)) {
       config.allTokens = [
         ...(config.allTokens || []),
@@ -78,11 +79,11 @@ export class AuthService {
     });
   }
 
-  private getConfig(): Promise<ConfigData> {
-    return window.pydtApi.ipc.invoke(RPC_INVOKE.STORAGE_GET, "configData");
+  private getConfig(): Promise<AuthConfigData> {
+    return window.pydtApi.ipc.invoke(RPC_INVOKE.STORAGE_GET, STORAGE_CONFIG.AUTH_CONFIG_DATA);
   }
 
-  private setConfig(config: ConfigData): Promise<void> {
-    return window.pydtApi.ipc.invoke(RPC_INVOKE.STORAGE_SET, "configData", config);
+  private setConfig(config: AuthConfigData): Promise<void> {
+    return window.pydtApi.ipc.invoke(RPC_INVOKE.STORAGE_SET, STORAGE_CONFIG.AUTH_CONFIG_DATA, config);
   }
 }

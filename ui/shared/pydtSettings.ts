@@ -3,12 +3,14 @@ import { CivGame, PlatformSaveLocation, GameStore, BasePath, Platform } from "py
 import { RPC_INVOKE } from "../rpcChannels";
 import { isEmpty, merge, omit } from "lodash-es";
 import { SafeMetadataLoader } from "./safeMetadataLoader";
+import { STORAGE_CONFIG } from "../storageConfig";
 
 const FIELDS_NOT_TO_PERSIST = ["basePaths"];
 
 export class PydtSettingsData {
   launchCiv = true;
   startOnBoot = false;
+  startHidden = false;
   numSaves = 100;
   gameStores: { [index: string]: GameStore } = {};
   savePaths: { [index: string]: string } = {};
@@ -50,7 +52,7 @@ export class PydtSettingsData {
   }
 
   async save(): Promise<void> {
-    await window.pydtApi.ipc.invoke(RPC_INVOKE.STORAGE_SET, "settings", omit(this, FIELDS_NOT_TO_PERSIST));
+    await window.pydtApi.ipc.invoke(RPC_INVOKE.STORAGE_SET, STORAGE_CONFIG.SETTINGS, omit(this, FIELDS_NOT_TO_PERSIST));
   }
 
   getDefaultDataPath(civGame: CivGame, gameStore?: GameStore): string {
@@ -120,7 +122,7 @@ export class PydtSettingsFactory {
   constructor(private readonly metadataLoader: SafeMetadataLoader) {}
 
   async getSettings(): Promise<PydtSettingsData> {
-    const settings = await window.pydtApi.ipc.invoke<PydtSettingsData>(RPC_INVOKE.STORAGE_GET, "settings");
+    const settings = await window.pydtApi.ipc.invoke<PydtSettingsData>(RPC_INVOKE.STORAGE_GET, STORAGE_CONFIG.SETTINGS);
 
     const metadata = await this.metadataLoader.loadMetadata();
 
