@@ -1,9 +1,5 @@
-import open from "open";
-import { deleteSync } from "del";
 import * as electron from "electron";
 import { default as log } from "electron-log";
-import * as fs from "fs";
-import * as path from "path";
 import { configureIot } from "./iot.mjs";
 import { getAppIcon, getWindow, createWindow, forceShowWindow } from "./window.mjs";
 import { checkForUpdates } from "./appUpdater.mjs";
@@ -21,33 +17,6 @@ contextMenu({
 
 (() => {
   const { app, dialog, ipcMain } = electron;
-
-  if (process.platform === "win32") {
-    // Check for and remove old squirrel installation, maybe we can remove this code someday
-    // https://github.com/electron-userland/electron-builder/issues/837
-    if (fs.existsSync(path.join(app.getPath("appData"), "../Local/playyourdamnturn/.shouldUninstall"))) {
-      // eslint-disable-next-line no-console
-      console.log("Removing old squirrel installation...");
-
-      open
-        .openApp(path.join(app.getPath("appData"), "../Local/playyourdamnturn/Update.exe"), {
-          arguments: ["--uninstall", "-s"],
-        })
-        .then(process => {
-          process.on("close", () => {
-            // eslint-disable-next-line no-console
-            console.log("Uninstall complete...");
-
-            setTimeout(() => {
-              deleteSync(path.join(app.getPath("appData"), "../Local/playyourdamnturn"), { force: true }).then(() => {
-                // eslint-disable-next-line no-console
-                console.log("Old folder deleted!");
-              });
-            }, 2500);
-          });
-        });
-    }
-  }
 
   app.on("second-instance", () => {
     // Someone tried to run a second instance, we should focus our window.
