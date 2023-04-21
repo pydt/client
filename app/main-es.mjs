@@ -1,4 +1,5 @@
 import * as electron from "electron";
+import open from "open";
 import { default as log } from "electron-log";
 import { configureIot } from "./iot.mjs";
 import { getAppIcon, getWindow, createWindow, forceShowWindow } from "./window.mjs";
@@ -29,7 +30,7 @@ contextMenu({
 
   ipcMain.on(RPC_TO_MAIN.LOG_ERROR, (e, message) => log.error(message));
 
-  ipcMain.on(RPC_TO_MAIN.OPEN_URL, (e, url) => open => open(url));
+  ipcMain.on(RPC_TO_MAIN.OPEN_URL, (e, url) => open(url));
 
   ipcMain.on(RPC_TO_MAIN.SHOW_WINDOW, () => {
     forceShowWindow();

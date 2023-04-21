@@ -191,7 +191,10 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
     this.saveFileToUpload = null;
 
     const fileData = pako.gzip(window.pydtApi.fs.readFileSync(fileBeingUploaded));
-    const moveTo = window.pydtApi.path.join(this.archiveDir, window.pydtApi.path.basename(fileBeingUploaded));
+    const moveTo = window.pydtApi.path.join(
+      this.archiveDir,
+      `${this.playTurnState.game.gameId.slice(0, 8)}_${window.pydtApi.path.basename(fileBeingUploaded)}`,
+    );
 
     try {
       const startResp = await this.gameService.startSubmit(this.playTurnState.game.gameId).toPromise();

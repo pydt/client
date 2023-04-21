@@ -5,6 +5,7 @@
     "app/ui_compiled/**/*",
     "app/rollbarConfig.js",
     "app/rpcChannels.js",
+    "app/storageConfig.js",
     "ui/environments/environment.build.ts"
   ],
   "overrides": [
