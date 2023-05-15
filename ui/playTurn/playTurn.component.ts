@@ -251,13 +251,21 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
     // If we've got too many archived files, delete some...
     const files: string[] = window.pydtApi.fs
       .readdirSync(this.archiveDir)
-      .map(x => {
+      .flatMap(x => {
         const file = window.pydtApi.path.join(this.archiveDir, x);
+        const stat = window.pydtApi.fs.statSync(file);
 
-        return {
-          file,
-          time: window.pydtApi.fs.statSync(file).ctime.getTime(),
-        };
+        if (stat.isDirectory) {
+          // Ignore directories
+          return [];
+        }
+
+        return [
+          {
+            file,
+            time: window.pydtApi.fs.statSync(file).ctime.getTime(),
+          },
+        ];
       })
       .sort((a, b) => a.time - b.time)
       .map(x => x.file);

@@ -94,7 +94,14 @@ electron.contextBridge.exposeInMainWorld("pydtApi", {
     readdirSync: p => fs.readdirSync(p),
     readFileSync: p => fs.readFileSync(p),
     renameSync: (oldPath, newPath) => fs.renameSync(oldPath, newPath),
-    statSync: p => fs.statSync(p),
+    statSync: p => {
+      const stat = fs.statSync(p);
+
+      return {
+        ctime: stat.ctime,
+        isDirectory: stat.isDirectory(),
+      };
+    },
     unlinkSync: p => fs.unlinkSync(p),
     writeFileSync: (p, data) => fs.writeFileSync(p, Buffer.from(data)),
   },

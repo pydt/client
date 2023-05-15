@@ -17,7 +17,7 @@ export interface PydtApi {
     readFileSync: (path: string) => Uint8Array;
     readdirSync: (path: string) => string[];
     renameSync: (oldPath: string, newPath: string) => void;
-    statSync: (path: string) => { ctime: { getTime(): number } };
+    statSync: (path: string) => { ctime: Date; isDirectory: boolean };
     unlinkSync: (path: string) => void;
     writeFileSync: (path: string, data: Uint8Array) => void;
   };
