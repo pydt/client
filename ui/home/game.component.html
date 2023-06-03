@@ -7,7 +7,7 @@
     <a href="javascript:void(0)" (click)="openGameOnWeb()">{{ game.displayName }}</a>
     <ng-container *ngIf="game.gameTurnRangeKey > 1">
       <small *ngIf="game.turnTimerMinutes" class="pull-right">Timer expires {{ timerExpires }}</small>
-      <small *ngIf="!game.turnTimerMinutes" class="pull-right">Last turn {{ lastTurn }} ago</small>
+      <small *ngIf="!game.turnTimerMinutes" class="pull-right">Last turn {{ lastTurn ? lastTurn + ' ago' : 'just happened' }}</small>
       <small class="pull-right">Round {{ game.round }} -&nbsp;</small>
     </ng-container>
   </div>
