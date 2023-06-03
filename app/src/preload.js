@@ -1,10 +1,10 @@
-const electron = require("electron");
-const path = require("path");
-const fs = require("fs");
-const mkdirp = require("mkdirp");
-const chokidar = require("chokidar");
-const AutoLaunch = require("auto-launch");
-const { RPC_INVOKE, RPC_TO_MAIN, RPC_TO_RENDERER } = require("./rpcChannels");
+import * as electron from "electron";
+import * as path from "path";
+import * as fs from "fs";
+import { mkdirpSync } from "mkdirp";
+import * as chokidar from "chokidar";
+import * as AutoLaunch from "auto-launch";
+import { RPC_INVOKE, RPC_TO_MAIN, RPC_TO_RENDERER } from "./rpcChannels.js";
 
 let watcher;
 
@@ -90,7 +90,7 @@ electron.contextBridge.exposeInMainWorld("pydtApi", {
   },
   fs: {
     existsSync: p => fs.existsSync(p),
-    mkdirp: p => mkdirp.sync(p),
+    mkdirp: p => mkdirpSync(p),
     readdirSync: p => fs.readdirSync(p),
     readFileSync: p => fs.readFileSync(p),
     renameSync: (oldPath, newPath) => fs.renameSync(oldPath, newPath),

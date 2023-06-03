@@ -1,15 +1,12 @@
 import * as electron from "electron";
 import * as path from "path";
 import * as fs from "fs";
-import * as url from 'url';
 import { RPC_TO_MAIN } from "./rpcChannels.js";
-import { forceShowWindow } from "./window.mjs";
+import { forceShowWindow } from "./window.js";
 
 // Needs to be out here to prevent GC
 // https://stackoverflow.com/questions/38449262/in-node-js-does-listening-to-an-eventemitter-create-a-reference-to-it
 let lastNotification;
-
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 electron.ipcMain.on(RPC_TO_MAIN.SHOW_NOTIFICATION, (e, arg) => {
   if (__dirname.indexOf("app.asar") > 0) {
@@ -22,7 +19,7 @@ electron.ipcMain.on(RPC_TO_MAIN.SHOW_NOTIFICATION, (e, arg) => {
       arg.icon = path.join(rootPath, "app/icon.png");
     }
   } else {
-    arg.icon = path.join(__dirname, "icon.png");
+    arg.icon = path.join(__dirname, "../icon.png");
   }
 
   lastNotification = new electron.Notification(arg);

@@ -1,3 +1,5 @@
-rollbarConfig.js
-rpcChannels.js
-storageConfig.js
+src/rollbarConfig.js
+src/rpcChannels.js
+src/storageConfig.js
+app_compiled
+ui_compiled

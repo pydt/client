@@ -4,17 +4,16 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "clean": "rimraf dist app/ui_compiled",
-    "build-common": "npx tsc ui/rpcChannels.ts ui/rollbarConfig.ts ui/storageConfig.ts --outDir app",
-    "build": "node createEnv.js && ng build && npm run build-common",
+    "clean": "rimraf dist app/ui_compiled app/app_compiled",
+    "build-common": "npx tsc ui/rpcChannels.ts ui/rollbarConfig.ts ui/storageConfig.ts --outDir app/src",
+    "build": "node createEnv.js && ng build && npm run build-common && cd app && npm run build",
     "serve": "ng serve",
-    "build-prod": "npm run lint && npm run clean && node createEnv.js && ng build",
+    "build-prod": "npm run lint && npm run clean && node createEnv.js && npm run build",
     "electron": "electron app",
-    "pack": "npm run build-prod && build --dir",
     "dist-win": "npm run build-prod && electron-builder --win --publish always",
     "dist-mac": "npm run build-prod && electron-builder --mac --publish always",
     "dist-linux": "npm run build-prod && electron-builder --linux --publish always",
-    "postinstall": "electron-builder install-app-deps",
+    "postinstall": "electron-builder install-app-deps && cd app && npm install",
     "lint": "npm run build-common && ng lint",
     "lint-fix": "npm run build-common && ng lint --fix"
   },
@@ -37,6 +36,12 @@
       "artifactName": "playyourdamnturn-linux-${version}-${arch}.${ext}",
       "target": "AppImage"
     },
+    "files": [
+      "!node_modules",
+      "app_compiled/**/*",
+      "ui_compiled/**/*",
+      "**/*.png"
+    ],
     "extraFiles": [
       "app/icon.png"
     ]

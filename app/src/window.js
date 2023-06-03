@@ -1,24 +1,22 @@
 import open from "open";
 import { app, BrowserWindow, ipcMain, Menu, Tray } from "electron";
 import * as path from "path";
-import * as url from "url";
 import { default as windowStateKeeper } from "electron-window-state";
 import { RPC_TO_MAIN, RPC_TO_RENDERER, RPC_INVOKE } from "./rpcChannels.js";
-import { clearConfig, getConfig } from "./storage.mjs";
+import { clearConfig, getConfig } from "./storage.js";
 import { STORAGE_CONFIG } from "./storageConfig.js";
 
 let win;
 let forceQuit = false;
 let appIcon;
-const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
 
 ipcMain.handle(RPC_INVOKE.SET_FORCE_QUIT, (event, data) => (forceQuit = data));
 
 ipcMain.on(RPC_TO_MAIN.UPDATE_TURNS_AVAILABLE, (event, available) => {
-  win.setOverlayIcon(available ? path.join(__dirname, "star.png") : null, available ? "Turns Available" : "");
+  win.setOverlayIcon(available ? path.join(__dirname, "../star.png") : null, available ? "Turns Available" : "");
 
   if (appIcon) {
-    appIcon.setImage(available ? path.join(__dirname, "icon_red.png") : path.join(__dirname, "icon.png"));
+    appIcon.setImage(available ? path.join(__dirname, "../icon_red.png") : path.join(__dirname, "../icon.png"));
   }
 });
 
@@ -26,7 +24,7 @@ const updateMenu = async () => {
   const config = await getConfig("configData");
 
   if (process.platform !== "darwin" && !appIcon) {
-    const iconPath = path.join(__dirname, "icon.png");
+    const iconPath = path.join(__dirname, "../icon.png");
 
     appIcon = new Tray(iconPath);
 
@@ -184,7 +182,7 @@ export const createWindow = async () => {
     mainWindowState.manage(win);
 
     // and load the index.html of the app.
-    win.loadURL(`file://${__dirname}/ui_compiled/index.html`);
+    win.loadURL(`file://${__dirname}/../ui_compiled/index.html`);
 
     app.on("before-quit", () => {
       forceQuit = true;

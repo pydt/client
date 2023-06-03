@@ -3,9 +3,10 @@
   "ignorePatterns": [
     "projects/**/*",
     "app/ui_compiled/**/*",
-    "app/rollbarConfig.js",
-    "app/rpcChannels.js",
-    "app/storageConfig.js",
+    "app/app_compiled/**/*",
+    "app/src/rollbarConfig.js",
+    "app/src/rpcChannels.js",
+    "app/src/storageConfig.js",
     "ui/environments/environment.build.ts"
   ],
   "overrides": [
@@ -32,7 +33,8 @@
         "semi": ["error", "always"],
         "no-new": ["off"],
         "node/no-path-concat": ["off"],
-        "node/no-extraneous-require": ["error", {
+        "node/no-unsupported-features/es-syntax": ["off"],
+        "node/no-extraneous-import": ["error", {
           "allowModules": ["electron"]
         }],
         "prettier/prettier": [

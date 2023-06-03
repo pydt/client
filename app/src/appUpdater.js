@@ -1,9 +1,7 @@
 import * as electron from "electron";
 import { default as log } from "electron-log";
-import { default as electron_updater } from "electron-updater";
+import { autoUpdater } from "electron-updater";
 import { RPC_TO_MAIN, RPC_TO_RENDERER } from "./rpcChannels.js";
-
-const { autoUpdater } = electron_updater;
 
 // Check for updates every 30 minutes
 const UPDATE_INTERVAL = 30 * 60 * 1000;

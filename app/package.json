@@ -4,12 +4,15 @@
   "version": "2.1.2",
   "description": "Desktop Client to assist with playing your damn turns.",
   "author": "playyourdamnturn.com",
-  "main": "main.js",
+  "main": "app_compiled/main.js",
   "files": [
     "*.js"
   ],
   "engines": {
     "node": ">=18.0.0"
+  },
+  "scripts": {
+    "build": "build-electron"
   },
   "dependencies": {
     "auto-launch": "^5.0.5",
@@ -23,5 +26,9 @@
     "mkdirp": "^3.0.0",
     "open": "^9.1.0",
     "rollbar": "^2.26.1"
+  },
+  "devDependencies": {
+    "build-electron": "^1.0.5",
+    "source-map-support": "^0.5.21"
   }
 }
