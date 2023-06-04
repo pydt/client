@@ -8,6 +8,15 @@
   >
     Refresh
   </button>
+  <button
+    *ngIf="hasUnreadSmack"
+    type="button"
+    class="btn btn-xs btn-default"
+    style="position: fixed; top: 0; right: 85px; z-index: 1000"
+    (click)="clearSmack()"
+  >
+    Clear All Smack Talk Notifications
+  </button>
   <h1 *ngIf="errorLoading">There was an error loading your games. Please check your internet connection.</h1>
   <ng-container *ngIf="!errorLoading">
     <h1 *ngIf="games?.length === 0">You have no games. :(</h1>

@@ -29,6 +29,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   discourseInfo: DiscourseInfo;
   errorLoading = false;
   refreshDisabled = false;
+  hasUnreadSmack = false;
   private user: User;
   private timerSub: Subscription;
   private destroyed = false;
@@ -109,8 +110,19 @@ export class HomeComponent implements OnInit, OnDestroy {
     }, 30000);
   }
 
+  async clearSmack() {
+    this.hasUnreadSmack = false;
+
+    for (const turn of this.sortedTurns) {
+      this.discourseInfo[turn.gameId] = turn.latestDiscoursePostNumber;
+    }
+
+    await DiscourseInfo.saveDiscourseInfo(this.discourseInfo);
+  }
+
   smackRead(gameId: string, postNumber: number): Promise<void> {
     this.discourseInfo[gameId] = postNumber;
+    this.findUnreadSmack();
     return DiscourseInfo.saveDiscourseInfo(this.discourseInfo);
   }
 
@@ -189,13 +201,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       }
 
       // Notify about smack talk
-      const smackTalk = this.games
-        .filter(x => {
-          const readPostNumber = this.discourseInfo[x.gameId] || 0;
-
-          return DiscourseInfo.isNewSmackTalkPost(x, this.user, readPostNumber);
-        })
-        .map(x => x.displayName);
+      const smackTalk = this.findUnreadSmack();
 
       if (smackTalk.length) {
         window.pydtApi.ipc.send(RPC_TO_MAIN.SHOW_NOTIFICATION, {
@@ -209,6 +215,21 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (notificationShown) {
       this.lastNotification = new Date();
     }
+  }
+
+  private findUnreadSmack() {
+    // Notify about smack talk
+    const result = this.games
+      .filter(x => {
+        const readPostNumber = this.discourseInfo[x.gameId] || 0;
+
+        return DiscourseInfo.isNewSmackTalkPost(x, this.user, readPostNumber);
+      })
+      .map(x => x.displayName);
+
+    this.hasUnreadSmack = !!result.length;
+
+    return result;
   }
 
   configureIot(): void {
