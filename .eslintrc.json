@@ -42,7 +42,8 @@
           {
             "endOfLine": "auto"
           }
-        ]
+        ],
+        "jsdoc/newline-after-description": "off"
       }
     },
     {
@@ -100,7 +101,8 @@
           {
             "endOfLine": "auto"
           }
-        ]
+        ],
+        "jsdoc/newline-after-description": "off"
       }
     },
     {
