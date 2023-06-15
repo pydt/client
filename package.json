@@ -5,17 +5,18 @@
   },
   "scripts": {
     "clean": "rimraf dist app/ui_compiled app/app_compiled",
-    "build-common": "npx tsc ui/rpcChannels.ts ui/rollbarConfig.ts ui/storageConfig.ts --outDir app/src",
-    "build": "node createEnv.js && ng build && npm run build-common && cd app && npm run build",
+    "generate-shared": "npx tsc ui/rpcChannels.ts ui/rollbarConfig.ts ui/storageConfig.ts --outDir app/src",
+    "build-common": "npm run generate-shared && ng build && cd app && npm run build",
+    "build": "node createEnv.js dev && npm run build-common",
     "serve": "ng serve",
-    "build-prod": "npm run lint && npm run clean && node createEnv.js && npm run build",
+    "build-prod": "npm run lint && npm run clean && node createEnv.js prod && npm run build-common",
     "electron": "electron app",
     "dist-win": "npm run build-prod && electron-builder --win --publish always",
     "dist-mac": "npm run build-prod && electron-builder --mac --publish always",
     "dist-linux": "npm run build-prod && electron-builder --linux --publish always",
     "postinstall": "electron-builder install-app-deps && cd app && npm install",
-    "lint": "npm run build-common && ng lint",
-    "lint-fix": "npm run build-common && ng lint --fix"
+    "lint": "npm run generate-shared && ng lint",
+    "lint-fix": "npm run generate-shared && ng lint --fix"
   },
   "build": {
     "appId": "play.your.damn.turn.client",
