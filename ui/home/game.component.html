@@ -8,7 +8,7 @@
     <ng-container *ngIf="game.gameTurnRangeKey > 1">
       <small *ngIf="game.turnTimerMinutes" class="pull-right">Timer expires {{ timerExpires }}</small>
       <small *ngIf="!game.turnTimerMinutes" class="pull-right"
-        >Last turn {{ lastTurn ? lastTurn + " ago" : "just happened" }}</small
+        >Last turn {{ lastTurn }}</small
       >
       <small class="pull-right">Round {{ game.round }} -&nbsp;</small>
     </ng-container>
