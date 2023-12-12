@@ -2,6 +2,12 @@
   margin-top:10px;
 }
 
+.panel-heading {
+  padding: 5px 15px;
+  height: 32px;
+  overflow: hidden;
+}
+
 h3 {
   margin-top: 0;
 }
@@ -9,4 +15,9 @@ h3 {
 .panel-default a, .panel-default a:hover {
   color: black;
   text-decoration: underline;
+}
+
+small {
+  font-size: 11px;
+  line-height: 22px;
 }

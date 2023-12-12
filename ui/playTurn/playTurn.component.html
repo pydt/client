@@ -1,6 +1,16 @@
 <div>
   <div class="panel panel-default">
     <div class="panel-heading">
+      <div
+        style="overflow: hidden; width: calc(100% - 80px); white-space: nowrap; text-overflow: ellipsis; float: left"
+      >
+        <a href="javascript:void(0)" (click)="openGameOnWeb()"
+          >Playing Turn:
+          <a href="javascript:void(0)" (click)="openGameOnWeb()">{{ playTurnState.game.displayName }}</a></a
+        >
+        <small class="pull-right">{{ lastTurnText$ | async }}</small>
+        <small class="pull-right">Round {{ playTurnState.game.round }} -&nbsp;</small>
+      </div>
       <button
         type="button"
         class="btn btn-xs btn-default"
@@ -9,9 +19,6 @@
       >
         {{ showGameInfo ? "Turn Data" : "Game Info" }}
       </button>
-      <div style="width: calc(100% - 125px); overflow: hidden; white-space: nowrap; text-overflow: ellipsis">
-        Playing Turn: <a href="javascript:void(0)" (click)="openGameOnWeb()">{{ playTurnState.game.displayName }}</a>
-      </div>
     </div>
     <div class="panel-body">
       <ng-container *ngIf="!showGameInfo">

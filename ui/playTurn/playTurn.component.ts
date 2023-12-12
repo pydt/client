@@ -2,20 +2,20 @@ import { HttpErrorResponse } from "@angular/common/http";
 import { Component, HostListener, Input, NgZone, OnDestroy, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import * as pako from "pako";
-import { Game, GameService, SteamProfileMap, CivGame } from "pydt-shared";
+import { GameService, SteamProfileMap, CivGame, CountdownUtility } from "pydt-shared";
 import { PydtSettingsFactory, PydtSettingsData } from "../shared/pydtSettings";
 import { PlayTurnState } from "./playTurnState.service";
 import { TurnCacheService, TurnDownloader } from "../shared/turnCacheService";
 import { SafeMetadataLoader } from "../shared/safeMetadataLoader";
 import { RPC_TO_MAIN } from "../rpcChannels";
+import { Observable } from "rxjs";
 
 @Component({
-  selector: "pydt-home",
+  selector: "pydt-play-turn",
   templateUrl: "./playTurn.component.html",
   styleUrls: ["./playTurn.component.css"],
 })
 export class PlayTurnComponent implements OnInit, OnDestroy {
-  @Input() game: Game;
   @Input() gamePlayerProfiles: SteamProfileMap;
   status = "Downloading Save File...";
   saveFileToUpload: string;
@@ -31,6 +31,7 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
   private saveDir: string;
   private archiveDir: string;
   private saveFileToPlay: string;
+  lastTurnText$: Observable<string>;
 
   constructor(
     public readonly playTurnState: PlayTurnState,
@@ -69,6 +70,7 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
     }
 
     this.games = metadata.civGames;
+    this.lastTurnText$ = CountdownUtility.lastTurnOrTimerExpires$(this.playTurnState.game);
 
     try {
       this.saveDir = this.settings.getSavePath(this.civGame);
