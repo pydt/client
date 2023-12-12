@@ -15,7 +15,10 @@ export class AuthConfigData {
 export class AuthService {
   private user: User;
 
-  constructor(private readonly apiConfig: Configuration, private readonly userService: UserService) {}
+  constructor(
+    private readonly apiConfig: Configuration,
+    private readonly userService: UserService,
+  ) {}
 
   async isAuthenticated(): Promise<boolean> {
     await this.setApiConfig();

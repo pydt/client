@@ -15,7 +15,11 @@ export class AuthComponent {
   model = new AuthModel();
   authError = false;
 
-  constructor(private auth: AuthService, private userService: UserService, private router: Router) {}
+  constructor(
+    private auth: AuthService,
+    private userService: UserService,
+    private router: Router,
+  ) {}
 
   async onSubmit(): Promise<void> {
     this.authError = false;

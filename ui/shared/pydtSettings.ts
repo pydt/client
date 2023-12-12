@@ -16,7 +16,11 @@ export class PydtSettingsData {
   savePaths: { [index: string]: string } = {};
   autoDownload = false;
 
-  constructor(civGames: CivGame[], prevData: PydtSettingsData, private basePaths: { [index: string]: string }) {
+  constructor(
+    civGames: CivGame[],
+    prevData: PydtSettingsData,
+    private basePaths: { [index: string]: string },
+  ) {
     if (!isEmpty(prevData)) {
       merge(this, omit(prevData, FIELDS_NOT_TO_PERSIST));
 
@@ -66,7 +70,7 @@ export class PydtSettingsData {
       ),
     );
 
-    if (window.pydtApi.platform === Platform.Linux) {
+    if (window.pydtApi.platform === Platform.Linux.toString()) {
       // User could be running proton on linux, see if proton path exists
       const protonLocation: PlatformSaveLocation = civGame.saveLocations[Platform.LinuxProton];
 

@@ -4,7 +4,10 @@ import { MetadataCacheService, PydtMetadata } from "pydt-shared";
 
 @Injectable()
 export class SafeMetadataLoader {
-  constructor(public metadataCache: MetadataCacheService, private router: Router) {}
+  constructor(
+    public metadataCache: MetadataCacheService,
+    private router: Router,
+  ) {}
 
   public async loadMetadata(): Promise<PydtMetadata> {
     try {

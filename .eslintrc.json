@@ -23,7 +23,6 @@
         "es6": true
       },
       "extends": [
-        "eslint",
         "plugin:prettier/recommended"
       ],
       "rules": {
@@ -34,9 +33,6 @@
         "no-new": ["off"],
         "node/no-path-concat": ["off"],
         "node/no-unsupported-features/es-syntax": ["off"],
-        "node/no-extraneous-import": ["error", {
-          "allowModules": ["electron"]
-        }],
         "prettier/prettier": [
           "error",
           {
@@ -58,7 +54,6 @@
         "createDefaultProgram": true
       },
       "extends": [
-        "eslint",
         "plugin:@typescript-eslint/recommended",
         "plugin:@typescript-eslint/recommended-requiring-type-checking",
         "plugin:@angular-eslint/recommended",

@@ -47,9 +47,9 @@
           class="clearfix"
           [gamePlayerProfiles]="playTurnState.gamePlayerProfiles"
         ></pydt-game-players>
-        <p style="margin-top: 10px"><b>Game Speed:</b> {{ playTurnState.game | gamespeed : games }}</p>
-        <p><b>Map Type:</b> {{ playTurnState.game | map : games }}</p>
-        <p><b>Map Size:</b> {{ playTurnState.game | mapsize : games }}</p>
+        <p style="margin-top: 10px"><b>Game Speed:</b> {{ playTurnState.game | gamespeed: games }}</p>
+        <p><b>Map Type:</b> {{ playTurnState.game | map: games }}</p>
+        <p><b>Map Size:</b> {{ playTurnState.game | mapsize: games }}</p>
         <ng-container *ngIf="playTurnState.game.description">
           <hr style="margin-top: 5px; margin-bottom: 5px; border-color: #000" />
           <markdown [data]="playTurnState.game.description"></markdown>

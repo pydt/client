@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from "@angular/core";
 import { Router } from "@angular/router";
-import { Game, SteamProfileMap, User, CivGame, countdown, CountdownUtility } from "pydt-shared";
+import { Game, SteamProfileMap, User, CivGame, CountdownUtility } from "pydt-shared";
 import { SafeMetadataLoader } from "../shared/safeMetadataLoader";
 import { PlayTurnState } from "../playTurn/playTurnState.service";
 import { DiscourseInfo } from "../shared/discourseInfo";
@@ -19,7 +19,7 @@ export class GameComponent implements OnInit, OnDestroy {
   @Input() discoursePostNumber: number;
   @Output() smackRead = new EventEmitter<number>();
   private now: Date;
-  updateDateHandle: NodeJS.Timer;
+  updateDateHandle: NodeJS.Timeout;
   games: CivGame[] = [];
 
   constructor(
