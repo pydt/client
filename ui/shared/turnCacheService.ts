@@ -8,7 +8,7 @@ import { PydtSettingsFactory } from "./pydtSettings";
 export class TurnDownloader {
   private xhr: XMLHttpRequest;
   private downloading = false;
-  public readonly data$ = new BehaviorSubject<Uint8Array>(null);
+  public readonly data$ = new BehaviorSubject<{ data: Uint8Array; version?: string }>(null);
   public readonly error$ = new BehaviorSubject<string>(null);
   public readonly curBytes$ = new BehaviorSubject<number>(0);
   public readonly maxBytes$ = new BehaviorSubject<number>(0);
@@ -113,7 +113,10 @@ export class TurnDownloader {
                 // Ignore - file probably wasn't gzipped...
               }
 
-              this.data$.next(data);
+              this.data$.next({
+                data,
+                version: resp.version,
+              });
             } catch (err) {
               // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
               this.error$.next(err);

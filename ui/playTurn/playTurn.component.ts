@@ -105,8 +105,20 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
 
     this.turnDownloader.startDownload();
 
-    if (this.turnDownloader.data$.value) {
-      this.status = "Turn already downloaded, moving to save location...";
+    const curData = this.turnDownloader.data$.value;
+
+    if (curData) {
+      this.status = "Turn already downloaded, validating...";
+
+      const turn = await this.gameService.getTurn(this.playTurnState.game.gameId, "yup").toPromise();
+
+      if (turn.version === curData.version) {
+        this.status = "Turn downloaded & validated, moving to save location...";
+      } else {
+        this.status = "Turn data is out of date, re-downloading...";
+        this.turnDownloader.abort();
+        this.turnDownloader.startDownload();
+      }
     }
 
     this.turnDownloader.error$.subscribe(err => {
@@ -126,7 +138,7 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
         }, 500);
 
         try {
-          window.pydtApi.fs.writeFileSync(this.saveFileToPlay, data);
+          window.pydtApi.fs.writeFileSync(this.saveFileToPlay, data.data);
 
           await new Promise(sleepResolve => setTimeout(sleepResolve, 500));
 
