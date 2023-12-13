@@ -61,12 +61,13 @@ export class PydtSettingsData {
 
   getDefaultDataPath(civGame: CivGame, gameStore?: GameStore): string {
     const location: PlatformSaveLocation = civGame.saveLocations[window.pydtApi.platform];
+    const finalStore = gameStore || this.getGameStore(civGame);
 
     let result = window.pydtApi.path.normalize(
       window.pydtApi.path.join(
         this.basePaths[location.basePath],
         location.prefix,
-        civGame.dataPaths[gameStore || this.getGameStore(civGame)],
+        location.dataPathOverrides?.[finalStore] || civGame.dataPaths[finalStore],
       ),
     );
 
@@ -79,7 +80,7 @@ export class PydtSettingsData {
           window.pydtApi.path.join(
             this.basePaths[protonLocation.basePath],
             protonLocation.prefix,
-            civGame.dataPaths[gameStore || this.getGameStore(civGame)],
+            protonLocation.dataPathOverrides?.[finalStore] || civGame.dataPaths[finalStore],
           ),
         );
 

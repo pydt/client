@@ -93,7 +93,7 @@
     "pako": "^2.1.0",
     "prettier": "^3.1.1",
     "prettier-eslint": "^16.1.2",
-    "pydt-shared": "file:../shared/dist/pydt-shared-lib",
+    "pydt-shared": "^1.8.12",
     "rimraf": "^5.0.5",
     "rollbar": "^2.26.2",
     "rxjs": "^7.8.1",
