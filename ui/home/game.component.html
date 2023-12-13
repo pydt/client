@@ -4,7 +4,7 @@
       src="https://playyourdamnturn.com/img/game_{{ civGame?.id }}.png"
       style="height: 15px; padding-right: 8px; position: relative; top: -2px"
     />
-    <a href="javascript:void(0)" (click)="openGameOnWeb()">{{ game.displayName }}</a>
+    <a href="javascript:void(0)" (click)="openGameOnWeb()">{{ gameTitle }}</a>
     <ng-container *ngIf="game.gameTurnRangeKey > 1">
       <small class="pull-right">{{ lastTurnText$ | async }}</small>
       <small class="pull-right">Round {{ game.round }} -&nbsp;</small>
@@ -20,7 +20,7 @@
       </button>
     </div>
     <div *ngIf="yourTurn && game.gameTurnRangeKey > 1">
-      <button type="submit" class="btn btn-primary btn-xs btn-block" (click)="playTurn()">Play Your Damn Turn!</button>
+      <button type="submit" class="btn btn-primary btn-xs btn-block" (click)="playTurn()">{{ playText }}</button>
     </div>
     <div *ngIf="yourTurn && game.gameTurnRangeKey === 1">
       <button type="submit" class="btn btn-primary btn-xs btn-block" (click)="openGameOnWeb()">

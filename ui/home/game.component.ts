@@ -47,8 +47,47 @@ export class GameComponent implements OnInit, OnDestroy {
     return this.games.find(x => x.id === this.game.gameType);
   }
 
+  get gameTitle() {
+    let result = this.game.displayName;
+
+    if (this.game.flags?.length) {
+      result += ` (${this.game.flags
+        .map(x => {
+          switch (x) {
+            case "CIV6_CONGRESS_TURN":
+              return "CONGRESS TURN!";
+            default:
+              return x;
+          }
+        })
+        .join(", ")})`;
+    }
+
+    return result;
+  }
+
+  get playText() {
+    let flagText = "";
+
+    if (this.game.flags?.length) {
+      flagText = `(${this.game.flags
+        .map(x => {
+          switch (x) {
+            case "CIV6_CONGRESS_TURN":
+              return "Congress";
+            default:
+              return x;
+          }
+        })
+        .join(", ")}) `;
+    }
+
+    return `Play Your Damn ${flagText}Turn!`;
+  }
+
   playTurn(): void {
     this.playTurnState.game = this.game;
+    this.playTurnState.gameTitle = this.gameTitle;
     this.playTurnState.gamePlayerProfiles = this.gamePlayerProfiles;
     void this.router.navigate(["/playTurn"]);
   }

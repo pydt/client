@@ -278,8 +278,8 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     const yourTurns = orderBy(
       this.sortedTurns.filter(x => x.yourTurn),
-      x => x.updatedAt,
-      "desc",
+      [x => (x.flags || []).length, x => x.updatedAt],
+      ["desc", "desc"],
     );
 
     const others = orderBy(
