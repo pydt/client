@@ -1,5 +1,5 @@
 export const ROLLBAR_CONFIG = {
-  accessToken: "2657e39f6c2847edb4f750a37ef4b20b",
+  accessToken: "5555ee71eb61470195bb42773371fb7a",
   captureUncaught: true,
   captureUnhandledRejections: true,
   environment: "production",
