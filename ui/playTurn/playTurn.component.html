@@ -4,9 +4,7 @@
       <div
         style="overflow: hidden; width: calc(100% - 80px); white-space: nowrap; text-overflow: ellipsis; float: left"
       >
-        <a href="javascript:void(0)" (click)="openGameOnWeb()"
-          >Playing Turn: <a href="javascript:void(0)" (click)="openGameOnWeb()">{{ playTurnState.gameTitle }}</a></a
-        >
+        Playing Turn: <a [href]="gameUrl">{{ playTurnState.gameTitle }}</a>
         <small class="pull-right">{{ lastTurnText$ | async }}</small>
         <small class="pull-right">Round {{ playTurnState.game.round }} -&nbsp;</small>
       </div>

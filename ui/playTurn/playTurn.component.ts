@@ -297,10 +297,7 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
     });
   }
 
-  openGameOnWeb(): void {
-    window.pydtApi.ipc.send(
-      RPC_TO_MAIN.OPEN_URL,
-      `https://playyourdamnturn.com/game/${this.playTurnState.game.gameId}`,
-    );
+  get gameUrl() {
+      return `https://playyourdamnturn.com/game/${this.playTurnState.game.gameId}`;
   }
 }
