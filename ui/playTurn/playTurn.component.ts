@@ -298,6 +298,6 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
   }
 
   get gameUrl() {
-      return `https://playyourdamnturn.com/game/${this.playTurnState.game.gameId}`;
+    return `https://playyourdamnturn.com/game/${this.playTurnState.game.gameId}`;
   }
 }
