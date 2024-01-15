@@ -7,6 +7,7 @@ export const ROLLBAR_CONFIG = {
     "Http failure response for https://api.playyourdamnturn.com/metadata",
     "net::ERR_",
     "GET url: https://objects.githubusercontent.com/",
+    "GET url: https://github.com/pydt/client/releases",
     "ENOENT: no such file or directory, open",
   ],
 };

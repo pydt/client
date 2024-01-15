@@ -247,6 +247,11 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
 
       await this.gameService.finishSubmit(this.playTurnState.game.gameId).toPromise();
       window.pydtApi.fs.renameSync(fileBeingUploaded, moveTo);
+
+      // If original save file still exists, delete it
+      if (window.pydtApi.fs.existsSync(this.saveFileToPlay)) {
+        window.pydtApi.fs.unlinkSync(this.saveFileToPlay);
+      }
     } catch (err) {
       this.status = "There was an error submitting your turn.  Please try again.";
 
