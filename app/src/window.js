@@ -34,6 +34,11 @@ const updateMenu = async () => {
         click: () => {
           win.show();
         },
+      },      {
+        label: "Hide Client",
+        click: () => {
+          win.hide();
+        },
       },
       {
         label: "Exit",
