@@ -7,7 +7,7 @@ import { ModalModule } from "ngx-bootstrap/modal";
 import { ProgressbarModule } from "ngx-bootstrap/progressbar";
 import { TabsModule } from "ngx-bootstrap/tabs";
 import { TooltipModule } from "ngx-bootstrap/tooltip";
-import { MarkdownModule, MarkedOptions } from "ngx-markdown";
+import { MARKED_OPTIONS, MarkdownModule } from "ngx-markdown";
 import {
   ApiModule,
   BusyService,
@@ -53,7 +53,7 @@ export const configFactory = (): Configuration =>
     routing,
     MarkdownModule.forRoot({
       markedOptions: {
-        provide: MarkedOptions,
+        provide: MARKED_OPTIONS,
         useValue: {
           breaks: true,
         },

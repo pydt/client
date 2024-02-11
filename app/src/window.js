@@ -37,7 +37,7 @@ const updateMenu = async () => {
     const contextMenu = Menu.buildFromTemplate([
       {
         label: win.isVisible() ? "Hide Client" : "Show Client",
-        click: () => win.isVisible() ? win.hide() : win.show()
+        click: () => (win.isVisible() ? win.hide() : win.show()),
       },
       {
         label: "Exit",
@@ -196,12 +196,12 @@ export const createWindow = async () => {
       }
     });
 
-    win.on('show', updateMenu);
-    win.on('hide', updateMenu);
-    win.on('minimize', updateMenu);
-    win.on('maximize', updateMenu);
-    win.on('unmaximize', updateMenu);
-    win.on('restore', updateMenu);
+    win.on("show", updateMenu);
+    win.on("hide", updateMenu);
+    win.on("minimize", updateMenu);
+    win.on("maximize", updateMenu);
+    win.on("unmaximize", updateMenu);
+    win.on("restore", updateMenu);
 
     // Emitted when the window is closed.
     win.on("closed", () => {
