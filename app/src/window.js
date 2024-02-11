@@ -23,22 +23,21 @@ ipcMain.on(RPC_TO_MAIN.UPDATE_TURNS_AVAILABLE, (event, available) => {
 const updateMenu = async () => {
   const config = await getConfig("configData");
 
-  if (process.platform !== "darwin" && !appIcon) {
-    const iconPath = path.join(__dirname, "../icon.png");
+  if (process.platform !== "darwin") {
+    if (!appIcon) {
+      const iconPath = path.join(__dirname, "../icon.png");
 
-    appIcon = new Tray(iconPath);
+      appIcon = new Tray(iconPath);
+      appIcon.setToolTip("Play Your Damn Turn Client");
+      appIcon.on("double-click", () => {
+        win.show();
+      });
+    }
 
     const contextMenu = Menu.buildFromTemplate([
       {
-        label: "Show Client",
-        click: () => {
-          win.show();
-        },
-      },      {
-        label: "Hide Client",
-        click: () => {
-          win.hide();
-        },
+        label: win.isVisible() ? "Hide Client" : "Show Client",
+        click: () => win.isVisible() ? win.hide() : win.show()
       },
       {
         label: "Exit",
@@ -49,11 +48,7 @@ const updateMenu = async () => {
       },
     ]);
 
-    appIcon.setToolTip("Play Your Damn Turn Client");
     appIcon.setContextMenu(contextMenu);
-    appIcon.on("double-click", () => {
-      win.show();
-    });
   }
 
   const aboutClick = () => {
@@ -200,6 +195,13 @@ export const createWindow = async () => {
         e.returnValue = false;
       }
     });
+
+    win.on('show', updateMenu);
+    win.on('hide', updateMenu);
+    win.on('minimize', updateMenu);
+    win.on('maximize', updateMenu);
+    win.on('unmaximize', updateMenu);
+    win.on('restore', updateMenu);
 
     // Emitted when the window is closed.
     win.on("closed", () => {
