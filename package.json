@@ -28,7 +28,13 @@
       "gatekeeperAssess": false,
       "entitlements": "build/entitlements.mac.plist",
       "entitlementsInherit": "build/entitlements.mac.plist",
-      "notarize": false
+      "notarize": false,
+      "target": [
+        {
+          "target": "default",
+          "arch": "x64"
+        }
+      ]
     },
     "dmg": {
       "sign": false
