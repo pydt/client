@@ -36,6 +36,16 @@
         }
       ]
     },
+    "win": {
+      "artifactName": "playyourdamnturn-win-${version}.${ext}",
+      "executableName": "PydtClient",
+      "azureSignOptions": {
+        "publisherName": "Rosack Software Solutions, LLC",
+        "endpoint": "https://eus.codesigning.azure.net/",
+        "certificateProfileName": "rss-public",
+        "codeSigningAccountName": "rss-trusted-signing"
+      }
+    },
     "dmg": {
       "sign": false
     },
@@ -79,13 +89,13 @@
     "@electron/notarize": "^2.5.0",
     "@types/node": "^20.11.17",
     "@types/pako": "^2.0.3",
+    "@types/plist": "^3.0.5",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "bootstrap-sass": "^3.4.3",
     "core-js": "^3.35.1",
-    "electron": "^32.1.2",
-    "electron-builder": "^25.0.5",
-    "electron-builder-lib": "^20.23.1",
+    "electron": "^33.2.1",
+    "electron-builder": "^26.0.0-alpha.8",
     "es6-shim": "^0.35.8",
     "eslint": "^8.56.0",
     "eslint-config-eslint": "^9.0.0",

@@ -18,8 +18,9 @@ jobs:
           GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
           IOT_CLIENT_ACCESS_KEY: ${{secrets.IOT_CLIENT_ACCESS_KEY}}
           IOT_CLIENT_SECRET_KEY: ${{secrets.IOT_CLIENT_SECRET_KEY}}
-          CSC_LINK: ${{secrets.WIN_CSC_LINK}}
-          CSC_KEY_PASSWORD: ${{secrets.WIN_CSC_KEY_PASSWORD}}
+          AZURE_CLIENT_ID: ${{secrets.AZURE_CLIENT_ID}}
+          AZURE_CLIENT_SECRET: ${{secrets.AZURE_CLIENT_SECRET}}
+          AZURE_TENANT_ID: ${{secrets.AZURE_TENANT_ID}}
   build-linux:
     runs-on: ubuntu-latest
     steps:
