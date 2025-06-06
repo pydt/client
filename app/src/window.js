@@ -1,5 +1,5 @@
 import open from "open";
-import { app, BrowserWindow, ipcMain, Menu, Tray } from "electron";
+import { app, BrowserWindow, ipcMain, Menu, Tray, nativeImage } from "electron";
 import * as path from "path";
 import { default as windowStateKeeper } from "electron-window-state";
 import { RPC_TO_MAIN, RPC_TO_RENDERER, RPC_INVOKE } from "./rpcChannels.js";
@@ -10,46 +10,63 @@ let win;
 let forceQuit = false;
 let appIcon;
 
+let appIconGreen;
+let appIconRed;
+let darwinIconSize = 20;
+
 ipcMain.handle(RPC_INVOKE.SET_FORCE_QUIT, (event, data) => (forceQuit = data));
 
 ipcMain.on(RPC_TO_MAIN.UPDATE_TURNS_AVAILABLE, (event, available) => {
   win.setOverlayIcon(available ? path.join(__dirname, "../star.png") : null, available ? "Turns Available" : "");
 
   if (appIcon) {
-    appIcon.setImage(available ? path.join(__dirname, "../icon_red.png") : path.join(__dirname, "../icon.png"));
+    appIcon.setImage(available ? appIconRed : appIconGreen);
   }
 });
 
 const updateMenu = async () => {
   const config = await getConfig("configData");
 
-  if (process.platform !== "darwin") {
-    if (!appIcon) {
-      const iconPath = path.join(__dirname, "../icon.png");
+  // Initialize icon images with electron's nativeImage
+  if (!appIconGreen || !appIconRed) {
+    appIconGreen = nativeImage.createFromPath(path.join(__dirname, "../icon.png"));
+    appIconRed = nativeImage.createFromPath(path.join(__dirname, "../icon_red.png"));
 
-      appIcon = new Tray(iconPath);
-      appIcon.setToolTip("Play Your Damn Turn Client");
-      appIcon.on("double-click", () => {
-        win.show();
-      });
+    // Resize icons on macOS
+    if (process.platform == "darwin") {
+      appIconGreen = appIconGreen.resize({ height: darwinIconSize });
+      appIconRed = appIconRed.resize({ height: darwinIconSize });
     }
-
-    const contextMenu = Menu.buildFromTemplate([
-      {
-        label: win.isVisible() ? "Hide Client" : "Show Client",
-        click: () => (win.isVisible() ? win.hide() : win.show()),
-      },
-      {
-        label: "Exit",
-        click: () => {
-          forceQuit = true;
-          app.quit();
-        },
-      },
-    ]);
-
-    appIcon.setContextMenu(contextMenu);
   }
+
+  // Hide dock icon on macOS
+  if (process.platform == "darwin") {
+    app.dock.hide();
+  }
+
+  if (!appIcon) {
+    appIcon = new Tray(appIconGreen);
+    appIcon.setToolTip("Play Your Damn Turn Client");
+    appIcon.on("double-click", () => {
+      win.show();
+    });
+  }
+
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: win.isVisible() ? "Hide Client" : "Show Client",
+      click: () => (win.isVisible() ? win.hide() : win.show()),
+    },
+    {
+      label: "Exit",
+      click: () => {
+        forceQuit = true;
+        app.quit();
+      },
+    },
+  ]);
+
+  appIcon.setContextMenu(contextMenu);
 
   const aboutClick = () => {
     win.show();
