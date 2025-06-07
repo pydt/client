@@ -41,7 +41,7 @@ const updateMenu = async () => {
 
   // Hide dock icon on macOS
   if (process.platform == "darwin") {
-    app.dock.hide();
+    if (!win.isVisible()) app.dock.hide();
   }
 
   if (!appIcon) {
@@ -55,7 +55,15 @@ const updateMenu = async () => {
   const contextMenu = Menu.buildFromTemplate([
     {
       label: win.isVisible() ? "Hide Client" : "Show Client",
-      click: () => (win.isVisible() ? win.hide() : win.show()),
+      click: () => {
+        if (win.isVisible()) {
+          win.hide();
+          app.dock.hide();
+        } else {
+          win.show();
+          app.dock.show();
+        }
+      },
     },
     {
       label: "Exit",
