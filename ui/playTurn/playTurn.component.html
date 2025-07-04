@@ -2,63 +2,54 @@
   <div class="panel panel-default">
     <div class="panel-heading">
       <div
-        style="overflow: hidden; width: calc(100% - 80px); white-space: nowrap; text-overflow: ellipsis; float: left"
+        style="overflow: hidden; width: 100%; white-space: nowrap; text-overflow: ellipsis; float: left"
       >
         Playing Turn: <a [href]="gameUrl">{{ playTurnState.gameTitle }}</a>
         <small class="pull-right">{{ lastTurnText$ | async }}</small>
         <small class="pull-right">Round {{ playTurnState.game.round }} -&nbsp;</small>
       </div>
-      <button
-        type="button"
-        class="btn btn-xs btn-default"
-        style="position: relative; top: -3px; float: right"
-        (click)="showGameInfo = !showGameInfo"
-      >
-        {{ showGameInfo ? "Turn Data" : "Game Info" }}
-      </button>
     </div>
     <div class="panel-body">
-      <ng-container *ngIf="!showGameInfo">
-        <h3 [innerHTML]="status"></h3>
-        <div>
-          <progressbar *ngIf="curBytes" [animate]="false" [max]="maxBytes" [value]="curBytes">
-            <span style="color: white; white-space: nowrap">{{ curBytes }} K / {{ maxBytes }} K</span>
-          </progressbar>
-          <progressbar
-            *ngIf="turnDownloader"
-            [animate]="false"
-            [max]="turnDownloader.maxBytes$ | async"
-            [value]="turnDownloader.curBytes$ | async"
+      <h3 [innerHTML]="status"></h3>
+      <div>
+        <progressbar *ngIf="curBytes" [animate]="false" [max]="maxBytes" [value]="curBytes">
+          <span style="color: white; white-space: nowrap">{{ curBytes }} K / {{ maxBytes }} K</span>
+        </progressbar>
+        <progressbar
+          *ngIf="turnDownloader"
+          [animate]="false"
+          [max]="turnDownloader.maxBytes$ | async"
+          [value]="turnDownloader.curBytes$ | async"
+        >
+          <span style="color: white; white-space: nowrap"
+            >{{ turnDownloader.curBytes$ | async }} K / {{ turnDownloader.maxBytes$ | async }} K</span
           >
-            <span style="color: white; white-space: nowrap"
-              >{{ turnDownloader.curBytes$ | async }} K / {{ turnDownloader.maxBytes$ | async }} K</span
-            >
-          </progressbar>
-          <button *ngIf="saveFileToUpload" class="btn btn-primary btn-sm btn-block" (click)="submitFile(game)">
-            {{ abort ? "Re-" : "" }}Submit File
-          </button>
-          <button *ngIf="saveFileToUpload" class="btn btn-default btn-sm btn-block" (click)="watchForSave()">
-            {{ abort ? "Watch for New Save" : "Ignore" }}
-          </button>
-          <button class="btn btn-default btn-sm btn-block" (click)="goHome()">
-            Cancel Turn and Return to Game List
-          </button>
-        </div>
-      </ng-container>
-      <ng-container *ngIf="showGameInfo">
-        <pydt-game-players
-          [game]="playTurnState.game"
-          class="clearfix"
-          [gamePlayerProfiles]="playTurnState.gamePlayerProfiles"
-        ></pydt-game-players>
-        <p style="margin-top: 10px"><b>Game Speed:</b> {{ playTurnState.game | gamespeed: games }}</p>
-        <p><b>Map Type:</b> {{ playTurnState.game | map: games }}</p>
-        <p><b>Map Size:</b> {{ playTurnState.game | mapsize: games }}</p>
-        <ng-container *ngIf="playTurnState.game.description">
-          <hr style="margin-top: 5px; margin-bottom: 5px; border-color: #000" />
-          <markdown [data]="playTurnState.game.description"></markdown>
-        </ng-container>
-      </ng-container>
+        </progressbar>
+        <button *ngIf="saveFileToUpload" class="btn btn-primary btn-sm btn-block" (click)="submitFile(game)">
+          {{ abort ? "Re-" : "" }}Submit File
+        </button>
+        <button *ngIf="saveFileToUpload" class="btn btn-default btn-sm btn-block" (click)="watchForSave()">
+          {{ abort ? "Watch for New Save" : "Ignore" }}
+        </button>
+        <button class="btn btn-default btn-sm btn-block" (click)="goHome()">
+          Cancel Turn and Return to Game List
+        </button>
+      </div>
     </div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <pydt-game-players
+        [game]="playTurnState.game"
+        class="clearfix"
+        [gamePlayerProfiles]="playTurnState.gamePlayerProfiles"
+      ></pydt-game-players>
+      <p style="margin-top: 10px"><b>Game Speed:</b> {{ playTurnState.game | gamespeed: games }}</p>
+      <p><b>Map Type:</b> {{ playTurnState.game | map: games }}</p>
+      <p><b>Map Size:</b> {{ playTurnState.game | mapsize: games }}</p>
+      <ng-container *ngIf="playTurnState.game.description">
+        <hr style="margin-top: 5px; margin-bottom: 5px; border-color: #000" />
+        <markdown [data]="playTurnState.game.description"></markdown>
+      </ng-container>
   </div>
 </div>

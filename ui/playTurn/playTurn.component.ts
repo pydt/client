@@ -23,7 +23,6 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
   downloaded: boolean;
   curBytes: number;
   maxBytes: number;
-  showGameInfo = false;
   settings: PydtSettingsData;
   games: CivGame[] = [];
   xhr: XMLHttpRequest;
@@ -92,7 +91,6 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error(err);
-      this.showGameInfo = false;
       this.abort = true;
       this.status =
         "Unable to locate/create save file directory.  " +
@@ -125,7 +123,6 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
       if (err) {
         this.turnDownloader = null;
         this.status = err;
-        this.showGameInfo = false;
         this.abort = true;
       }
     });
@@ -154,7 +151,6 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
         } catch (err) {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           this.status = err;
-          this.showGameInfo = false;
           this.abort = true;
         }
       }
@@ -191,7 +187,6 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
           .basename(path)
           .replace(`.${this.civGame.saveExtension}`, "")}.  Submit turn?`;
         this.downloaded = false;
-        this.showGameInfo = false;
         this.saveFileToUpload = path;
       });
     });
@@ -263,7 +258,6 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
       this.curBytes = this.maxBytes = null;
       this.saveFileToUpload = fileBeingUploaded;
       this.abort = true;
-      this.showGameInfo = false;
       return;
     }
 
