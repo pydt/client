@@ -1,9 +1,7 @@
 <div>
   <div class="panel panel-default">
     <div class="panel-heading">
-      <div
-        style="overflow: hidden; width: 100%; white-space: nowrap; text-overflow: ellipsis; float: left"
-      >
+      <div style="overflow: hidden; width: 100%; white-space: nowrap; text-overflow: ellipsis; float: left">
         Playing Turn: <a [href]="gameUrl">{{ playTurnState.gameTitle }}</a>
         <small class="pull-right">{{ lastTurnText$ | async }}</small>
         <small class="pull-right">Round {{ playTurnState.game.round }} -&nbsp;</small>
@@ -31,9 +29,7 @@
         <button *ngIf="saveFileToUpload" class="btn btn-default btn-sm btn-block" (click)="watchForSave()">
           {{ abort ? "Watch for New Save" : "Ignore" }}
         </button>
-        <button class="btn btn-default btn-sm btn-block" (click)="goHome()">
-          Cancel Turn and Return to Game List
-        </button>
+        <button class="btn btn-default btn-sm btn-block" (click)="goHome()">Cancel Turn and Return to Game List</button>
       </div>
     </div>
   </div>
@@ -51,5 +47,6 @@
         <hr style="margin-top: 5px; margin-bottom: 5px; border-color: #000" />
         <markdown [data]="playTurnState.game.description"></markdown>
       </ng-container>
+    </div>
   </div>
 </div>
