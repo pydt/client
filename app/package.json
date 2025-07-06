@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "auto-launch": "^5.0.6",
-    "aws-iot-device-sdk": "^2.2.13",
+    "aws-iot-device-sdk": "^2.2.15",
     "chokidar": "^3.6.0",
     "electron-context-menu": "^3.6.1",
     "electron-json-storage": "^4.6.0",
