@@ -11,7 +11,7 @@ export class SafeMetadataLoader {
 
   public async loadMetadata(): Promise<PydtMetadata> {
     try {
-      return this.metadataCache.getCivGameMetadata();
+      return await this.metadataCache.getCivGameMetadata();
     } catch {
       await this.router.navigateByUrl("/?errorLoading=true");
       return null;
