@@ -24,7 +24,7 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
   curBytes: number;
   maxBytes: number;
   settings: PydtSettingsData;
-  games: CivGame[] = [];
+  games: CivGame[];
   xhr: XMLHttpRequest;
   turnDownloader: TurnDownloader;
   private saveDir: string;
