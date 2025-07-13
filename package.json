@@ -110,7 +110,7 @@
     "pako": "^2.1.0",
     "prettier": "^3.2.5",
     "prettier-eslint": "^16.3.0",
-    "pydt-shared": "^1.8.15",
+    "pydt-shared": "^1.9.2",
     "rimraf": "^5.0.5",
     "rollbar": "^2.26.2",
     "rxjs": "^7.8.1",
