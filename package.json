@@ -94,7 +94,7 @@
     "@typescript-eslint/parser": "^6.21.0",
     "bootstrap-sass": "^3.4.3",
     "core-js": "^3.35.1",
-    "electron": "^33.2.1",
+    "electron": "^35.7.5",
     "electron-builder": "^26.0.0-alpha.8",
     "es6-shim": "^0.35.8",
     "eslint": "^8.56.0",
