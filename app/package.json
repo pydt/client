@@ -25,7 +25,7 @@
     "electron-window-state": "^5.0.3",
     "mkdirp": "^3.0.1",
     "open": "^10.0.3",
-    "rollbar": "^2.26.2"
+    "rollbar": "^2.26.5"
   },
   "devDependencies": {
     "build-electron": "^1.0.5",
