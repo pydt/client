@@ -22,6 +22,7 @@ ipcMain.on(RPC_TO_MAIN.UPDATE_TURNS_AVAILABLE, (event, turnState) => {
   win.setOverlayIcon(available ? path.join(__dirname, "../star.png") : null, available ? "Turns Available" : "");
 
   if (appIcon) {
+    // Red if available to grab attention, the normal icon is green
     appIcon.setImage(available ? appIconRed : appIconGreen);
   }
 });
@@ -35,14 +36,14 @@ const updateMenu = async () => {
     appIconRed = nativeImage.createFromPath(path.join(__dirname, "../icon_red.png"));
 
     // Resize icons on macOS
-    if (process.platform == "darwin") {
+    if (process.platform === "darwin") {
       appIconGreen = appIconGreen.resize({ height: darwinIconSize });
       appIconRed = appIconRed.resize({ height: darwinIconSize });
     }
   }
 
   // Hide dock icon on macOS
-  if (process.platform == "darwin") {
+  if (process.platform === "darwin") {
     if (!win.isVisible()) app.dock.hide();
   }
 
@@ -60,10 +61,14 @@ const updateMenu = async () => {
       click: () => {
         if (win.isVisible()) {
           win.hide();
-          app.dock.hide();
+          if (process.platform === "darwin") {
+            app.dock.hide();
+          }
         } else {
           win.show();
-          app.dock.show();
+          if (process.platform === "darwin") {
+            app.dock.show();
+          }
         }
       },
     },
@@ -80,12 +85,12 @@ const updateMenu = async () => {
 
   const aboutClick = () => {
     win.show();
-    win.send(RPC_TO_RENDERER.SHOW_ABOUT_MODAL, app.getVersion());
+    win.webContents.send(RPC_TO_RENDERER.SHOW_ABOUT_MODAL, app.getVersion());
   };
 
   const settingsClick = () => {
     win.show();
-    win.send(RPC_TO_RENDERER.SHOW_SETTINGS_MODAL);
+    win.webContents.send(RPC_TO_RENDERER.SHOW_SETTINGS_MODAL);
   };
 
   const menuTemplate = [
@@ -135,15 +140,15 @@ const updateMenu = async () => {
           {
             label: "User",
             submenu: [
-              ...config.allTokens.map(x => ({
-                label: x.name,
+              ...config.allTokens.map(curToken => ({
+                label: curToken.name,
                 type: "radio",
-                checked: x.token === config.token,
-                click: () => win.send(RPC_TO_RENDERER.SET_USER, x.token),
+                checked: curToken.token === config.token,
+                click: () => win.webContents.send(RPC_TO_RENDERER.SET_USER, curToken.token),
               })),
               {
                 label: "Add New User",
-                click: () => win.send(RPC_TO_RENDERER.NEW_USER),
+                click: () => win.webContents.send(RPC_TO_RENDERER.NEW_USER),
               },
             ],
           },
