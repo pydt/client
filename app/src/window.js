@@ -200,6 +200,7 @@ export const createWindow = async () => {
       show: !settings?.startHidden,
       width: mainWindowState.width,
       height: mainWindowState.height,
+      icon: path.join(__dirname, "../icon.png"),
       webPreferences: {
         preload: path.join(__dirname, "preload.js"),
         sandbox: false,

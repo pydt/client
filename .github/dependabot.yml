@@ -1,0 +1,20 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    # Disable version updates; only security updates will be created
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "npm"
+    directory: "/app"
+    schedule:
+      interval: "daily"
+    # Disable version updates; only security updates will be created
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
