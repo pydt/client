@@ -12,7 +12,20 @@ let appIcon;
 
 let appIconGreen;
 let appIconRed;
-let darwinIconSize = 20;
+const DARWIN_ICON_SIZE = 20;
+
+const initializeTrayIcons = () => {
+  if (!appIconGreen || !appIconRed) {
+    appIconGreen = nativeImage.createFromPath(path.join(__dirname, "../icon.png"));
+    appIconRed = nativeImage.createFromPath(path.join(__dirname, "../icon_red.png"));
+
+    // Resize icons on macOS
+    if (process.platform === "darwin") {
+      appIconGreen = appIconGreen.resize({ height: DARWIN_ICON_SIZE });
+      appIconRed = appIconRed.resize({ height: DARWIN_ICON_SIZE });
+    }
+  }
+};
 
 ipcMain.handle(RPC_INVOKE.SET_FORCE_QUIT, (event, data) => (forceQuit = data));
 
@@ -22,6 +35,7 @@ ipcMain.on(RPC_TO_MAIN.UPDATE_TURNS_AVAILABLE, (event, turnState) => {
   win.setOverlayIcon(available ? path.join(__dirname, "../star.png") : null, available ? "Turns Available" : "");
 
   if (appIcon) {
+    initializeTrayIcons();
     // Red if available to grab attention, the normal icon is green
     appIcon.setImage(available ? appIconRed : appIconGreen);
   }
@@ -31,16 +45,7 @@ const updateMenu = async () => {
   const config = await getConfig("configData");
 
   // Initialize icon images with electron's nativeImage
-  if (!appIconGreen || !appIconRed) {
-    appIconGreen = nativeImage.createFromPath(path.join(__dirname, "../icon.png"));
-    appIconRed = nativeImage.createFromPath(path.join(__dirname, "../icon_red.png"));
-
-    // Resize icons on macOS
-    if (process.platform === "darwin") {
-      appIconGreen = appIconGreen.resize({ height: darwinIconSize });
-      appIconRed = appIconRed.resize({ height: darwinIconSize });
-    }
-  }
+  initializeTrayIcons();
 
   // Hide dock icon on macOS
   if (process.platform === "darwin") {
