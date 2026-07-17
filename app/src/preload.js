@@ -23,6 +23,7 @@ electron.contextBridge.exposeInMainWorld("pydtApi", {
         depth: 0,
         ignoreInitial: true,
         awaitWriteFinish: arg.awaitWriteFinish,
+        usePolling: arg.awaitWriteFinish,
       });
 
       const changeDetected = p => {
