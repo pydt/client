@@ -6,6 +6,7 @@ import { RPC_INVOKE, RPC_TO_MAIN, RPC_TO_RENDERER } from "./rpcChannels";
 import { setTheme } from "ngx-bootstrap/utils";
 import { SafeMetadataLoader } from "./shared/safeMetadataLoader";
 import { AuthService } from "./shared/authService";
+import { UpdateService } from "./shared/updateService";
 import { Router } from "@angular/router";
 
 @Component({
@@ -20,6 +21,7 @@ export class AppComponent implements OnInit {
   private modalService = inject(BsModalService);
   private pydtSettingsFactory = inject(PydtSettingsFactory);
   private authService = inject(AuthService);
+  private updateService = inject(UpdateService);
   private router = inject(Router);
 
   version: string;
@@ -64,10 +66,12 @@ export class AppComponent implements OnInit {
       });
     });
 
-    window.pydtApi.ipc.receive<string>(RPC_TO_RENDERER.SHOW_UPDATE_MODAL, data => {
+    this.updateService.listen();
+
+    this.updateService.showModal$.subscribe(version => {
       this.zone.run(() => {
         this.hideOpenModal();
-        this.newVersion = data;
+        this.newVersion = version;
         this.openModal = this.modalService.show(this.updateModal, modalOptions);
       });
     });
@@ -127,7 +131,6 @@ export class AppComponent implements OnInit {
   }
 
   async applyUpdate(): Promise<void> {
-    await window.pydtApi.ipc.invoke(RPC_INVOKE.SET_FORCE_QUIT, true);
-    window.pydtApi.ipc.send(RPC_TO_MAIN.APPLY_UPDATE, null);
+    await this.updateService.applyUpdate();
   }
 }

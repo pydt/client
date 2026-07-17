@@ -8,6 +8,7 @@ import { map } from "rxjs/operators";
 import { TurnCacheService } from "../shared/turnCacheService";
 import { AuthService } from "../shared/authService";
 import { DiscourseInfo } from "../shared/discourseInfo";
+import { UpdateService } from "../shared/updateService";
 import { environment } from "../environments/environment";
 import { RPC_TO_MAIN, RPC_TO_RENDERER } from "../rpcChannels";
 import { GameComponent } from "./game.component";
@@ -34,6 +35,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private readonly turnCacheService = inject(TurnCacheService);
   private readonly authService = inject(AuthService);
   private readonly busyService = inject(BusyService);
+  private readonly updateService = inject(UpdateService);
 
   games: Game[];
   gamePlayerProfiles: SteamProfileMap = {};
@@ -41,8 +43,10 @@ export class HomeComponent implements OnInit, OnDestroy {
   errorLoading = false;
   refreshDisabled = false;
   hasUnreadSmack = false;
+  updateAvailable = false;
   private user: User;
   private timerSub: Subscription;
+  private updateSub: Subscription;
   private destroyed = false;
   private lastNotification: Date;
   private pollUrl: string;
@@ -78,6 +82,12 @@ export class HomeComponent implements OnInit, OnDestroy {
         void this.safeLoadGames();
       });
 
+      this.updateService.listen();
+
+      this.updateSub = this.updateService.newVersion$.subscribe(version => {
+        this.updateAvailable = !!version;
+      });
+
       this.navigationSubscription = this.router.events.subscribe((e: unknown) => {
         // If reloading page reload user and games (could be changing user)
         if (e instanceof NavigationEnd) {
@@ -106,6 +116,11 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.navigationSubscription = null;
     }
 
+    if (this.updateSub) {
+      this.updateSub.unsubscribe();
+      this.updateSub = null;
+    }
+
     this.destroyed = true;
 
     window.pydtApi.ipc.removeAllListeners(RPC_TO_RENDERER.IOT_CONNECT);
@@ -119,6 +134,10 @@ export class HomeComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.refreshDisabled = false;
     }, 30000);
+  }
+
+  promptForUpdate(): void {
+    this.updateService.promptForUpdate();
   }
 
   async clearSmack() {

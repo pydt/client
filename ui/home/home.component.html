@@ -1,9 +1,19 @@
 <div>
+  @if (updateAvailable) {
+    <button
+      type="button"
+      class="btn btn-sm btn-primary"
+      style="position: fixed; top: 0; left: 20px; z-index: 1000; border-top-left-radius: 0; border-top-right-radius: 0"
+      (click)="promptForUpdate()"
+    >
+      Update Available - Click to Install
+    </button>
+  }
   <button
     type="button"
     class="btn btn-sm btn-secondary"
     [disabled]="refreshDisabled"
-    style="position: fixed; top: 0; right: 20px; z-index: 1000"
+    style="position: fixed; top: 0; right: 20px; z-index: 1000; border-top-left-radius: 0; border-top-right-radius: 0"
     (click)="refresh()"
   >
     Refresh
@@ -12,7 +22,7 @@
     <button
       type="button"
       class="btn btn-sm btn-secondary"
-      style="position: fixed; top: 0; right: 85px; z-index: 1000"
+      style="position: fixed; top: 0; right: 85px; z-index: 1000; border-top-left-radius: 0; border-top-right-radius: 0"
       (click)="clearSmack()"
     >
       Clear All Smack Talk Notifications
