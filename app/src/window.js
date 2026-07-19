@@ -30,7 +30,7 @@ const initializeTrayIcons = () => {
 ipcMain.handle(RPC_INVOKE.SET_FORCE_QUIT, (event, data) => (forceQuit = data));
 
 ipcMain.on(RPC_TO_MAIN.UPDATE_TURNS_AVAILABLE, (event, turnState) => {
-  const available = turnState.count > 0;
+  const available = turnState.count > 0 || turnState.hasUnreadSmack;
 
   win.setOverlayIcon(available ? path.join(__dirname, "../star.png") : null, available ? "Turns Available" : "");
 

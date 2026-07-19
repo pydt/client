@@ -217,9 +217,13 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     this.turnCacheService.updateGames(yourTurns);
 
+    // Notify about smack talk
+    const smackTalk = this.findUnreadSmack();
+
     window.pydtApi.ipc.send(RPC_TO_MAIN.UPDATE_TURNS_AVAILABLE, {
       ready: true,
       count: yourTurns.length,
+      hasUnreadSmack: this.hasUnreadSmack,
       games: yourTurns.map(game => ({
         id: game.gameId,
         name: game.displayName,
@@ -239,9 +243,6 @@ export class HomeComponent implements OnInit, OnDestroy {
         });
         notificationShown = true;
       }
-
-      // Notify about smack talk
-      const smackTalk = this.findUnreadSmack();
 
       if (smackTalk.length) {
         window.pydtApi.ipc.send(RPC_TO_MAIN.SHOW_NOTIFICATION, {
