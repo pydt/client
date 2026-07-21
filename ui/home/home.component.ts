@@ -52,6 +52,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private pollUrl: string;
   private iotConnected = false;
   private sortedTurns: GameWithYourTurn[];
+  private yourTurns: GameWithYourTurn[];
   private navigationSubscription: Subscription;
 
   ngOnInit(): void {
@@ -148,12 +149,29 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     await DiscourseInfo.saveDiscourseInfo(this.discourseInfo);
+    this.notifyMain();
   }
 
-  smackRead(gameId: string, postNumber: number): Promise<void> {
+  async smackRead(gameId: string, postNumber: number): Promise<void> {
     this.discourseInfo[gameId] = postNumber;
     this.findUnreadSmack();
-    return DiscourseInfo.saveDiscourseInfo(this.discourseInfo);
+    await DiscourseInfo.saveDiscourseInfo(this.discourseInfo);
+    this.notifyMain();
+  }
+
+  private notifyMain(): void {
+    window.pydtApi.ipc.send(RPC_TO_MAIN.UPDATE_TURNS_AVAILABLE, {
+      ready: true,
+      count: this.yourTurns.length,
+      hasUnreadSmack: this.hasUnreadSmack,
+      games: this.yourTurns.map(game => ({
+        id: game.gameId,
+        name: game.displayName,
+        gameType: game.gameType,
+        flags: game.flags || [],
+        updatedAt: game.updatedAt,
+      })),
+    });
   }
 
   async safeLoadGames(): Promise<void> {
@@ -211,35 +229,23 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.gamePlayerProfiles = await this.profileCache.getProfilesForGames(this.games);
 
     // Notify about turns available
-    const yourTurns = this.games.filter(
-      game => game.currentPlayerSteamId === this.user.steamId && game.gameTurnRangeKey > 1,
-    );
-
-    this.turnCacheService.updateGames(yourTurns);
+    this.turnCacheService.updateGames(this.yourTurns);
 
     // Notify about smack talk
     const smackTalk = this.findUnreadSmack();
 
-    window.pydtApi.ipc.send(RPC_TO_MAIN.UPDATE_TURNS_AVAILABLE, {
-      ready: true,
-      count: yourTurns.length,
-      hasUnreadSmack: this.hasUnreadSmack,
-      games: yourTurns.map(game => ({
-        id: game.gameId,
-        name: game.displayName,
-        gameType: game.gameType,
-        flags: game.flags || [],
-        updatedAt: game.updatedAt,
-      })),
-    });
+    this.notifyMain();
 
     let notificationShown = false;
 
     if (!this.lastNotification || new Date().getTime() - this.lastNotification.getTime() > TOAST_INTERVAL) {
-      if (yourTurns.length) {
+      // Exclude turn 1, which just means the game needs to be created
+      const turnsToNotify = this.yourTurns.filter(x => (x.gameTurnRangeKey || 0) > 1);
+
+      if (turnsToNotify.length) {
         window.pydtApi.ipc.send(RPC_TO_MAIN.SHOW_NOTIFICATION, {
           title: "Play Your Damn Turn!",
-          body: yourTurns.map(x => x.displayName).join(", "),
+          body: turnsToNotify.map(x => x.displayName).join(", "),
         });
         notificationShown = true;
       }
@@ -317,18 +323,18 @@ export class HomeComponent implements OnInit, OnDestroy {
       hasSmackTalk: DiscourseInfo.isNewSmackTalkPost(game, this.user, this.discourseInfo[game.gameId] || 0),
     }));
 
-    const yourTurns = orderBy(
+    this.yourTurns = orderBy(
       this.sortedTurns.filter(x => x.yourTurn),
       [x => (x.flags || []).length, x => x.updatedAt],
       ["desc", "desc"],
     );
 
     const others = orderBy(
-      difference(this.sortedTurns, yourTurns),
+      difference(this.sortedTurns, this.yourTurns),
       [x => x.hasSmackTalk, x => x.updatedAt],
       ["desc", "desc"],
     );
 
-    this.sortedTurns = [...yourTurns, ...others];
+    this.sortedTurns = [...this.yourTurns, ...others];
   }
 }
