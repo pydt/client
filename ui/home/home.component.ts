@@ -228,8 +228,11 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     this.gamePlayerProfiles = await this.profileCache.getProfilesForGames(this.games);
 
+    // Exclude turn 1, which just means the game needs to be created and has no turn uploaded yet
+    const turnsToNotify = this.yourTurns.filter(x => (x.gameTurnRangeKey || 0) > 1);
+
     // Notify about turns available
-    this.turnCacheService.updateGames(this.yourTurns);
+    this.turnCacheService.updateGames(turnsToNotify);
 
     // Notify about smack talk
     const smackTalk = this.findUnreadSmack();
@@ -239,9 +242,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     let notificationShown = false;
 
     if (!this.lastNotification || new Date().getTime() - this.lastNotification.getTime() > TOAST_INTERVAL) {
-      // Exclude turn 1, which just means the game needs to be created
-      const turnsToNotify = this.yourTurns.filter(x => (x.gameTurnRangeKey || 0) > 1);
-
       if (turnsToNotify.length) {
         window.pydtApi.ipc.send(RPC_TO_MAIN.SHOW_NOTIFICATION, {
           title: "Play Your Damn Turn!",

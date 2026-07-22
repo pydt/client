@@ -4,9 +4,14 @@ import { BehaviorSubject, firstValueFrom, merge, of } from "rxjs";
 import { catchError, filter, map } from "rxjs/operators";
 import { PydtSettingsFactory } from "./pydtSettings";
 
+const BASE_RETRY_BACKOFF_MS = 5000;
+const MAX_RETRY_BACKOFF_MS = 5 * 60 * 1000;
+
 export class TurnDownloader {
   private xhr: XMLHttpRequest;
   private downloading = false;
+  private failureCount = 0;
+  private nextAttemptAt = 0;
   public readonly data$ = new BehaviorSubject<{ data: Uint8Array; version?: string }>(null);
   public readonly error$ = new BehaviorSubject<string>(null);
   public readonly curBytes$ = new BehaviorSubject<number>(0);
@@ -41,8 +46,19 @@ export class TurnDownloader {
     );
   }
 
+  private registerFailure(): void {
+    this.failureCount++;
+    this.nextAttemptAt = Date.now() + Math.min(BASE_RETRY_BACKOFF_MS * 2 ** this.failureCount, MAX_RETRY_BACKOFF_MS);
+  }
+
   startDownload(): void {
     if (this.xhr || this.data$.value || this.downloading) {
+      return;
+    }
+
+    if (Date.now() < this.nextAttemptAt) {
+      // Still backing off after a recent failure - don't hammer the API, leave the
+      // existing error$ in place so anyone awaiting waitForCompletion() resolves.
       return;
     }
 
@@ -62,6 +78,7 @@ export class TurnDownloader {
           if (!resp) {
             this.error$.next("Failed to load turn information, is your computer offline?");
             this.downloading = false;
+            this.registerFailure();
             return;
           }
 
@@ -85,6 +102,7 @@ export class TurnDownloader {
             this.error$.next(`Bad response code returned: ${this.xhr.status}`);
             this.xhr = null;
             this.downloading = false;
+            this.registerFailure();
           };
 
           this.xhr.onload = async () => {
