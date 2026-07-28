@@ -1,8 +1,11 @@
 import { Injectable, inject } from "@angular/core";
 import { BusyService, Game, GameService, GameTurnResponse } from "pydt-shared";
-import { BehaviorSubject, firstValueFrom, merge, of } from "rxjs";
-import { catchError, filter, map } from "rxjs/operators";
-import { PydtSettingsFactory } from "./pydtSettings";
+import { BehaviorSubject, firstValueFrom, merge, of, Subject } from "rxjs";
+import { catchError, filter, map, timeout } from "rxjs/operators";
+import { PydtSettingsData, PydtSettingsFactory } from "./pydtSettings";
+import { SafeMetadataLoader } from "./safeMetadataLoader";
+import { saveDownloadedTurn } from "./autoDownloadSave";
+import { RPC_TO_MAIN } from "../rpcChannels";
 
 const BASE_RETRY_BACKOFF_MS = 5000;
 const MAX_RETRY_BACKOFF_MS = 5 * 60 * 1000;
@@ -148,11 +151,15 @@ export class TurnCacheService {
   private readonly gameService = inject(GameService);
   private readonly busyService = inject(BusyService);
   private readonly pydtSettingsFactory = inject(PydtSettingsFactory);
+  private readonly metadataLoader = inject(SafeMetadataLoader);
 
   private readonly cache: TurnDownloader[] = [];
+  private readonly savedVersions = new Set<string>();
+  readonly completedGameIds$ = new Subject<string>();
 
   constructor() {
     void this.backgroundDownloader().then();
+    void this.automaticTurnQueue().then();
   }
 
   async backgroundDownloader(): Promise<void> {
@@ -173,6 +180,176 @@ export class TurnCacheService {
     }
   }
 
+  private async automaticTurnQueue(): Promise<void> {
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      await new Promise(resolve => setTimeout(resolve, 5000));
+
+      const settings = await this.pydtSettingsFactory.getSettings();
+      const td = this.cache.find(candidate => {
+        const versionKey = `${candidate.game.gameId}:${candidate.game.version}`;
+        return !this.savedVersions.has(versionKey);
+      });
+
+      if (!settings.saveDownloadedTurns || !td) {
+        continue;
+      }
+
+      try {
+        if (!td.data$.value) {
+          await td.waitForCompletion();
+        }
+
+        await this.processAutomaticTurn(td, settings);
+      } catch (err) {
+        // Keep the queue alive after temporary filesystem or network failures.
+        // eslint-disable-next-line no-console
+        console.error(`Unable to process automatic turn for ${td.game.displayName}`, err);
+      }
+    }
+  }
+
+  private async processAutomaticTurn(td: TurnDownloader, settings: PydtSettingsData): Promise<void> {
+    const data = td.data$.value;
+    const versionKey = `${td.game.gameId}:${td.game.version}`;
+
+    if (!data || this.savedVersions.has(versionKey)) {
+      return;
+    }
+
+    const metadata = await this.metadataLoader.loadMetadata();
+    const civGame = metadata?.civGames.find(x => x.id === td.game.gameType);
+
+    if (!civGame) {
+      return;
+    }
+
+    const saveDir = settings.getSavePath(civGame);
+    const saveFile = saveDownloadedTurn({
+      saveDir,
+      saveExtension: civGame.saveExtension,
+      data: data.data,
+      fs: window.pydtApi.fs,
+      path: window.pydtApi.path,
+    });
+
+    // Let the handoff write settle before watching for the save created by Civ.
+    await new Promise(resolve => setTimeout(resolve, 5000));
+    const completedSave = await window.pydtApi.startChokidar({
+      path: saveDir,
+      awaitWriteFinish: civGame.awaitWriteFinish,
+    });
+
+    // Do not advance or rewrite the handoff after a temporary upload failure.
+    // Keep retrying the completed save so the player's work remains intact.
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      try {
+        await this.uploadCompletedTurn(td.game.gameId, completedSave);
+        break;
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error(`Unable to upload automatic turn for ${td.game.displayName}; retrying`, err);
+        window.pydtApi.ipc.send(
+          RPC_TO_MAIN.LOG_ERROR,
+          `Unable to upload automatic turn for ${td.game.displayName}: ${String(err)}`,
+        );
+        await new Promise(resolve => setTimeout(resolve, 30000));
+      }
+    }
+
+    const archiveDir = window.pydtApi.path.join(saveDir, "pydt-archive");
+    if (!window.pydtApi.fs.existsSync(archiveDir)) {
+      window.pydtApi.fs.mkdirp(archiveDir);
+    }
+
+    const archivedSave = window.pydtApi.path.join(
+      archiveDir,
+      `${td.game.gameId.slice(0, 8)}_${window.pydtApi.path.basename(completedSave)}`,
+    );
+    window.pydtApi.fs.renameSync(completedSave, archivedSave);
+
+    if (window.pydtApi.fs.existsSync(saveFile)) {
+      window.pydtApi.fs.unlinkSync(saveFile);
+    }
+
+    this.trimArchive(archiveDir, settings.numSaves);
+    this.savedVersions.add(versionKey);
+    this.completedGameIds$.next(td.game.gameId);
+  }
+
+  private async uploadCompletedTurn(gameId: string, saveFile: string): Promise<void> {
+    window.pydtApi.ipc.send(RPC_TO_MAIN.LOG_INFO, `Compressing completed turn: ${saveFile}`);
+    const fileData = await window.pydtApi.readFileGzipped(saveFile);
+    window.pydtApi.ipc.send(RPC_TO_MAIN.LOG_INFO, `Starting turn submission: ${gameId}`);
+    const startResp = await firstValueFrom(this.gameService.startSubmit(gameId));
+    window.pydtApi.ipc.send(RPC_TO_MAIN.LOG_INFO, `Uploading completed turn: ${gameId}`);
+
+    await new Promise<void>((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("PUT", startResp.putUrl, true);
+      xhr.timeout = 60000;
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          resolve();
+        } else {
+          reject(new Error(`Turn upload returned HTTP ${xhr.status}`));
+        }
+      };
+      xhr.onerror = () => reject(new Error(`Turn upload returned HTTP ${xhr.status}`));
+      xhr.ontimeout = () => reject(new Error("Turn upload timed out"));
+      xhr.setRequestHeader("Content-Type", "application/octet-stream");
+      xhr.send(fileData as unknown as ArrayBuffer);
+    });
+
+    // The uploaded file is already durable at this point. Retry only the final
+    // confirmation if the API stalls so the save is not uploaded repeatedly.
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      try {
+        window.pydtApi.ipc.send(RPC_TO_MAIN.LOG_INFO, `Finishing turn submission: ${gameId}`);
+        await firstValueFrom(this.gameService.finishSubmit(gameId).pipe(timeout(60000)));
+        break;
+      } catch (err) {
+        const httpError = err as { status?: number; message?: string; error?: unknown };
+        const errorDetails = JSON.stringify({
+          status: httpError.status,
+          message: httpError.message,
+          error: httpError.error,
+        });
+        // eslint-disable-next-line no-console
+        console.error(`Unable to finish turn submission for ${gameId}; retrying`, err);
+        window.pydtApi.ipc.send(
+          RPC_TO_MAIN.LOG_ERROR,
+          `Unable to finish turn submission for ${gameId}: ${errorDetails}`,
+        );
+
+        if (httpError.status >= 400 && httpError.status < 500) {
+          throw err;
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 30000));
+      }
+    }
+
+    window.pydtApi.ipc.send(RPC_TO_MAIN.LOG_INFO, `Turn submission completed: ${gameId}`);
+  }
+
+  private trimArchive(archiveDir: string, numSaves: number): void {
+    const files = window.pydtApi.fs
+      .readdirSync(archiveDir)
+      .flatMap(fileName => {
+        const file = window.pydtApi.path.join(archiveDir, fileName);
+        const stat = window.pydtApi.fs.statSync(file);
+        return stat.isDirectory ? [] : [{ file, time: stat.ctime.getTime() }];
+      })
+      .sort((a, b) => a.time - b.time);
+
+    while (files.length > numSaves) {
+      window.pydtApi.fs.unlinkSync(files.shift().file);
+    }
+  }
+
   updateGames(games: Game[]): void {
     const newGames = games.filter(
       x => !this.cache.some(y => x.gameId === y.game.gameId && x.version === y.game.version),
@@ -190,6 +367,7 @@ export class TurnCacheService {
 
       this.cache[i].abort();
       this.cache.splice(i, 1);
+      this.savedVersions.delete(`${dl.game.gameId}:${dl.game.version}`);
     }
   }
 

@@ -89,6 +89,18 @@
             />
             <label class="form-check-label" for="autoDownload">Automatically download turns in background</label>
           </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              name="saveDownloadedTurns"
+              [(ngModel)]="settings.saveDownloadedTurns"
+              id="saveDownloadedTurns"
+            />
+            <label class="form-check-label" for="saveDownloadedTurns">
+              Queue turns in game save folders and automatically upload completed saves
+            </label>
+          </div>
           <div class="mt-2" [ngClass]="{ 'has-error': numSaves.errors }">
             <span>Archive</span>
             <input

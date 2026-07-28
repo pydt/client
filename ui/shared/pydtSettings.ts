@@ -17,6 +17,7 @@ export class PydtSettingsData {
   gameStores: { [index: string]: GameStore } = {};
   savePaths: { [index: string]: string } = {};
   autoDownload = false;
+  saveDownloadedTurns = false;
 
   constructor(
     civGames: CivGame[],
