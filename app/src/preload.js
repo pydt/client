@@ -10,26 +10,25 @@ import * as chokidar from "chokidar";
 import * as AutoLaunch from "auto-launch";
 import { RPC_INVOKE, RPC_TO_MAIN, RPC_TO_RENDERER } from "./rpcChannels.js";
 
-let watcher;
+const watchers = new Set();
 
 electron.contextBridge.exposeInMainWorld("pydtApi", {
   startChokidar: arg =>
     new Promise(resolve => {
-      if (watcher) {
-        watcher.close();
-      }
-
-      watcher = chokidar.watch(arg.path, {
+      const watcher = chokidar.watch(arg.path, {
         depth: 0,
         ignoreInitial: true,
         awaitWriteFinish: arg.awaitWriteFinish,
         usePolling: arg.awaitWriteFinish,
       });
+      watchers.add(watcher);
+      electron.ipcRenderer.send(RPC_TO_MAIN.LOG_INFO, `Watching save directory: ${arg.path}`);
 
       const changeDetected = p => {
+        electron.ipcRenderer.send(RPC_TO_MAIN.LOG_INFO, `Save change detected: ${p}`);
         electron.ipcRenderer.send(RPC_TO_MAIN.SHOW_WINDOW);
         watcher.close();
-        watcher = null;
+        watchers.delete(watcher);
         resolve(p);
       };
 

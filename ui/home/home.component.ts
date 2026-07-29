@@ -54,6 +54,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private sortedTurns: GameWithYourTurn[];
   private yourTurns: GameWithYourTurn[];
   private navigationSubscription: Subscription;
+  private completedGameSubscription: Subscription;
 
   ngOnInit(): void {
     void this.init();
@@ -89,6 +90,14 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.updateAvailable = !!version;
       });
 
+      this.completedGameSubscription = this.turnCacheService.completedGameIds$.subscribe(gameId => {
+        this.games = this.games?.filter(game => game.gameId !== gameId) || [];
+        this.setSortedTurns();
+        this.notifyMain();
+        this.pollUrl = "";
+        void this.safeLoadGames();
+      });
+
       this.navigationSubscription = this.router.events.subscribe((e: unknown) => {
         // If reloading page reload user and games (could be changing user)
         if (e instanceof NavigationEnd) {
@@ -120,6 +129,11 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (this.updateSub) {
       this.updateSub.unsubscribe();
       this.updateSub = null;
+    }
+
+    if (this.completedGameSubscription) {
+      this.completedGameSubscription.unsubscribe();
+      this.completedGameSubscription = null;
     }
 
     this.destroyed = true;
