@@ -4,6 +4,7 @@ import { RPC_INVOKE } from "../rpcChannels";
 import { isEmpty, merge, omit } from "lodash-es";
 import { SafeMetadataLoader } from "./safeMetadataLoader";
 import { STORAGE_CONFIG } from "../storageConfig";
+import { Subject } from "rxjs";
 
 const FIELDS_NOT_TO_PERSIST = ["basePaths"];
 
@@ -17,6 +18,7 @@ export class PydtSettingsData {
   gameStores: { [index: string]: GameStore } = {};
   savePaths: { [index: string]: string } = {};
   autoDownload = false;
+  autoPlay = false;
 
   constructor(
     civGames: CivGame[],
@@ -127,6 +129,10 @@ export class PydtSettingsData {
 @Injectable()
 export class PydtSettingsFactory {
   private readonly metadataLoader = inject(SafeMetadataLoader);
+
+  // Emits whenever settings are saved, so already-mounted components (e.g. HomeComponent's
+  // autoPlay check) can react immediately instead of waiting for their next poll cycle.
+  readonly settingsChanged$ = new Subject<void>();
 
   async getSettings(): Promise<PydtSettingsData> {
     const settings = await window.pydtApi.ipc.invoke<PydtSettingsData>(RPC_INVOKE.STORAGE_GET, STORAGE_CONFIG.SETTINGS);

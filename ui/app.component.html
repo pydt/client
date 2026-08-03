@@ -1,3 +1,20 @@
+@if (autoPlayEnabled) {
+  <div
+    style="
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      border-bottom-left-radius: 4px;
+      border-bottom-right-radius: 4px;
+    "
+    class="btn btn-sm btn-dark"
+  >
+    ⚡ Auto-Play Enabled
+  </div>
+}
+
 <router-outlet></router-outlet>
 
 <ng-template #aboutModal>
@@ -89,6 +106,24 @@
             />
             <label class="form-check-label" for="autoDownload">Automatically download turns in background</label>
           </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              name="autoPlay"
+              [(ngModel)]="settings.autoPlay"
+              id="autoPlay"
+            />
+            <label class="form-check-label" for="autoPlay">Automatically play turns (unattended/Steam Deck mode)</label>
+          </div>
+          @if (settings.autoPlay) {
+            <p class="text-warning mt-1 mb-2">
+              <small>
+                Warning: with this on, the client will launch Civ and submit the first save file it detects for each of
+                your turns with <b>no confirmation prompt</b>, then automatically move on to your next turn.
+              </small>
+            </p>
+          }
           <div class="mt-2" [ngClass]="{ 'has-error': numSaves.errors }">
             <span>Archive</span>
             <input

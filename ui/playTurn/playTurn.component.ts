@@ -156,6 +156,10 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
             }
 
             await this.watchForSave();
+
+            if (this.settings.autoPlay && this.saveFileToUpload) {
+              await this.submitFile();
+            }
           });
         } catch (err) {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

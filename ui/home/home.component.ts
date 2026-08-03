@@ -11,7 +11,9 @@ import { DiscourseInfo } from "../shared/discourseInfo";
 import { UpdateService } from "../shared/updateService";
 import { environment } from "../environments/environment";
 import { RPC_TO_MAIN, RPC_TO_RENDERER } from "../rpcChannels";
-import { GameComponent } from "./game.component";
+import { GameComponent, gameTitleFor } from "./game.component";
+import { PlayTurnState } from "../playTurn/playTurnState.service";
+import { PydtSettingsData, PydtSettingsFactory } from "../shared/pydtSettings";
 
 const POLL_INTERVAL: number = 600 * 1000;
 const TOAST_INTERVAL: number = 14.5 * 60 * 1000;
@@ -36,6 +38,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   private readonly authService = inject(AuthService);
   private readonly busyService = inject(BusyService);
   private readonly updateService = inject(UpdateService);
+  private readonly playTurnState = inject(PlayTurnState);
+  private readonly pydtSettingsFactory = inject(PydtSettingsFactory);
 
   games: Game[];
   gamePlayerProfiles: SteamProfileMap = {};
@@ -45,8 +49,10 @@ export class HomeComponent implements OnInit, OnDestroy {
   hasUnreadSmack = false;
   updateAvailable = false;
   private user: User;
+  private settings!: PydtSettingsData;
   private timerSub: Subscription;
   private updateSub: Subscription;
+  private settingsChangedSub: Subscription | null = null;
   private destroyed = false;
   private lastNotification: Date;
   private pollUrl: string;
@@ -76,6 +82,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
       // Force a refresh of the user data
       this.user = await this.authService.getUser(true);
+      this.settings = await this.pydtSettingsFactory.getSettings();
 
       const $timer = timer(10, POLL_INTERVAL);
 
@@ -87,6 +94,13 @@ export class HomeComponent implements OnInit, OnDestroy {
 
       this.updateSub = this.updateService.newVersion$.subscribe(version => {
         this.updateAvailable = !!version;
+      });
+
+      this.settingsChangedSub = this.pydtSettingsFactory.settingsChanged$.subscribe(() => {
+        void this.pydtSettingsFactory.getSettings().then(settings => {
+          this.settings = settings;
+          void this.safeLoadGames();
+        });
       });
 
       this.navigationSubscription = this.router.events.subscribe((e: unknown) => {
@@ -120,6 +134,11 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (this.updateSub) {
       this.updateSub.unsubscribe();
       this.updateSub = null;
+    }
+
+    if (this.settingsChangedSub) {
+      this.settingsChangedSub.unsubscribe();
+      this.settingsChangedSub = null;
     }
 
     this.destroyed = true;
@@ -233,6 +252,17 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     // Notify about turns available
     this.turnCacheService.updateGames(turnsToNotify);
+
+    if (this.settings?.autoPlay && turnsToNotify.length) {
+      const nextGame = turnsToNotify[0];
+
+      this.playTurnState.game = nextGame;
+      this.playTurnState.gameTitle = gameTitleFor(nextGame);
+      this.playTurnState.gamePlayerProfiles = this.gamePlayerProfiles;
+
+      await this.router.navigate(["/playTurn"]);
+      return;
+    }
 
     // Notify about smack talk
     const smackTalk = this.findUnreadSmack();

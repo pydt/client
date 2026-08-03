@@ -9,6 +9,25 @@ import { Observable } from "rxjs";
 import { NgClass, AsyncPipe } from "@angular/common";
 import { GamePlayersComponent } from "./gamePlayers.component";
 
+export const gameTitleFor = (game: Game): string => {
+  let result = game.displayName;
+
+  if (game.flags?.length) {
+    result += ` (${game.flags
+      .map(x => {
+        switch (x) {
+          case "CIV6_CONGRESS_TURN":
+            return "CONGRESS TURN!";
+          default:
+            return x;
+        }
+      })
+      .join(", ")})`;
+  }
+
+  return result;
+};
+
 @Component({
   selector: "pydt-game",
   templateUrl: "./game.component.html",
@@ -53,22 +72,7 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   get gameTitle() {
-    let result = this.game.displayName;
-
-    if (this.game.flags?.length) {
-      result += ` (${this.game.flags
-        .map(x => {
-          switch (x) {
-            case "CIV6_CONGRESS_TURN":
-              return "CONGRESS TURN!";
-            default:
-              return x;
-          }
-        })
-        .join(", ")})`;
-    }
-
-    return result;
+    return gameTitleFor(this.game);
   }
 
   get playText() {

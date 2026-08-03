@@ -27,6 +27,7 @@ export class AppComponent implements OnInit {
   version: string;
   newVersion: string;
   settings: PydtSettingsData;
+  autoPlayEnabled = false;
 
   @ViewChild("aboutModal", { static: true }) aboutModal: TemplateRef<unknown>;
   @ViewChild("updateModal", { static: true }) updateModal: TemplateRef<unknown>;
@@ -42,6 +43,8 @@ export class AppComponent implements OnInit {
     const modalOptions: ModalOptions = {
       class: "modal-near-fullscreen",
     };
+
+    void this.refreshAutoPlayEnabled();
 
     window.pydtApi.ipc.receive<string>(RPC_TO_RENDERER.SHOW_ABOUT_MODAL, data => {
       this.zone.run(() => {
@@ -91,6 +94,11 @@ export class AppComponent implements OnInit {
     });
   }
 
+  private async refreshAutoPlayEnabled(): Promise<void> {
+    const settings = await this.pydtSettingsFactory.getSettings();
+    this.autoPlayEnabled = settings.autoPlay;
+  }
+
   openReleaseNotes(): void {
     window.pydtApi.ipc.send(RPC_TO_MAIN.OPEN_URL, `https://github.com/pydt/client/releases/tag/v${this.version}`);
   }
@@ -127,6 +135,8 @@ export class AppComponent implements OnInit {
       enabled: this.settings.turnApiEnabled,
       port: this.settings.turnApiPort,
     });
+    this.autoPlayEnabled = this.settings.autoPlay;
+    this.pydtSettingsFactory.settingsChanged$.next();
     this.hideOpenModal();
   }
 
