@@ -89,7 +89,7 @@
     "@angular/common": "^21.2.4",
     "@angular/compiler": "^21.2.4",
     "@angular/compiler-cli": "^21.2.4",
-    "@angular/core": "^21.2.4",
+    "@angular/core": "^21.2.19",
     "@angular/forms": "^21.2.4",
     "@angular/language-service": "^21.2.4",
     "@angular/platform-browser": "^21.2.4",
