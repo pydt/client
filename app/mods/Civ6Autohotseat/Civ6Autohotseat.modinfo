@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Mod id="b7e4c1d2-3f5a-4a8e-9c6d-2e1f0a9b8c7d" version="8">
+	<Properties>
+		<Name>PYDT Auto Hotseat Loader</Name>
+		<Teaser>Automatically loads a hotseat save on game startup</Teaser>
+		<Description>PYDT AutoHotseat Loader. Automatically loads a hotseat save on game startup.</Description>
+		<Authors>Justin Becker, Mike Rosack</Authors>
+		<CompatibleVersions>2.0</CompatibleVersions>
+		<AffectsSavedGames>0</AffectsSavedGames>
+	</Properties>
+	<FrontEndActions>
+		<ImportFiles id="AutoHotseat_FrontEndFiles">
+			<File>UI/Test.lua</File>
+			<File>UI/AutoHotseat_FrontEnd.lua</File>
+			<File>UI/IntroScreen.lua</File>
+		</ImportFiles>
+	</FrontEndActions>
+	<InGameActions>
+		<ReplaceUIScript id="AutoHotseat_PlayerChange">
+			<Properties>
+				<LuaContext>PlayerChange</LuaContext>
+				<LuaReplace>UI/PlayerChange_AutoHotseat.lua</LuaReplace>
+			</Properties>
+		</ReplaceUIScript>
+	</InGameActions>
+	<Files>
+		<File>UI/Test.lua</File>
+		<File>UI/AutoHotseat_FrontEnd.lua</File>
+		<File>UI/IntroScreen.lua</File>
+		<File>UI/PlayerChange_AutoHotseat.lua</File>
+	</Files>
+</Mod>

@@ -9,7 +9,7 @@ import { default as log } from "electron-log";
 const CIV6_DATA_DIR = "Sid Meier's Civilization VI";
 
 // Proton data paths look like .../compatdata/289070/pfx/drive_c/users/steamuser/Documents/My Games/...
-const PROTON_RE = /^(.*[\\/]pfx[\\/]drive_c)[\\/]users[\\/]([^\\/]+)[\\/]/i;
+export const PROTON_RE = /^(.*[\\/]pfx[\\/]drive_c)[\\/]users[\\/]([^\\/]+)[\\/]/i;
 
 const localAppData = () => process.env.LOCALAPPDATA || path.join(os.homedir(), "AppData", "Local");
 

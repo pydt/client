@@ -44,6 +44,7 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
   private saveDir: string;
   private archiveDir: string;
   private saveFileToPlay: string;
+  private civ6AutostartAttempted = false;
   lastTurnText$: Observable<string>;
   private readonly destroy$ = new Subject<void>();
 
@@ -152,7 +153,8 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
 
           await this.ngZone.run(async () => {
             if (this.settings.launchCiv) {
-              await this.prepareIntroSkip();
+              await this.prepareCiv6IntroSkip();
+              await this.prepareCiv6Autostart();
               window.pydtApi.ipc.send(RPC_TO_MAIN.OPEN_URL, url);
             }
 
@@ -174,6 +176,8 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
 
+    void this.revertCiv6Autostart();
+
     if (this.xhr) {
       this.xhr.abort();
       this.xhr = null;
@@ -185,7 +189,7 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
     }
   }
 
-  private async prepareIntroSkip(): Promise<void> {
+  private async prepareCiv6IntroSkip(): Promise<void> {
     if (!this.settings.shouldSkipCiv6Intro(this.civGame)) {
       return;
     }
@@ -198,6 +202,40 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
     if (!result?.ok) {
       window.pydtApi.ipc.send(RPC_TO_MAIN.LOG_ERROR, `Intro skip unavailable: ${result?.message}`);
     }
+  }
+
+  // Install the AutoHotseat mod and set PlayNowSave in AppOptions.txt
+  private async prepareCiv6Autostart(): Promise<void> {
+    if (!this.settings.shouldHotSeatAutoStartCiv6(this.civGame)) {
+      return;
+    }
+
+    this.civ6AutostartAttempted = true;
+
+    const result = await window.pydtApi.ipc.invoke<{ ok: boolean; message: string }>(
+      RPC_INVOKE.CIV6_AUTOSTART_PREPARE,
+      {
+        dataPath: this.settings.getDefaultDataPath(this.civGame),
+        savePath: this.saveFileToPlay,
+      },
+    );
+
+    if (!result?.ok) {
+      window.pydtApi.ipc.send(RPC_TO_MAIN.LOG_ERROR, `Falling back to normal launch: ${result?.message}`);
+    }
+  }
+
+  private async revertCiv6Autostart(): Promise<void> {
+    if (!this.civ6AutostartAttempted) {
+      return;
+    }
+
+    this.civ6AutostartAttempted = false;
+
+    await window.pydtApi.ipc.invoke(RPC_INVOKE.CIV6_AUTOSTART_REVERT, {
+      dataPath: this.settings.getDefaultDataPath(this.civGame),
+      waitForExit: true,
+    });
   }
 
   public watchForSave(): Promise<void> {

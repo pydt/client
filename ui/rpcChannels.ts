@@ -31,4 +31,6 @@ export enum RPC_INVOKE {
   STORAGE_SET = "storage-set",
   CIV6_INTRO_SKIP_PREPARE = "civ6-intro-skip-prepare",
   CIV6_INTRO_SKIP_REVERT = "civ6-intro-skip-revert",
+  CIV6_AUTOSTART_PREPARE = "civ6-autostart-prepare",
+  CIV6_AUTOSTART_REVERT = "civ6-autostart-revert",
 }

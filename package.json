@@ -71,6 +71,12 @@
     ],
     "extraFiles": [
       "app/icon.png"
+    ],
+    "extraResources": [
+      {
+        "from": "app/mods",
+        "to": "mods"
+      }
     ]
   },
   "browserslist": [
