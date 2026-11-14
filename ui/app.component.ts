@@ -1,7 +1,12 @@
 import { Component, NgZone, OnInit, ViewChild, TemplateRef, inject } from "@angular/core";
 import { BsModalRef, BsModalService, ModalOptions } from "ngx-bootstrap/modal";
 import { CivGame, GameStore } from "pydt-shared";
-import { CIV6_GAME_ID, isCiv6HotSeatAutoStartBeta, PydtSettingsData, PydtSettingsFactory } from "./shared/pydtSettings";
+import {
+  CIV6_GAME_ID,
+  isCiv6HotSeatAutoStartExtraBeta,
+  PydtSettingsData,
+  PydtSettingsFactory,
+} from "./shared/pydtSettings";
 import { RPC_INVOKE, RPC_TO_MAIN, RPC_TO_RENDERER } from "./rpcChannels";
 import { setTheme } from "ngx-bootstrap/utils";
 import { SafeMetadataLoader } from "./shared/safeMetadataLoader";
@@ -25,7 +30,7 @@ export class AppComponent implements OnInit {
   private router = inject(Router);
 
   readonly CIV6_GAME_ID = CIV6_GAME_ID;
-  readonly civ6HotSeatAutoStartBeta = isCiv6HotSeatAutoStartBeta();
+  readonly civ6HotSeatAutoStartExtraBeta = isCiv6HotSeatAutoStartExtraBeta();
   version: string;
   newVersion: string;
   settings: PydtSettingsData;

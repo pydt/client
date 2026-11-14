@@ -13,22 +13,23 @@ const loadConfig = key =>
     }),
   );
 
+const saveConfig = (key, data) =>
+  new Promise((resolve, reject) => {
+    storage.set(key, data, err => {
+      if (err) {
+        reject(err);
+      }
+
+      resolve();
+    });
+  });
+
 electron.ipcMain.handle(RPC_INVOKE.STORAGE_GET, (e, key) => loadConfig(key));
 
-electron.ipcMain.handle(
-  RPC_INVOKE.STORAGE_SET,
-  (e, key, data) =>
-    new Promise((resolve, reject) => {
-      storage.set(key, data, err => {
-        if (err) {
-          reject(err);
-        }
-
-        resolve();
-      });
-    }),
-);
+electron.ipcMain.handle(RPC_INVOKE.STORAGE_SET, (e, key, data) => saveConfig(key, data));
 
 export const getConfig = key => loadConfig(key);
+
+export const setConfig = (key, data) => saveConfig(key, data);
 
 export const clearConfig = () => new Promise(resolve => storage.clear(resolve));

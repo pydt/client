@@ -80,7 +80,8 @@ const removeMod = dataPath => {
 const setPlayNowSave = (appOptionsPath, value) => {
   const text = readOptions(appOptionsPath);
 
-  if (getAppOption(text, "PlayNowSave") !== value) {
+  // A missing key counts as empty, so clearing never adds the key for players who haven't used this feature
+  if ((getAppOption(text, "PlayNowSave") ?? "") !== value) {
     writeOptions(appOptionsPath, setAppOption(text, "Debug", "PlayNowSave", value));
   }
 };
@@ -130,7 +131,8 @@ export const revertAutostart = ({ dataPath, waitForExit = false }) => {
     if (!isModInstalled(dataPath)) {
       cancelPendingRevert();
 
-      return result(true, "nothing to revert");
+      // The client checks this on every game list refresh, so don't log when there's nothing to do
+      return { ok: true, complete: true, message: "Civ 6 autostart revert: nothing to revert" };
     }
 
     if (isCiv6Running()) {

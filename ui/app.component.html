@@ -204,16 +204,12 @@
                 />
                 <label class="form-check-label" for="civ6HotSeatAutoStart">
                   Auto-start directly into the downloaded save
-                  @if (civ6HotSeatAutoStartBeta) {
-                    <span class="badge text-bg-warning ms-1">Beta</span>
-                  }
+                  <span class="badge text-bg-warning ms-1">Beta</span>
                   <small class="text-body-secondary d-block">
                     When this is enabled PYDT uses a temporary game mod to load your hotseat save automatically on
                     startup.
-                    @if (civ6HotSeatAutoStartBeta) {
-                      <span class="d-block">
-                        This feature is still in beta for MacOS and Linux.
-                      </span>
+                    @if (civ6HotSeatAutoStartExtraBeta) {
+                      <span class="d-block"> Extra beta on macOS and Linux: it hasn't been tested there yet. </span>
                     }
                   </small>
                 </label>

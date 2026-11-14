@@ -4,6 +4,8 @@ import * as path from "path";
 import { default as log } from "electron-log";
 import { RPC_INVOKE } from "./rpcChannels.js";
 import { findCiv6InstallDir } from "./civ6Installation.js";
+import { getConfig, setConfig } from "./storage.js";
+import { STORAGE_CONFIG } from "./storageConfig.js";
 import {
   findAppOptionsPath,
   getAppOption,
@@ -108,8 +110,24 @@ export const lockLogoMovies = dataPath => {
   return fds.length;
 };
 
+// AppOptions.txt files where PYDT (not the player) turned PlayIntroVideo off. We only turn it back on
+// for these, so a player who disabled the intro themselves in game keeps their choice.
+const loadChangedPaths = async () => {
+  try {
+    const data = await getConfig(STORAGE_CONFIG.CIV6_INTRO_SKIP);
+
+    return new Set(Array.isArray(data?.changedAppOptionsPaths) ? data.changedAppOptionsPaths : []);
+  } catch (err) {
+    log.warn(`Civ 6 intro skip: could not read state: ${err.message}`);
+
+    return new Set();
+  }
+};
+
+const saveChangedPaths = paths => setConfig(STORAGE_CONFIG.CIV6_INTRO_SKIP, { changedAppOptionsPaths: [...paths] });
+
 // dataPath is the Civ 6 user data folder (parent of Saves/).
-export const prepareIntroSkip = ({ dataPath }) => {
+export const prepareIntroSkip = async ({ dataPath }) => {
   try {
     cancelPendingRevert();
 
@@ -121,6 +139,11 @@ export const prepareIntroSkip = ({ dataPath }) => {
 
       if (getAppOption(text, "PlayIntroVideo") !== "0") {
         writeOptions(appOptionsPath, setAppOption(text, "Video", "PlayIntroVideo", "0"));
+
+        const changed = await loadChangedPaths();
+        changed.add(appOptionsPath);
+        await saveChangedPaths(changed);
+
         notes.push(`PlayIntroVideo=0 in ${appOptionsPath}`);
       }
     } else {
@@ -145,8 +168,8 @@ export const prepareIntroSkip = ({ dataPath }) => {
   }
 };
 
-// Turn the intro video back on once the setting is off.
-export const revertIntroSkip = ({ dataPath }) => {
+// Turn the intro video back on once the setting is off, but only if PYDT was the one that turned it off.
+export const revertIntroSkip = async ({ dataPath }) => {
   try {
     const notes = [];
 
@@ -155,13 +178,21 @@ export const revertIntroSkip = ({ dataPath }) => {
     }
 
     const appOptionsPath = findAppOptionsPath(dataPath);
+    const changed = await loadChangedPaths();
 
-    if (appOptionsPath && getAppOption(readOptions(appOptionsPath), "PlayIntroVideo") === "0") {
-      if (isCiv6Running()) {
+    if (appOptionsPath && changed.has(appOptionsPath)) {
+      if (getAppOption(readOptions(appOptionsPath), "PlayIntroVideo") !== "0") {
+        // Already back on, nothing left for us to undo
+        changed.delete(appOptionsPath);
+        await saveChangedPaths(changed);
+        cancelPendingRevert();
+      } else if (isCiv6Running()) {
         schedulePendingRevert(dataPath);
         notes.push("Civ 6 is running; PlayIntroVideo will be restored when it exits");
       } else {
         writeOptions(appOptionsPath, setAppOption(readOptions(appOptionsPath), "Video", "PlayIntroVideo", "1"));
+        changed.delete(appOptionsPath);
+        await saveChangedPaths(changed);
         cancelPendingRevert();
         notes.push(`PlayIntroVideo=1 in ${appOptionsPath}`);
       }
