@@ -14,6 +14,7 @@ import { STORAGE_CONFIG } from "./storageConfig.js";
 
 import "./notifications.js";
 import "./civ6IntroSkip.js";
+import "./civ6Autostart.js";
 
 contextMenu({
   showLookUpSelection: false,

@@ -10,10 +10,11 @@ import { AuthService } from "../shared/authService";
 import { DiscourseInfo } from "../shared/discourseInfo";
 import { UpdateService } from "../shared/updateService";
 import { environment } from "../environments/environment";
-import { RPC_TO_MAIN, RPC_TO_RENDERER } from "../rpcChannels";
+import { RPC_INVOKE, RPC_TO_MAIN, RPC_TO_RENDERER } from "../rpcChannels";
 import { GameComponent, gameTitleFor } from "./game.component";
 import { PlayTurnState } from "../playTurn/playTurnState.service";
 import { PydtSettingsData, PydtSettingsFactory } from "../shared/pydtSettings";
+import { SafeMetadataLoader } from "../shared/safeMetadataLoader";
 
 const POLL_INTERVAL: number = 600 * 1000;
 const TOAST_INTERVAL: number = 14.5 * 60 * 1000;
@@ -40,6 +41,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private readonly updateService = inject(UpdateService);
   private readonly playTurnState = inject(PlayTurnState);
   private readonly pydtSettingsFactory = inject(PydtSettingsFactory);
+  private readonly metadataLoader = inject(SafeMetadataLoader);
 
   games: Game[];
   gamePlayerProfiles: SteamProfileMap = {};
@@ -218,6 +220,25 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.errorLoading = true;
   }
 
+  // When the Civ6 autostart mod is not needed, we uninstall it to prevent
+  // potentially changing game behavior when launching the game normally.
+  private async revertStaleCiv6Autostart(turnsToNotify: Game[]): Promise<void> {
+    if (turnsToNotify.some(x => x.gameType === "CIV6")) {
+      return;
+    }
+
+    const civ6 = (await this.metadataLoader.loadMetadata())?.civGames.find(x => x.id === "CIV6");
+
+    if (!civ6 || !this.settings) {
+      return;
+    }
+
+    await window.pydtApi.ipc.invoke(RPC_INVOKE.CIV6_AUTOSTART_REVERT, {
+      dataPath: this.settings.getDefaultDataPath(civ6),
+      waitForExit: false,
+    });
+  }
+
   async loadGames(): Promise<void> {
     let req: Observable<Game[]>;
 
@@ -252,6 +273,8 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     // Notify about turns available
     this.turnCacheService.updateGames(turnsToNotify);
+
+    void this.revertStaleCiv6Autostart(turnsToNotify);
 
     if (this.settings?.autoPlay && turnsToNotify.length) {
       const nextGame = turnsToNotify[0];
