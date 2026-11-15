@@ -17,8 +17,10 @@ export class PydtSettingsData {
   numSaves = 100;
   gameStores: { [index: string]: GameStore } = {};
   savePaths: { [index: string]: string } = {};
-  civ6SkipIntroVideo = true;
-  // Opt-in for now: it installs a temporary mod and relies on undocumented Civ 6 behavior
+  // Both Civ 6 helpers are opt-in: intro skip edits AppOptions.txt and (on Windows)
+  // locks the logo movie files while the game starts, and auto-start installs a
+  // temporary mod and relies on undocumented Civ 6 behavior.
+  civ6SkipIntroVideo = false;
   civ6HotSeatAutoStart = false;
   autoDownload = false;
   autoPlay = false;
