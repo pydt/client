@@ -13,6 +13,11 @@ switch (env) {
 
 const environment = {
   production: env === "prod",
+  // App version, and the platform this bundle was built on. Each release job builds
+  // the UI separately, so Rollbar's code version (and the source maps CI uploads
+  // for it) is "<version>-<platform>", e.g. 2.3.0-win32.
+  version: JSON.parse(fs.readFileSync("app/package.json", "utf-8")).version,
+  platform: process.platform,
   apiUrl: "https://api.playyourdamnturn.com",
   iotClientAccessKey: process.env.IOT_CLIENT_ACCESS_KEY || "",
   iotClientSecretKey: process.env.IOT_CLIENT_SECRET_KEY || "",

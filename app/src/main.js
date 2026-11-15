@@ -7,7 +7,7 @@ import { getAppIcon, getWindow, createWindow, forceShowWindow } from "./window.j
 import { checkForUpdates } from "./appUpdater.js";
 import { RPC_INVOKE, RPC_TO_MAIN } from "./rpcChannels.js";
 import { default as contextMenu } from "electron-context-menu";
-import { ROLLBAR_CONFIG } from "./rollbarConfig.js";
+import { initRollbar } from "./rollbar.js";
 import { initTurnApi } from "./turnApi.js";
 import { getConfig } from "./storage.js";
 import { STORAGE_CONFIG } from "./storageConfig.js";
@@ -41,6 +41,9 @@ contextMenu({
   });
 
   app.on("ready", async () => {
+    // First, so errors during startup are reported (subject to the remote switch).
+    initRollbar(app, ipcMain, getWindow);
+
     const settings = await getConfig(STORAGE_CONFIG.SETTINGS);
     initTurnApi(app, ipcMain, !!settings.turnApiEnabled, settings.turnApiPort);
 
@@ -85,17 +88,6 @@ contextMenu({
       } else {
         getWindow().show();
       }
-    });
-
-    ipcMain.on(RPC_TO_MAIN.INIT_ROLLBAR, () => {
-      const Rollbar = require("rollbar");
-
-      new Rollbar({
-        ...ROLLBAR_CONFIG,
-        payload: {
-          platform: "client",
-        },
-      });
     });
 
     const win = await createWindow();

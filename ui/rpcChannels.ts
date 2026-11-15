@@ -1,6 +1,5 @@
 export enum RPC_TO_MAIN {
   APPLY_UPDATE = "apply-update",
-  INIT_ROLLBAR = "init-rollbar",
   SHOW_NOTIFICATION = "show-notification",
   SHOW_WINDOW = "show-window",
   START_IOT = "start-iot",
@@ -21,10 +20,12 @@ export enum RPC_TO_RENDERER {
   SHOW_UPDATE_MODAL = "show-update-modal",
   SET_USER = "set-user",
   NEW_USER = "new-user",
+  ROLLBAR_SETTINGS = "rollbar-settings",
 }
 
 export enum RPC_INVOKE {
   GET_PATH = "get-path",
+  GET_ROLLBAR_SETTINGS = "get-rollbar-settings",
   SET_FORCE_QUIT = "set-force-quit",
   SHOW_OPEN_DIALOG = "show-open-dialog",
   STORAGE_GET = "storage-get",
