@@ -1,6 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "strict": false,
     "allowJs": true,
     "importHelpers": true,
     "outDir": "./dist/out-tsc",
@@ -12,8 +13,6 @@
     "experimentalDecorators": true,
     "target": "ES2022",
     "typeRoots": ["node_modules/@types"],
-    "module": "esnext",
-    "baseUrl": "./",
-    "useDefineForClassFields": false
+    "module": "esnext",    "useDefineForClassFields": false
   }
 }

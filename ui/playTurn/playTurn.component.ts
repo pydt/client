@@ -1,5 +1,14 @@
 import { HttpErrorResponse } from "@angular/common/http";
-import { Component, HostListener, Input, NgZone, OnDestroy, OnInit, inject } from "@angular/core";
+import {
+  Component,
+  HostListener,
+  Input,
+  NgZone,
+  OnDestroy,
+  OnInit,
+  inject,
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import { Router } from "@angular/router";
 import { GameService, SteamProfileMap, CivGame, CountdownUtility, PydtSharedModule } from "pydt-shared";
 import { PydtSettingsFactory, PydtSettingsData } from "../shared/pydtSettings";
@@ -12,14 +21,14 @@ import { takeUntil } from "rxjs/operators";
 import { ProgressbarComponent } from "ngx-bootstrap/progressbar";
 import { GamePlayersComponent } from "../home/gamePlayers.component";
 import { MarkdownComponent } from "ngx-markdown";
-import { AuthComponent } from "../auth/auth.component";
 import { AsyncPipe } from "@angular/common";
 
 @Component({
   selector: "pydt-play-turn",
   templateUrl: "./playTurn.component.html",
   styleUrls: ["./playTurn.component.css"],
-  imports: [ProgressbarComponent, GamePlayersComponent, MarkdownComponent, AuthComponent, AsyncPipe, PydtSharedModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  imports: [ProgressbarComponent, GamePlayersComponent, MarkdownComponent, AsyncPipe, PydtSharedModule],
 })
 export class PlayTurnComponent implements OnInit, OnDestroy {
   readonly playTurnState = inject(PlayTurnState);

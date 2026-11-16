@@ -18,7 +18,9 @@
             },
             "index": "ui/index.html",
             "tsConfig": "ui/tsconfig.app.json",
-            "polyfills": ["ui/polyfills.ts"],
+            "polyfills": [
+              "ui/polyfills.ts"
+            ],
             "assets": [
               {
                 "glob": "**/*",
@@ -26,7 +28,9 @@
                 "output": "/"
               }
             ],
-            "styles": ["ui/styles/app.scss"],
+            "styles": [
+              "ui/styles/app.scss"
+            ],
             "fileReplacements": [
               {
                 "replace": "ui/environments/environment.ts",
@@ -59,31 +63,14 @@
             "buildTarget": "ui:build"
           }
         },
-        "test": {
-          "builder": "@angular-builders/custom-webpack:karma",
-          "options": {
-            "customWebpackConfig": {
-              "path": "./extra-webpack.config.js"
-            },
-            "main": "src/test.ts",
-            "karmaConfig": "./karma.conf.js",
-            "polyfills": "ui/polyfills.ts",
-            "tsConfig": "ui/tsconfig.spec.json",
-            "scripts": [],
-            "styles": ["ui/styles/app.scss"],
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "src/public",
-                "output": "/"
-              }
-            ]
-          }
-        },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": ["ui/**/*.ts", "ui/**/*.html", "app/**/*.js"]
+            "lintFilePatterns": [
+              "ui/**/*.ts",
+              "ui/**/*.html",
+              "app/**/*.js"
+            ]
           }
         }
       }
@@ -119,7 +106,9 @@
     }
   },
   "cli": {
-    "schematicCollections": ["@angular-eslint/schematics"],
+    "schematicCollections": [
+      "@angular-eslint/schematics"
+    ],
     "analytics": false
   }
 }

@@ -1,4 +1,4 @@
-import { Component, inject } from "@angular/core";
+import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
 import { Router } from "@angular/router";
 import { UserService } from "pydt-shared";
 import { AuthService } from "../shared/authService";
@@ -12,6 +12,7 @@ class AuthModel {
 @Component({
   selector: "pydt-auth",
   templateUrl: "./auth.component.html",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [TooltipDirective, FormsModule],
 })
 export class AuthComponent {

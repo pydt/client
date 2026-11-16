@@ -1,4 +1,4 @@
-import { Component, NgZone, OnInit, ViewChild, TemplateRef, inject } from "@angular/core";
+import { Component, NgZone, OnInit, ViewChild, TemplateRef, inject, ChangeDetectionStrategy } from "@angular/core";
 import { BsModalRef, BsModalService, ModalOptions } from "ngx-bootstrap/modal";
 import { CivGame, GameStore } from "pydt-shared";
 import {
@@ -17,6 +17,7 @@ import { Router } from "@angular/router";
 @Component({
   selector: "pydt-app",
   templateUrl: "./app.component.html",
+  changeDetection: ChangeDetectionStrategy.Eager,
   // eslint-disable-next-line @angular-eslint/prefer-standalone
   standalone: false,
 })

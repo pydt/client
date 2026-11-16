@@ -1,5 +1,5 @@
 import { HttpClient } from "@angular/common/http";
-import { Component, OnDestroy, OnInit, inject } from "@angular/core";
+import { Component, OnDestroy, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
 import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
 import { difference, orderBy } from "lodash-es";
 import { BusyService, Game, ProfileCacheService, SteamProfileMap, User, UserService } from "pydt-shared";
@@ -27,6 +27,7 @@ interface GameWithYourTurn extends Game {
 @Component({
   selector: "pydt-home",
   templateUrl: "./home.component.html",
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [GameComponent],
 })
 export class HomeComponent implements OnInit, OnDestroy {

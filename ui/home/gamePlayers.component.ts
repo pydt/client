@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, inject } from "@angular/core";
+import { Component, Input, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
 import { CivDef, Game, GamePlayer, SteamProfileMap, CivGame, PydtSharedModule } from "pydt-shared";
 import { SafeMetadataLoader } from "../shared/safeMetadataLoader";
 
@@ -6,6 +6,7 @@ import { SafeMetadataLoader } from "../shared/safeMetadataLoader";
   selector: "pydt-game-players",
   templateUrl: "./gamePlayers.component.html",
   styleUrls: ["./gamePlayers.component.css"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [PydtSharedModule],
 })
 export class GamePlayersComponent implements OnInit {

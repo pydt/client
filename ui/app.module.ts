@@ -1,4 +1,4 @@
-import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi, withXhr } from "@angular/common/http";
 import { ErrorHandler, NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { BrowserModule } from "@angular/platform-browser";
@@ -46,10 +46,10 @@ export const configFactory = (): Configuration =>
     BrowserAnimationsModule,
     ApiModule.forRoot(configFactory),
     FormsModule,
-    ModalModule.forRoot(),
-    ProgressbarModule.forRoot(),
-    TooltipModule.forRoot(),
-    TabsModule.forRoot(),
+    ModalModule,
+    ProgressbarModule,
+    TooltipModule,
+    TabsModule,
     PydtSharedModule,
     routing,
     MarkdownModule.forRoot({
@@ -78,7 +78,7 @@ export const configFactory = (): Configuration =>
     { provide: HTTP_INTERCEPTORS, useExisting: DateInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useExisting: MetadataCacheService, multi: true },
     PlayTurnState,
-    provideHttpClient(withInterceptorsFromDi()),
+    provideHttpClient(withXhr(), withInterceptorsFromDi()),
   ],
 })
 export class AppModule {}

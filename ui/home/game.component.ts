@@ -1,4 +1,13 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, inject } from "@angular/core";
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+  inject,
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import { Router } from "@angular/router";
 import { Game, SteamProfileMap, User, CivGame, CountdownUtility } from "pydt-shared";
 import { SafeMetadataLoader } from "../shared/safeMetadataLoader";
@@ -32,6 +41,7 @@ export const gameTitleFor = (game: Game): string => {
   selector: "pydt-game",
   templateUrl: "./game.component.html",
   styleUrls: ["./game.component.css"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [NgClass, GamePlayersComponent, AsyncPipe],
 })
 export class GameComponent implements OnInit, OnDestroy {
