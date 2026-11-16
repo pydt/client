@@ -2,17 +2,19 @@
   "compileOnSave": false,
   "compilerOptions": {
     "strict": false,
-    "allowJs": true,
-    "importHelpers": true,
-    "outDir": "./dist/out-tsc",
-    "sourceMap": false,
-    "declaration": false,
+    "types": ["node"],
+    "skipLibCheck": true,
+    "isolatedModules": true,
     "esModuleInterop": true,
-    "moduleResolution": "bundler",
-    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "importHelpers": true,
     "target": "ES2022",
-    "typeRoots": ["node_modules/@types"],
-    "module": "esnext",    "useDefineForClassFields": false
+    "module": "preserve",
+    "useDefineForClassFields": false
+  },
+  "angularCompilerOptions": {
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true
   }
 }

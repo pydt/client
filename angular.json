@@ -19,6 +19,7 @@
             "index": "ui/index.html",
             "tsConfig": "ui/tsconfig.app.json",
             "polyfills": [
+              "zone.js",
               "ui/polyfills.ts"
             ],
             "assets": [
