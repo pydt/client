@@ -116,9 +116,15 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   readSmack(): void {
+    // With unread posts, jump to the first one the client hasn't shown yet (forum #9981). Otherwise
+    // open the topic and let the forum pick the spot.
+    const firstUnread = this.newDiscoursePost
+      ? Math.min((this.discoursePostNumber || 0) + 1, this.game.latestDiscoursePostNumber)
+      : undefined;
+
     window.pydtApi.ipc.send(
       RPC_TO_MAIN.OPEN_URL,
-      `https://discourse.playyourdamnturn.com/t/${this.game.discourseTopicId}`,
+      `https://discourse.playyourdamnturn.com/t/${this.game.discourseTopicId}${firstUnread ? `/${firstUnread}` : ""}`,
     );
     this.smackRead.emit(this.game.latestDiscoursePostNumber);
   }
