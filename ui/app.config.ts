@@ -1,37 +1,20 @@
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi, withXhr } from "@angular/common/http";
-import { ErrorHandler, NgModule } from "@angular/core";
-import { FormsModule } from "@angular/forms";
-import { BrowserModule } from "@angular/platform-browser";
+import { ApplicationConfig, ErrorHandler, importProvidersFrom, provideZoneChangeDetection } from "@angular/core";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { ModalModule } from "ngx-bootstrap/modal";
 import { ProgressbarModule } from "ngx-bootstrap/progressbar";
 import { TabsModule } from "ngx-bootstrap/tabs";
 import { TooltipModule } from "ngx-bootstrap/tooltip";
 import { MARKED_OPTIONS, MarkdownModule } from "ngx-markdown";
-import {
-  ApiModule,
-  BusyService,
-  Configuration,
-  DateInterceptor,
-  MetadataCacheService,
-  ProfileCacheService,
-  PydtSharedModule,
-} from "pydt-shared";
-import { AppComponent } from "./app.component";
+import { ApiModule, BusyService, Configuration, DateInterceptor, MetadataCacheService } from "pydt-shared";
 import { routing } from "./app.routing";
-import { AuthComponent } from "./auth/auth.component";
-import { GameComponent } from "./home/game.component";
-import { GamePlayersComponent } from "./home/gamePlayers.component";
-import { HomeComponent } from "./home/home.component";
-import { PlayTurnComponent } from "./playTurn/playTurn.component";
+import { environment } from "./environments/environment";
 import { PlayTurnState } from "./playTurn/playTurnState.service";
 import { RollbarErrorHandler, rollbarFactory, RollbarService } from "./rollbarErrorHandler";
 import { AuthService } from "./shared/authService";
-import { TurnCacheService } from "./shared/turnCacheService";
 import { PydtSettingsFactory } from "./shared/pydtSettings";
-import { environment } from "./environments/environment";
 import { SafeMetadataLoader } from "./shared/safeMetadataLoader";
-import { ScrollTabsDirective } from "./shared/scrollTabs.directive";
+import { TurnCacheService } from "./shared/turnCacheService";
 
 export const configFactory = (): Configuration =>
   new Configuration({
@@ -39,37 +22,27 @@ export const configFactory = (): Configuration =>
     basePath: environment.apiUrl,
   });
 
-@NgModule({
-  declarations: [AppComponent],
-  bootstrap: [AppComponent],
-  imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    ApiModule.forRoot(configFactory),
-    FormsModule,
-    ModalModule,
-    ProgressbarModule,
-    TooltipModule,
-    TabsModule,
-    ScrollTabsDirective,
-    PydtSharedModule,
-    routing,
-    MarkdownModule.forRoot({
-      markedOptions: {
-        provide: MARKED_OPTIONS,
-        useValue: {
-          breaks: true,
-        },
-      },
-    }),
-    AuthComponent,
-    HomeComponent,
-    GameComponent,
-    PlayTurnComponent,
-    GamePlayersComponent,
-  ],
+export const appConfig: ApplicationConfig = {
   providers: [
-    ProfileCacheService,
+    // The app still relies on zone.js; without this, bootstrapApplication runs zoneless.
+    provideZoneChangeDetection(),
+    importProvidersFrom(
+      BrowserAnimationsModule,
+      ApiModule.forRoot(configFactory),
+      ModalModule,
+      ProgressbarModule,
+      TooltipModule,
+      TabsModule,
+      routing,
+      MarkdownModule.forRoot({
+        markedOptions: {
+          provide: MARKED_OPTIONS,
+          useValue: {
+            breaks: true,
+          },
+        },
+      }),
+    ),
     TurnCacheService,
     PydtSettingsFactory,
     SafeMetadataLoader,
@@ -82,5 +55,4 @@ export const configFactory = (): Configuration =>
     PlayTurnState,
     provideHttpClient(withXhr(), withInterceptorsFromDi()),
   ],
-})
-export class AppModule {}
+};

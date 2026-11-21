@@ -10,7 +10,15 @@ import {
   ChangeDetectionStrategy,
 } from "@angular/core";
 import { Router } from "@angular/router";
-import { GameService, SteamProfileMap, CivGame, CountdownUtility, PydtSharedModule } from "pydt-shared";
+import {
+  GameService,
+  SteamProfileMap,
+  CivGame,
+  CountdownUtility,
+  GameSpeedPipe,
+  MapPipe,
+  MapSizePipe,
+} from "pydt-shared";
 import { PydtSettingsFactory, PydtSettingsData } from "../shared/pydtSettings";
 import { PlayTurnState } from "./playTurnState.service";
 import { TurnCacheService, TurnDownloader } from "../shared/turnCacheService";
@@ -28,7 +36,15 @@ import { AsyncPipe } from "@angular/common";
   templateUrl: "./playTurn.component.html",
   styleUrls: ["./playTurn.component.css"],
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [ProgressbarComponent, GamePlayersComponent, MarkdownComponent, AsyncPipe, PydtSharedModule],
+  imports: [
+    ProgressbarComponent,
+    GamePlayersComponent,
+    MarkdownComponent,
+    AsyncPipe,
+    GameSpeedPipe,
+    MapPipe,
+    MapSizePipe,
+  ],
 })
 export class PlayTurnComponent implements OnInit, OnDestroy {
   readonly playTurnState = inject(PlayTurnState);

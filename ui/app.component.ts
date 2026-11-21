@@ -1,6 +1,9 @@
 import { Component, NgZone, OnInit, ViewChild, TemplateRef, inject, ChangeDetectionStrategy } from "@angular/core";
 import { BsModalRef, BsModalService, ModalOptions } from "ngx-bootstrap/modal";
-import { CivGame, GameStore } from "pydt-shared";
+import { BusyComponent, CivGame, GameStore } from "pydt-shared";
+import { FormsModule } from "@angular/forms";
+import { TabDirective, TabsetComponent } from "ngx-bootstrap/tabs";
+import { ScrollTabsDirective } from "./shared/scrollTabs.directive";
 import {
   CIV6_GAME_ID,
   isCiv6HotSeatAutoStartExtraBeta,
@@ -12,14 +15,13 @@ import { setTheme } from "ngx-bootstrap/utils";
 import { SafeMetadataLoader } from "./shared/safeMetadataLoader";
 import { AuthService } from "./shared/authService";
 import { UpdateService } from "./shared/updateService";
-import { Router } from "@angular/router";
+import { Router, RouterOutlet } from "@angular/router";
 
 @Component({
   selector: "pydt-app",
   templateUrl: "./app.component.html",
   changeDetection: ChangeDetectionStrategy.Eager,
-  // eslint-disable-next-line @angular-eslint/prefer-standalone
-  standalone: false,
+  imports: [FormsModule, RouterOutlet, TabsetComponent, TabDirective, ScrollTabsDirective, BusyComponent],
 })
 export class AppComponent implements OnInit {
   private zone = inject(NgZone);
@@ -129,7 +131,10 @@ export class AppComponent implements OnInit {
   }
 
   async openDirectoryDialog(civGame: CivGame): Promise<void> {
-    const filePath = await window.pydtApi.ipc.invoke<string>(RPC_INVOKE.SHOW_OPEN_DIALOG);
+    const filePath = await window.pydtApi.ipc.invoke<string>(
+      RPC_INVOKE.SHOW_OPEN_DIALOG,
+      this.settings.getSavePath(civGame),
+    );
 
     if (filePath) {
       this.settings.setSavePath(civGame, filePath);

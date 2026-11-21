@@ -59,9 +59,11 @@ contextMenu({
       forceShowWindow();
     });
 
-    ipcMain.handle(RPC_INVOKE.SHOW_OPEN_DIALOG, () => {
+    ipcMain.handle(RPC_INVOKE.SHOW_OPEN_DIALOG, (e, defaultPath) => {
       const result = dialog.showOpenDialogSync({
         properties: ["openDirectory"],
+        // Electron 45+ opens in Downloads when this is unset, so start where the current folder is
+        defaultPath: typeof defaultPath === "string" ? defaultPath : undefined,
       });
 
       return result ? result[0] : null;
