@@ -36,6 +36,13 @@ export const initRollbar = (app, ipcMain, getWindow) => {
     return;
   }
 
+  // Rollbar 2.x swallowed uncaught errors even while disabled (the remote switch is
+  // off by default); since 4.1 they reach Electron, which shows a "JavaScript error
+  // in the main process" dialog. Keep the old quiet behavior, but log them. When
+  // reporting is on, Rollbar's own handlers still send them.
+  process.on("uncaughtException", err => log.error("Uncaught exception in main process:", err));
+  process.on("unhandledRejection", reason => log.error("Unhandled rejection in main process:", reason));
+
   const Rollbar = require("rollbar");
   const version = app.getVersion();
 
