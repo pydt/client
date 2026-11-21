@@ -2,7 +2,7 @@
   <div class="card" [ngClass]="{ 'card-primary': yourTurn }">
     <div class="card-header game-header">
       <a class="game-title" href="javascript:void(0)" (click)="openGameOnWeb()" [title]="gameTitle">
-        <img src="https://playyourdamnturn.com/img/game_{{ civGame?.id }}.png" alt="" />
+        <img src="https://playyourdamnturn.com/img/game_{{ civGame?.id }}.png?v=2" alt="" />
         <span>{{ gameTitle }}</span>
       </a>
       @if (game.gameTurnRangeKey > 1) {

@@ -277,13 +277,6 @@ input {
       small {
         color: #fff;
       }
-
-      // Some game icons are dark (Civ 7's hex), so give them a light backing on navy
-      img {
-        padding: 1px;
-        border-radius: 3px;
-        background: rgba(255, 255, 255, 0.85);
-      }
     }
   }
 }
