@@ -1,33 +1,22 @@
 <div>
-  @if (updateAvailable) {
-    <button
-      type="button"
-      class="btn btn-sm btn-primary"
-      style="position: fixed; top: 0; left: 20px; z-index: 1000; border-top-left-radius: 0; border-top-right-radius: 0"
-      (click)="promptForUpdate()"
-    >
-      Update Available - Click to Install
-    </button>
-  }
-  <button
-    type="button"
-    class="btn btn-sm btn-secondary"
-    [disabled]="refreshDisabled"
-    style="position: fixed; top: 0; right: 20px; z-index: 1000; border-top-left-radius: 0; border-top-right-radius: 0"
-    (click)="refresh()"
-  >
-    Refresh
-  </button>
-  @if (hasUnreadSmack) {
-    <button
-      type="button"
-      class="btn btn-sm btn-secondary"
-      style="position: fixed; top: 0; right: 85px; z-index: 1000; border-top-left-radius: 0; border-top-right-radius: 0"
-      (click)="clearSmack()"
-    >
-      Clear All Smack Talk Notifications
-    </button>
-  }
+  <!-- Stays at the top while scrolling; buttons wrap instead of overlapping in a narrow window -->
+  <div class="home-toolbar">
+    @if (updateAvailable) {
+      <button type="button" class="btn btn-sm btn-success" (click)="promptForUpdate()">
+        Update Available - Click to Install
+      </button>
+    }
+    <div class="home-toolbar-end">
+      @if (hasUnreadSmack) {
+        <button type="button" class="btn btn-sm btn-secondary" (click)="clearSmack()">
+          Clear All Smack Talk Notifications
+        </button>
+      }
+      <button type="button" class="btn btn-sm btn-secondary" [disabled]="refreshDisabled" (click)="refresh()">
+        Refresh
+      </button>
+    </div>
+  </div>
   @if (errorLoading) {
     <h1>There was an error loading your games. Please check your internet connection.</h1>
   }
@@ -36,7 +25,7 @@
       <h1>You have no games. :(</h1>
     }
     @if (games) {
-      <div style="margin-top: 35px">
+      <div>
         @for (game of sortedTurns; track game) {
           <div>
             <pydt-game

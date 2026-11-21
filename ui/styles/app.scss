@@ -132,9 +132,32 @@ input {
   max-width: 95vw;
   margin: 2.5vh auto;
 
+  // Header and footer stay put; only the body scrolls
   .modal-content {
     max-height: 95vh;
+    overflow: hidden;
+  }
+
+  .modal-header,
+  .modal-footer {
+    flex-shrink: 0;
+  }
+
+  .modal-body {
+    min-height: 0;
     overflow-y: auto;
+    // Rows' -12px gutters stick 2px past the 10px modal padding; don't add a scrollbar for that
+    overflow-x: hidden;
+  }
+
+  // Keep the tab row visible at the top of the scrolling body
+  .modal-body .scroll-tabs {
+    position: sticky;
+    top: -10px; // the body's top padding, so the row sits flush with the header when stuck
+    z-index: 2;
+    margin-top: -10px;
+    padding-top: 10px;
+    background: #fff;
   }
 }
 
@@ -189,17 +212,36 @@ input {
 
 // Nav tabs ===================================================================
 
+// Flat underline tabs, matching the website. They wrap by default; a tabset with
+// appScrollTabs keeps them on one scrolling row instead (see .scroll-tabs below).
 .nav-tabs {
-  a {
-    color: $primary;
-  }
+  flex-wrap: wrap;
+  gap: 0 0.25rem;
+  border-bottom: 0;
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.1);
+  margin-bottom: 0.75rem;
 
   .nav-link {
-    border-color: #adb5bd;
-    background-color: $body-bg;
+    margin-bottom: 0;
+    padding: 0.45rem 0.8rem;
+    border: 0;
+    border-bottom: 3px solid transparent;
+    border-radius: 0;
+    background: transparent;
+    color: rgba($primary, 0.65);
+    font-weight: 700;
+    white-space: nowrap;
 
-    &:hover {
+    &:hover,
+    &:focus {
       color: $primary;
+      border-bottom-color: rgba($primary, 0.25);
+    }
+
+    &.active {
+      color: $primary;
+      background: transparent;
+      border-bottom-color: $success;
     }
   }
 }
@@ -208,21 +250,134 @@ input {
 
 .card {
   margin-bottom: 0.75rem;
+  border: 0;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 
+  > .card-header {
+    background-color: #f4f5f6;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+
+    a,
+    small {
+      color: $primary;
+    }
+  }
+
+  // Your turn: navy header with a green edge so it stands out in the list
   &.card-primary {
-    border-color: $primary;
+    box-shadow: 0 0 0 2px $success, 0 2px 6px rgba(0, 0, 0, 0.15);
 
     > .card-header {
       background-color: $primary;
-      a, small {
+      border-bottom-color: $primary;
+
+      a,
+      small {
         color: #fff;
+      }
+
+      // Some game icons are dark (Civ 7's hex), so give them a light backing on navy
+      img {
+        padding: 1px;
+        border-radius: 3px;
+        background: rgba(255, 255, 255, 0.85);
       }
     }
   }
+}
 
-  > .card-header {
-    a, small {
-      color: #000;
+// Home toolbar ===============================================================
+
+// The bar itself is see-through and ignores clicks, so games scroll "under" it and stay visible and
+// clickable around the buttons. Only the buttons, hanging from the top edge, cover anything.
+.home-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+  pointer-events: none;
+
+  .btn {
+    pointer-events: auto;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.home-toolbar-end {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  margin-left: auto;
+}
+
+// Scrolling tab row (appScrollTabs) =========================================
+
+.scroll-tabs {
+  position: relative;
+  margin-bottom: 0.75rem;
+
+  > .nav-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    margin-bottom: 0;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    .nav-item {
+      flex-shrink: 0;
     }
   }
+}
+
+// ‹ › over a fade at whichever edge has more tabs. They stop 2px short of the bottom so the
+// tab row's underline still runs underneath.
+.scroll-tabs-btn {
+  position: absolute;
+  top: 0;
+  bottom: 2px;
+  z-index: 1;
+  display: none;
+  align-items: center;
+  width: 2.5rem;
+  padding: 0 0.35rem;
+  border: 0;
+  color: $primary;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+
+  &.prev {
+    left: 0;
+    justify-content: flex-start;
+    background: linear-gradient(to right, #fff 55%, rgba(255, 255, 255, 0));
+  }
+
+  &.next {
+    right: 0;
+    justify-content: flex-end;
+    background: linear-gradient(to left, #fff 55%, rgba(255, 255, 255, 0));
+  }
+
+  &:hover {
+    color: $success;
+  }
+}
+
+.scroll-tabs.can-prev .scroll-tabs-btn.prev,
+.scroll-tabs.can-next .scroll-tabs-btn.next {
+  display: flex;
 }

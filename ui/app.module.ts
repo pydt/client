@@ -31,6 +31,7 @@ import { TurnCacheService } from "./shared/turnCacheService";
 import { PydtSettingsFactory } from "./shared/pydtSettings";
 import { environment } from "./environments/environment";
 import { SafeMetadataLoader } from "./shared/safeMetadataLoader";
+import { ScrollTabsDirective } from "./shared/scrollTabs.directive";
 
 export const configFactory = (): Configuration =>
   new Configuration({
@@ -50,6 +51,7 @@ export const configFactory = (): Configuration =>
     ProgressbarModule,
     TooltipModule,
     TabsModule,
+    ScrollTabsDirective,
     PydtSharedModule,
     routing,
     MarkdownModule.forRoot({

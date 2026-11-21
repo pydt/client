@@ -1,14 +1,12 @@
 @if (!!games) {
   <div class="card" [ngClass]="{ 'card-primary': yourTurn }">
-    <div class="card-header" style="height: 36px; overflow: hidden">
-      <img
-        src="https://playyourdamnturn.com/img/game_{{ civGame?.id }}.png"
-        style="height: 15px; padding-right: 8px; position: relative; top: -2px"
-      />
-      <a href="javascript:void(0)" (click)="openGameOnWeb()">{{ gameTitle }}</a>
+    <div class="card-header game-header">
+      <a class="game-title" href="javascript:void(0)" (click)="openGameOnWeb()" [title]="gameTitle">
+        <img src="https://playyourdamnturn.com/img/game_{{ civGame?.id }}.png" alt="" />
+        <span>{{ gameTitle }}</span>
+      </a>
       @if (game.gameTurnRangeKey > 1) {
-        <small class="float-end">{{ lastTurnText$ | async }}</small>
-        <small class="float-end">Round {{ game.round }} -&nbsp;</small>
+        <small class="game-meta">Round {{ game.round }} · {{ lastTurnText$ | async }}</small>
       }
     </div>
     <div class="card-body">
