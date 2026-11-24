@@ -31,6 +31,15 @@ import { GamePlayersComponent } from "../home/gamePlayers.component";
 import { MarkdownComponent } from "ngx-markdown";
 import { AsyncPipe } from "@angular/common";
 
+// The save upload to S3 failed (after the fallback, when the api sent one). status 0 = network error.
+class UploadError extends Error {
+  constructor(public readonly status: number) {
+    super(
+      `Uploading the save failed (${status ? `status ${status}` : "network error"}). Please try again in a few minutes.`,
+    );
+  }
+}
+
 @Component({
   selector: "pydt-play-turn",
   templateUrl: "./playTurn.component.html",
@@ -302,37 +311,47 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
     try {
       const startResp = await this.gameService.startSubmit(this.playTurnState.game.gameId).toPromise();
 
-      await new Promise((resolve, reject) => {
-        this.xhr = new XMLHttpRequest();
-        this.xhr.open("PUT", startResp.putUrl, true);
+      // Resolves with the HTTP status, or 0 for a network error
+      const putSave = (url: string) =>
+        new Promise<number>(resolve => {
+          this.xhr = new XMLHttpRequest();
+          this.xhr.open("PUT", url, true);
 
-        this.xhr.upload.onprogress = e => {
-          this.ngZone.run(() => {
-            if (e.lengthComputable) {
-              this.curBytes = Math.round(e.loaded / 1024);
-              this.maxBytes = Math.round(e.total / 1024);
-            }
-          });
-        };
+          this.xhr.upload.onprogress = e => {
+            this.ngZone.run(() => {
+              if (e.lengthComputable) {
+                this.curBytes = Math.round(e.loaded / 1024);
+                this.maxBytes = Math.round(e.total / 1024);
+              }
+            });
+          };
 
-        this.xhr.onload = () => {
-          if (this.xhr.status === 200) {
-            resolve(null);
-          } else {
-            reject(new Error(String(this.xhr.status)));
-          }
+          this.xhr.onload = () => {
+            resolve(this.xhr.status);
+            this.xhr = null;
+          };
 
-          this.xhr = null;
-        };
+          this.xhr.onerror = () => {
+            resolve(0);
+            this.xhr = null;
+          };
 
-        this.xhr.onerror = () => {
-          reject(new Error(String(this.xhr.status)));
-          this.xhr = null;
-        };
+          this.xhr.setRequestHeader("Content-Type", "application/octet-stream");
+          this.xhr.send(fileData as unknown as ArrayBuffer);
+        });
 
-        this.xhr.setRequestHeader("Content-Type", "application/octet-stream");
-        this.xhr.send(fileData as unknown as ArrayBuffer);
-      });
+      let uploadStatus = await putSave(startResp.putUrl);
+
+      // S3 Transfer Acceleration has had 504 outages (forum #14499); retry once on the regular endpoint
+      if ((uploadStatus === 0 || uploadStatus >= 500) && startResp.fallbackPutUrl) {
+        console.warn(`Save upload through S3 Transfer Acceleration failed (${uploadStatus}), retrying directly`);
+        this.curBytes = 0;
+        uploadStatus = await putSave(startResp.fallbackPutUrl);
+      }
+
+      if (uploadStatus !== 200) {
+        throw new UploadError(uploadStatus);
+      }
 
       await this.gameService.finishSubmit(this.playTurnState.game.gameId).toPromise();
       window.pydtApi.fs.renameSync(fileBeingUploaded, moveTo);
@@ -347,6 +366,8 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
       if (err instanceof HttpErrorResponse) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         this.status = err.error.errorMessage;
+      } else if (err instanceof UploadError) {
+        this.status = err.message;
       }
 
       this.curBytes = this.maxBytes = null;
