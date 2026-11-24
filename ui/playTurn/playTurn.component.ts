@@ -183,7 +183,11 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
               window.pydtApi.ipc.send(RPC_TO_MAIN.OPEN_URL, url);
             }
 
-            await this.watchForSave();
+            // OneDrive (and maybe other cloud providers) like to modify
+            // the metadata of files after they are written, which can cause
+            // the "change detector" to fire spuriously. Wait a little longer than
+            // normal before starting the watch to allow this to settle first.
+            await this.watchForSave(10000);
 
             if (this.settings.autoPlay && this.saveFileToUpload) {
               await this.submitFile();
@@ -263,14 +267,14 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
     });
   }
 
-  public watchForSave(): Promise<void> {
+  public watchForSave(delayMs = 5000): Promise<void> {
     this.curBytes = this.maxBytes = null;
     this.status = "Downloaded file!<br />Play Your Damn Turn!";
     this.saveFileToUpload = null;
     this.abort = false;
     this.downloaded = true;
 
-    return new Promise(resolve => setTimeout(resolve, 5000)).then(async () => {
+    return new Promise(resolve => setTimeout(resolve, delayMs)).then(async () => {
       const path = await window.pydtApi.startChokidar({
         path: this.saveDir,
         awaitWriteFinish: this.civGame.awaitWriteFinish,
