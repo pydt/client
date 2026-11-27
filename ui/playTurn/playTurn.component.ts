@@ -306,7 +306,25 @@ export class PlayTurnComponent implements OnInit, OnDestroy {
     this.abort = false;
     this.saveFileToUpload = null;
 
-    const fileData = await window.pydtApi.readFileGzipped(fileBeingUploaded);
+    let fileData: Uint8Array;
+
+    try {
+      fileData = await window.pydtApi.readFileGzipped(fileBeingUploaded);
+    } catch (err) {
+      if (window.pydtApi.fs.existsSync(fileBeingUploaded)) {
+        throw err;
+      }
+
+      // The detected save was moved or deleted before it was submitted (Rollbar #2633, #2637, #2638).
+      // Watch for the next save instead of sitting on "Uploading..." forever. No delay: if the game was
+      // replacing the file (delete, then write) when Submit was clicked, the new one is about to land.
+      void this.watchForSave(0);
+      this.status = `Couldn't find the save file ${window.pydtApi.path.basename(
+        fileBeingUploaded,
+      )} anymore.<br />Save your turn in game again and PYDT will pick it up.`;
+      return;
+    }
+
     const moveTo = window.pydtApi.path.join(
       this.archiveDir,
       `${this.playTurnState.game.gameId.slice(0, 8)}_${window.pydtApi.path.basename(fileBeingUploaded)}`,

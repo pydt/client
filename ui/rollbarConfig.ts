@@ -24,7 +24,10 @@ export const ROLLBAR_CONFIG = {
     "net::ERR_",
     "GET url: https://objects.githubusercontent.com/",
     "GET url: https://github.com/pydt/client/releases",
-    "ENOENT: no such file or directory, open",
+    // Without the "ENOENT: " prefix: errors that come back over IPC lose it
+    "no such file or directory, open",
+    // The user's disk is full
+    "ENOSPC: no space left on device",
   ],
 };
 

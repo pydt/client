@@ -234,10 +234,15 @@ export class HomeComponent implements OnInit, OnDestroy {
       return;
     }
 
-    await window.pydtApi.ipc.invoke(RPC_INVOKE.CIV6_AUTOSTART_REVERT, {
-      dataPath: this.settings.getDefaultDataPath(civ6),
-      waitForExit: false,
-    });
+    try {
+      await window.pydtApi.ipc.invoke(RPC_INVOKE.CIV6_AUTOSTART_REVERT, {
+        dataPath: this.settings.getDefaultDataPath(civ6),
+        waitForExit: false,
+      });
+    } catch (err) {
+      // Best-effort cleanup: if the Civ 6 data path can't be worked out (Rollbar #2634), skip it
+      console.warn("Couldn't revert a stale Civ 6 autostart", err);
+    }
   }
 
   async loadGames(): Promise<void> {
