@@ -6,7 +6,7 @@ import { SafeMetadataLoader } from "./safeMetadataLoader";
 import { STORAGE_CONFIG } from "../storageConfig";
 import { Subject } from "rxjs";
 
-const FIELDS_NOT_TO_PERSIST = ["basePaths"];
+const FIELDS_NOT_TO_PERSIST = ["basePaths", "isNew"];
 
 export class PydtSettingsData {
   launchCiv = true;
@@ -25,12 +25,17 @@ export class PydtSettingsData {
   autoDownload = false;
   autoPlay = false;
 
+  // Nothing saved yet: a fresh install, or nobody has saved Settings (only saving writes the file)
+  readonly isNew: boolean;
+
   constructor(
     civGames: CivGame[],
     prevData: PydtSettingsData,
     private basePaths: { [index: string]: string },
   ) {
-    if (!isEmpty(prevData)) {
+    this.isNew = isEmpty(prevData);
+
+    if (!this.isNew) {
       merge(this, omit(prevData, FIELDS_NOT_TO_PERSIST));
 
       // Make sure numSaves is an int

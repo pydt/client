@@ -15,7 +15,8 @@ import { setTheme } from "ngx-bootstrap/utils";
 import { SafeMetadataLoader } from "./shared/safeMetadataLoader";
 import { AuthService } from "./shared/authService";
 import { UpdateService } from "./shared/updateService";
-import { Router, RouterOutlet } from "@angular/router";
+import { NavigationEnd, Router, RouterOutlet } from "@angular/router";
+import { filter } from "rxjs";
 
 @Component({
   selector: "pydt-app",
@@ -38,10 +39,13 @@ export class AppComponent implements OnInit {
   newVersion: string;
   settings: PydtSettingsData;
   autoPlayEnabled = false;
+  // Ask about starting on boot at most once per run (see maybeAskStartOnBoot)
+  private startOnBootAsked = false;
 
   @ViewChild("aboutModal", { static: true }) aboutModal: TemplateRef<unknown>;
   @ViewChild("updateModal", { static: true }) updateModal: TemplateRef<unknown>;
   @ViewChild("settingsModal", { static: true }) settingsModal: TemplateRef<unknown>;
+  @ViewChild("startOnBootModal", { static: true }) startOnBootModal: TemplateRef<unknown>;
   openModal: BsModalRef;
   civGames: CivGame[];
 
@@ -96,6 +100,11 @@ export class AppComponent implements OnInit {
       });
     });
 
+    // Ask once the signed-in game list shows
+    this.router.events.pipe(filter(e => e instanceof NavigationEnd && e.urlAfterRedirects === "/")).subscribe(() => {
+      void this.maybeAskStartOnBoot();
+    });
+
     window.pydtApi.ipc.receive<string>(RPC_TO_RENDERER.NEW_USER, () => {
       this.zone.run(() => {
         this.hideOpenModal();
@@ -104,9 +113,52 @@ export class AppComponent implements OnInit {
     });
   }
 
+  // On a fresh install (nothing saved yet), ask whether to start on boot (forum #5360). Either answer
+  // saves the settings, so it's only asked once; it stays in Settings as "Start client on boot".
+  private async maybeAskStartOnBoot(): Promise<void> {
+    // Not signed in yet: a fresh install passes through the game list on its way to sign-in,
+    // which would close the pop-up. Signing in comes back here.
+    if (this.startOnBootAsked || !(await this.authService.isAuthenticated())) {
+      return;
+    }
+
+    const settings = await this.pydtSettingsFactory.getSettings();
+
+    if (!settings.isNew) {
+      this.startOnBootAsked = true;
+      return;
+    }
+
+    this.zone.run(() => {
+      // Don't cover another pop-up (an update, say); try again the next time the game list shows
+      if (this.openModal || this.startOnBootAsked) {
+        return;
+      }
+
+      this.startOnBootAsked = true;
+      this.settings = settings;
+      this.openModal = this.modalService.show(this.startOnBootModal);
+    });
+  }
+
+  async answerStartOnBoot(startOnBoot: boolean): Promise<void> {
+    this.settings.startOnBoot = startOnBoot;
+    await this.settings.save();
+    window.pydtApi.setAutostart(startOnBoot);
+    this.pydtSettingsFactory.settingsChanged$.next();
+    this.hideOpenModal();
+  }
+
   private async refreshAutoPlayEnabled(): Promise<void> {
     const settings = await this.pydtSettingsFactory.getSettings();
     this.autoPlayEnabled = settings.autoPlay;
+
+    // Linux AppImage: refresh the start-on-boot entry so it points at this copy of the app (setAutostart
+    // rewrites it there). Linux only: on macOS even checking the entry goes through AppleScript, which
+    // can ask the user for permission.
+    if (settings.startOnBoot && window.pydtApi.platform === "linux") {
+      window.pydtApi.setAutostart(true);
+    }
   }
 
   openReleaseNotes(): void {

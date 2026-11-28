@@ -39,19 +39,42 @@ electron.contextBridge.exposeInMainWorld("pydtApi", {
   setAutostart: arg => {
     electron.ipcRenderer.send(RPC_TO_MAIN.LOG_INFO, "set-autostart");
 
+    const name = "Play Your Damn Turn Client";
+    const appImage = process.env.APPIMAGE;
     const launcher = new AutoLaunch({
-      name: "Play Your Damn Turn Client",
+      name,
+      // A running AppImage lives in a temporary mount (/tmp/.mount_xxx) that changes every launch, so
+      // auto-launch's default (process.execPath) would point at a folder that's gone after a reboot.
+      // APPIMAGE is set by the AppImage runtime to the real .AppImage file.
+      ...(appImage ? { path: appImage } : {}),
     });
+    let cleanup = Promise.resolve();
 
-    launcher
-      .isEnabled()
+    if (appImage) {
+      // auto-launch names the entry after the path's file name, which for an AppImage includes the
+      // version; keep one fixed name so a new version replaces the entry instead of adding another
+      launcher.opts.appName = name;
+
+      if (appImage.includes(" ")) {
+        launcher.opts.appPath = `"${appImage}"`;
+      }
+
+      // Older clients wrote an entry named after the executable, pointing at the temporary mount.
+      // It can't start anything, so remove it (a default AutoLaunch targets exactly that entry).
+      cleanup = new AutoLaunch({ name }).disable().catch(() => null);
+    }
+
+    cleanup
+      .then(() => launcher.isEnabled())
       .then(isEnabled => {
         if (isEnabled && !arg) {
           electron.ipcRenderer.send(RPC_TO_MAIN.LOG_INFO, "Disabling auto start...");
           return launcher.disable();
         }
 
-        if (!isEnabled && !!arg) {
+        // On an AppImage, rewrite the entry even if one exists: older clients wrote the temporary mount
+        // path, and each downloaded version has its own file name.
+        if (!!arg && (!isEnabled || appImage)) {
           electron.ipcRenderer.send(RPC_TO_MAIN.LOG_INFO, "Enabling auto start...");
           return launcher.enable();
         }

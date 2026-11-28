@@ -233,6 +233,24 @@
   </div>
 </ng-template>
 
+<ng-template #startOnBootModal>
+  <div class="modal-header">
+    <h5 class="modal-title">Start on boot?</h5>
+    <button type="button" class="btn-close" (click)="hideOpenModal()" aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <p>
+      Start the Play Your Damn Turn client when your computer starts? It runs in the background and lets you know when
+      it's your turn.
+    </p>
+    <p class="mb-0 text-muted">You can change this any time in Settings.</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="answerStartOnBoot(false)">No thanks</button>
+    <button type="button" class="btn btn-primary" (click)="answerStartOnBoot(true)">Yes</button>
+  </div>
+</ng-template>
+
 <ng-template #updateModal>
   <div class="modal-header">
     <h5 class="modal-title">Update Available</h5>
